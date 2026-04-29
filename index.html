@@ -3,868 +3,1415 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FBI</title>
+    <title>GOV — Law Enforcement Portal</title>
 
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone@7.23.5/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --gold: #c9a84c;
-            --gold-bright: #f0d060;
-            --crimson: #8b0000;
-            --crimson-bright: #cc1111;
-            --navy: #020610;
-            --panel: rgba(4,10,26,0.97);
-            --glass: rgba(255,255,255,0.03);
-            --border-gold: rgba(201,168,76,0.25);
-            --border-dim: rgba(255,255,255,0.07);
+            /* Government palette */
+            --bg:       #f0f2f5;
+            --surface:  #ffffff;
+            --surface2: #f7f8fa;
+            --border:   #d1d5db;
+            --border2:  #e5e8ec;
+            --text:     #0f1923;
+            --text2:    #4b5563;
+            --text3:    #9ca3af;
+
+            /* FBI accent */
+            --fbi:      #1a3a6e;
+            --fbi-dark: #0f2347;
+            --fbi-light:#2756a8;
+            --fbi-glow: rgba(26,58,110,0.12);
+
+            /* STF accent */
+            --stf:      #1a5c2e;
+            --stf-dark: #0f3a1c;
+            --stf-light:#22803f;
+            --stf-glow: rgba(26,92,46,0.12);
+
+            /* Joint */
+            --joint:    #7c1d1d;
+            --joint-light:#a52828;
+
+            --danger:   #dc2626;
+            --warning:  #d97706;
+            --success:  #16a34a;
+            --mono:     'IBM Plex Mono', monospace;
+            --sans:     'IBM Plex Sans', sans-serif;
+            --display:  'Oswald', sans-serif;
+
+            --radius: 6px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.12);
         }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--navy); color: #ddd8c8; font-family: 'Rajdhani', sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
-        .mono { font-family: 'Share Tech Mono', monospace; }
-        .display { font-family: 'Bebas Neue', cursive; }
+        body { background: var(--bg); color: var(--text); font-family: var(--sans); height: 100vh; width: 100vw; overflow: hidden; font-size: 14px; }
 
-        body::after {
-            content: '';
-            position: fixed; inset: 0;
-            background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px);
-            pointer-events: none; z-index: 9999;
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+        /* ── Typography ── */
+        .mono   { font-family: var(--mono); }
+        .display{ font-family: var(--display); }
+
+        /* ── Animations ── */
+        @keyframes fadeIn  { from { opacity:0 } to { opacity:1 } }
+        @keyframes fadeUp  { from { opacity:0; transform:translateY(16px) } to { opacity:1; transform:translateY(0) } }
+        @keyframes slideR  { from { opacity:0; transform:translateX(-12px) } to { opacity:1; transform:translateX(0) } }
+        @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:.4} }
+        @keyframes spin    { to{transform:rotate(360deg)} }
+        @keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+
+        .fade-in  { animation: fadeIn  .35s ease both }
+        .fade-up  { animation: fadeUp  .4s ease both }
+        .slide-r  { animation: slideR  .3s ease both }
+
+        .spin { animation: spin 1s linear infinite }
+
+        /* ── Cards & Surfaces ── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
         }
-        .grid-overlay {
-            position: fixed; inset: 0;
-            background-image: linear-gradient(rgba(201,168,76,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.035) 1px, transparent 1px);
-            background-size: 44px 44px; pointer-events: none; z-index: 0;
+        .card-inset {
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: var(--radius);
         }
-        .corner-tl, .corner-tr, .corner-bl, .corner-br { position: absolute; width: 18px; height: 18px; border-color: var(--gold); border-style: solid; opacity: 0.4; }
-        .corner-tl { top: 10px; left: 10px; border-width: 2px 0 0 2px; }
-        .corner-tr { top: 10px; right: 10px; border-width: 2px 2px 0 0; }
-        .corner-bl { bottom: 10px; left: 10px; border-width: 0 0 2px 2px; }
-        .corner-br { bottom: 10px; right: 10px; border-width: 0 2px 2px 0; }
 
-        .glass-card { background: var(--panel); border: 1px solid var(--border-gold); border-radius: 4px; box-shadow: 0 0 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(201,168,76,0.1); position: relative; }
-        .fbi-input { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(201,168,76,0.2); border-radius: 3px; padding: 12px 16px; color: #e8e4d8; font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; letter-spacing: 0.05em; }
-        .fbi-input:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(201,168,76,0.1); }
-        .fbi-input::placeholder { color: #333; letter-spacing: 0.1em; }
-        select.fbi-input option { background: #0a0f1e; color: #e8e4d8; }
-        textarea.fbi-input { resize: none; }
+        /* ── Buttons ── */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 10px 18px; border-radius: var(--radius); border: none; cursor: pointer;
+            font-family: var(--sans); font-weight: 600; font-size: 0.82rem;
+            letter-spacing: 0.04em; transition: all .18s ease; white-space: nowrap;
+        }
+        .btn-primary-fbi { background: var(--fbi); color: #fff; }
+        .btn-primary-fbi:hover { background: var(--fbi-light); box-shadow: 0 4px 12px rgba(26,58,110,.3); }
+        .btn-primary-stf { background: var(--stf); color: #fff; }
+        .btn-primary-stf:hover { background: var(--stf-light); box-shadow: 0 4px 12px rgba(26,92,46,.3); }
+        .btn-primary-joint { background: var(--joint); color: #fff; }
+        .btn-primary-joint:hover { background: var(--joint-light); }
+        .btn-outline { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+        .btn-outline:hover { background: var(--surface2); border-color: var(--text3); }
+        .btn-ghost  { background: transparent; color: var(--text2); border: none; padding: 8px 12px; }
+        .btn-ghost:hover  { background: var(--surface2); }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn:disabled { opacity: .5; cursor: not-allowed; }
+        .btn-sm { padding: 6px 12px; font-size: 0.75rem; }
+        .btn-xs { padding: 4px 8px; font-size: 0.7rem; }
 
-        .btn-gold { background: linear-gradient(135deg, #7a5e20, #c9a84c, #7a5e20); color: #0a0f1e; font-family: 'Bebas Neue', cursive; letter-spacing: 0.25em; font-size: 1rem; padding: 12px 24px; border: none; border-radius: 3px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 20px rgba(201,168,76,0.2); }
-        .btn-gold:hover { box-shadow: 0 4px 30px rgba(201,168,76,0.4); filter: brightness(1.1); }
-        .btn-gold:active { transform: scale(0.97); }
-        .btn-red { background: linear-gradient(135deg, #5a0000, #8b0000, #5a0000); color: #ffcdd2; font-family: 'Bebas Neue', cursive; letter-spacing: 0.25em; font-size: 1rem; padding: 12px 24px; border: none; border-radius: 3px; cursor: pointer; transition: all 0.2s; }
-        .btn-red:hover { filter: brightness(1.2); }
-        .btn-ghost { background: transparent; color: var(--gold); font-family: 'Bebas Neue', cursive; letter-spacing: 0.2em; font-size: 0.9rem; padding: 10px 18px; border: 1px solid var(--border-gold); border-radius: 3px; cursor: pointer; transition: all 0.2s; }
-        .btn-ghost:hover { background: rgba(201,168,76,0.08); border-color: var(--gold); }
+        /* ── Form inputs ── */
+        .input {
+            width: 100%; padding: 10px 14px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); font-family: var(--sans); font-size: 0.85rem;
+            color: var(--text); outline: none; transition: border-color .15s, box-shadow .15s;
+        }
+        .input:focus { border-color: var(--fbi); box-shadow: 0 0 0 3px rgba(26,58,110,.08); }
+        .input-stf:focus { border-color: var(--stf); box-shadow: 0 0 0 3px rgba(26,92,46,.08); }
+        .input::placeholder { color: var(--text3); }
+        select.input option { background: var(--surface); }
+        textarea.input { resize: none; }
+        .label { display: block; font-size: 0.72rem; font-weight: 600; color: var(--text2); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
 
-        @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-        @keyframes scanDown { 0% { transform:translateY(-100%); opacity:0.5; } 100% { transform:translateY(100vh); opacity:0; } }
-        @keyframes sealPulse { 0%,100% { filter:drop-shadow(0 0 20px rgba(201,168,76,0.3)); } 50% { filter:drop-shadow(0 0 45px rgba(201,168,76,0.6)); } }
-        @keyframes pulseAnim { 0% { box-shadow:0 0 0 0 rgba(22,163,74,0.5); } 50% { box-shadow:0 0 0 6px rgba(22,163,74,0); } 100% { box-shadow:0 0 0 0 rgba(22,163,74,0); } }
-        @keyframes ticker { from { transform:translateX(100%); } to { transform:translateX(-200%); } }
-        @keyframes slideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+        /* ── Badges ── */
+        .badge { display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-family:var(--mono);font-size:0.62rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase; }
+        .badge-open    { background:#fef2f2;color:#dc2626;border:1px solid #fecaca; }
+        .badge-closed  { background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0; }
+        .badge-pending { background:#fffbeb;color:#d97706;border:1px solid #fed7aa; }
+        .badge-fbi     { background:#eff6ff;color:var(--fbi);border:1px solid #bfdbfe; }
+        .badge-stf     { background:#f0fdf4;color:var(--stf);border:1px solid #bbf7d0; }
+        .badge-joint   { background:#fef2f2;color:var(--joint);border:1px solid #fecaca; }
+        .badge-blue    { background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe; }
 
-        .scan-line { position:absolute; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent); animation:scanDown 4s linear infinite; pointer-events:none; z-index:10; }
-        .animate-fade-up { animation: fadeUp 0.5s ease forwards; }
-        .pulse-dot { width:8px; height:8px; border-radius:50%; background:#16a34a; box-shadow:0 0 0 0 rgba(22,163,74,0.5); animation:pulseAnim 2s ease-in-out infinite; }
-        .ticker-inner { display:inline-block; animation:ticker 30s linear infinite; white-space:nowrap; }
+        /* ── Table rows ── */
+        .data-row {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 14px 16px; border-bottom: 1px solid var(--border2);
+            transition: background .15s;
+        }
+        .data-row:last-child { border-bottom: none; }
+        .data-row:hover { background: var(--surface2); }
 
-        .bottom-nav { background:rgba(2,6,16,0.98); border-top:1px solid var(--border-gold); }
-        .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:8px 10px; border-radius:4px; transition:all 0.2s; position:relative; }
-        .nav-item.active { color:var(--gold-bright); }
-        .nav-item.active::after { content:''; position:absolute; bottom:-1px; left:20%; width:60%; height:2px; background:var(--gold); border-radius:2px 2px 0 0; }
-        .nav-item:not(.active) { color:#2a2a3a; }
+        /* ── Nav ── */
+        .nav-tab {
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            padding: 8px 6px; cursor: pointer; border-radius: var(--radius);
+            transition: all .15s; position: relative; min-width: 48px;
+        }
+        .nav-tab span { font-size: 0.5rem; font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
+        .nav-tab i { font-size: 1rem; }
+        .nav-tab.active-fbi   { color: var(--fbi); }
+        .nav-tab.active-stf   { color: var(--stf); }
+        .nav-tab.active-joint { color: var(--joint); }
+        .nav-tab.inactive { color: var(--text3); }
+        .nav-tab.active-fbi::after, .nav-tab.active-stf::after, .nav-tab.active-joint::after {
+            content: ''; position: absolute; bottom: -10px; left: 20%; width: 60%; height: 2px; border-radius: 2px 2px 0 0;
+        }
+        .nav-tab.active-fbi::after   { background: var(--fbi); }
+        .nav-tab.active-stf::after   { background: var(--stf); }
+        .nav-tab.active-joint::after { background: var(--joint); }
 
-        .badge { font-family:'Share Tech Mono',monospace; font-size:0.6rem; padding:3px 8px; border-radius:2px; letter-spacing:0.15em; text-transform:uppercase; }
-        .badge-open   { background:rgba(180,30,30,0.15); color:#f87171; border:1px solid rgba(180,30,30,0.3); }
-        .badge-closed { background:rgba(30,160,80,0.12); color:#4ade80; border:1px solid rgba(30,160,80,0.25); }
-        .badge-gold   { background:rgba(201,168,76,0.12); color:var(--gold); border:1px solid var(--border-gold); }
+        /* ── Status dot ── */
+        .dot { width:7px;height:7px;border-radius:50%;display:inline-block; }
+        .dot-green  { background:#16a34a;box-shadow:0 0 0 0 rgba(22,163,74,.5);animation:dotPulse 2s ease-in-out infinite; }
+        .dot-red    { background:#dc2626; }
+        .dot-orange { background:#d97706; }
+        @keyframes dotPulse { 0%{box-shadow:0 0 0 0 rgba(22,163,74,.5)}70%{box-shadow:0 0 0 5px rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)} }
 
-        .data-row { background:var(--glass); border:1px solid var(--border-dim); border-left:3px solid var(--gold); border-radius:3px; padding:14px 16px; transition:background 0.2s; }
-        .data-row:hover { background:rgba(201,168,76,0.04); }
-        .data-row-red { border-left-color:var(--crimson-bright); }
+        /* ── Modal ── */
+        .modal-backdrop {
+            position:fixed;inset:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);
+            z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;
+            animation:fadeIn .2s ease;
+        }
+        .modal-box {
+            background:var(--surface);border:1px solid var(--border);border-radius:8px;
+            width:100%;max-width:480px;max-height:90vh;overflow-y:auto;
+            box-shadow:var(--shadow-lg);animation:fadeUp .25s ease;
+        }
+        .modal-header { padding:20px 24px 16px;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center; }
+        .modal-body   { padding:20px 24px; }
+        .modal-footer { padding:16px 24px;border-top:1px solid var(--border2);display:flex;gap:10px;justify-content:flex-end; }
 
-        .stat-card { background:var(--glass); border:1px solid var(--border-dim); border-radius:3px; padding:18px 16px; position:relative; overflow:hidden; }
-        .stat-card::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; }
-        .stat-card.blue::before { background:#1d4ed8; }
-        .stat-card.red::before  { background:var(--crimson-bright); }
-        .stat-card.gold::before { background:var(--gold); }
-        .stat-card.green::before { background:#16a34a; }
+        /* ── Top bar ── */
+        .topbar { background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;box-shadow:var(--shadow); }
 
-        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.88); backdrop-filter:blur(12px); z-index:500; display:flex; align-items:center; justify-content:center; padding:20px; animation:fadeIn 0.2s ease; }
+        /* ── Sector strip ── */
+        .sector-strip-fbi   { background:var(--fbi);height:3px;width:100%; }
+        .sector-strip-stf   { background:var(--stf);height:3px;width:100%; }
+        .sector-strip-joint { background:var(--joint);height:3px;width:100%; }
 
-        .wanted-img { width:100%; height:180px; object-fit:cover; filter:grayscale(30%) contrast(1.1); border-bottom:3px solid var(--crimson-bright); }
-        .log-entry { font-family:'Share Tech Mono',monospace; font-size:0.72rem; color:#2a3a2a; padding:7px 12px; border-bottom:1px solid rgba(255,255,255,0.03); letter-spacing:0.05em; }
-        .log-entry .t { color:var(--gold); }
-        .log-entry .u { color:#2a4a3a; }
-        .log-entry .a { color:#2a3a4a; }
+        /* ── Stat card ── */
+        .stat-card { padding:16px;display:flex;flex-direction:column;gap:4px; }
+        .stat-val   { font-family:var(--display);font-size:2rem;line-height:1; }
+        .stat-label { font-size:0.65rem;font-family:var(--mono);letter-spacing:0.12em;text-transform:uppercase;color:var(--text3); }
 
-        .progress-bar { height:3px; background:rgba(201,168,76,0.1); border-radius:2px; overflow:hidden; }
-        .progress-fill { height:100%; background:linear-gradient(90deg,var(--gold),var(--gold-bright)); border-radius:2px; transition:width 1s ease; }
+        /* ── Progress ── */
+        .progress-track { height:4px;background:var(--border2);border-radius:2px;overflow:hidden; }
+        .progress-fill  { height:100%;border-radius:2px;transition:width 1s ease; }
 
-        ::-webkit-scrollbar { width:3px; }
-        ::-webkit-scrollbar-track { background:transparent; }
-        ::-webkit-scrollbar-thumb { background:var(--border-gold); border-radius:2px; }
-        .divider { border:none; border-top:1px solid var(--border-dim); margin:14px 0; }
-        .hero-title { font-family:'Bebas Neue',cursive; font-size:clamp(2.8rem,9vw,7rem); line-height:0.88; letter-spacing:0.06em; background:linear-gradient(180deg,#f2c84a 0%,#c9a84c 45%,#7a5e20 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-        .classified-stripe { background:repeating-linear-gradient(-50deg,#8b0000,#8b0000 8px,#111 8px,#111 16px); }
+        /* ── Divider ── */
+        .divider { border:none;border-top:1px solid var(--border2);margin:14px 0; }
 
-        .alert-item { background:rgba(255,68,68,0.05); border-left:4px solid #ff4444; padding:12px; margin-bottom:10px; display:flex; gap:15px; align-items:center; animation:slideIn 0.3s ease-out; }
-        .unit-card { padding:10px; background:rgba(255,255,255,0.02); border-left:3px solid var(--gold); display:flex; justify-content:space-between; align-items:center; }
+        /* ── Alert banner ── */
+        .alert { padding:12px 16px;border-radius:var(--radius);border-left:4px solid;margin-bottom:10px; }
+        .alert-info    { background:#eff6ff;border-color:var(--fbi);color:var(--fbi-dark); }
+        .alert-warning { background:#fffbeb;border-color:var(--warning);color:#92400e; }
+        .alert-danger  { background:#fef2f2;border-color:var(--danger);color:#991b1b; }
+        .alert-success { background:#f0fdf4;border-color:var(--success);color:#14532d; }
+
+        /* ── Home hero ── */
+        .gov-header {
+            background: linear-gradient(135deg, #0f1923 0%, #1a2a3e 50%, #0f1923 100%);
+            color: white; padding: 48px 24px; text-align: center;
+        }
+
+        /* ── Log entry ── */
+        .log-entry { padding:8px 16px;border-bottom:1px solid var(--border2);font-family:var(--mono);font-size:0.68rem;color:var(--text2); }
+        .log-time  { color:var(--text3); }
+        .log-user  { font-weight:600; }
+
+        /* ── Wanted card ── */
+        .wanted-photo { width:100%;height:160px;object-fit:cover;border-bottom:3px solid var(--danger);display:block; }
+
+        /* ── Joint mission card ── */
+        .mission-card { padding:16px;border-left:4px solid var(--joint); }
+        .mission-card.approved { border-left-color:var(--success); }
+        .mission-card.pending  { border-left-color:var(--warning); }
+
+        /* ── Unit card ── */
+        .unit-item { padding:10px 14px;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center; }
+        .unit-item:last-child { border-bottom:none; }
+
+        /* home page sector cards */
+        .sector-choice {
+            border: 2px solid var(--border); border-radius: 10px; padding: 32px 24px;
+            cursor: pointer; transition: all .2s ease; text-align: center;
+            background: var(--surface);
+        }
+        .sector-choice:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+        .sector-choice.fbi-choice:hover { border-color: var(--fbi); }
+        .sector-choice.stf-choice:hover { border-color: var(--stf); }
     </style>
 </head>
 <body>
-<div class="grid-overlay"></div>
 <div id="root"></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, setDoc, doc, deleteDoc, query, orderBy, addDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
-    const firebaseConfig = { apiKey:"AIzaSyCYgffN2dA7IILMbI2i_1YfERkKWIrpHyA", authDomain:"ek-police.firebaseapp.com", projectId:"ek-police", storageBucket:"ek-police.firebasestorage.app", messagingSenderId:"300605258409", appId:"1:300605258409:web:f265025ffa5592f651c7b8" };
+    import { getFirestore, collection, onSnapshot, setDoc, doc, deleteDoc, query, orderBy, addDoc, updateDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey:"AIzaSyCYgffN2dA7IILMbI2i_1YfERkKWIrpHyA",
+        authDomain:"ek-police.firebaseapp.com",
+        projectId:"ek-police",
+        storageBucket:"ek-police.firebasestorage.app",
+        messagingSenderId:"300605258409",
+        appId:"1:300605258409:web:f265025ffa5592f651c7b8"
+    };
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
     window.fbDB    = db;
-    window.fbTools = { collection, onSnapshot, setDoc, doc, deleteDoc, query, orderBy, addDoc, updateDoc, serverTimestamp };
+    window.fbTools = { collection, onSnapshot, setDoc, doc, deleteDoc, query, orderBy, addDoc, updateDoc, serverTimestamp, getDoc };
 </script>
 
 <script type="text/babel">
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect, useRef, useCallback } = React;
 
-const FBI_RANKS = ["Director","Deputy Director","Associate Deputy Director","Executive Assistant Director","Assistant Director","Deputy Assistant Director","Special Agent in Charge (SAC)","Assistant Special Agent in Charge (ASAC)","Supervisory Special Agent (SSA)","Senior Special Agent","Special Agent"];
-const TICKER = "⬛ CLASSIFIED CHANNEL ACTIVE — ALL TRANSMISSIONS MONITORED — UNAUTHORIZED ACCESS WILL BE PROSECUTED — FBI Federal Bureau of Investigation — SECURE UPLINK ESTABLISHED ⬛";
+/* ═══════════════════════════════════════════════════════
+   CONSTANTS
+═══════════════════════════════════════════════════════ */
+const FBI_RANKS = [
+    "Director","Deputy Director","Associate Deputy Director",
+    "Executive Assistant Director","Assistant Director",
+    "Deputy Assistant Director","Special Agent in Charge (SAC)",
+    "Assistant Special Agent in Charge (ASAC)",
+    "Supervisory Special Agent (SSA)","Senior Special Agent","Special Agent"
+];
 
-const Corners = () => (<><div className="corner-tl"/><div className="corner-tr"/><div className="corner-bl"/><div className="corner-br"/></>);
-const ScanLine = () => <div className="scan-line"/>;
+const STF_RANKS = [
+    "Chief of STF","Deputy Chief of STF","Special Commander",
+    "Tactical Commander","Commander","Colonel","Major","Captain",
+    "First Lieutenant","Lieutenant","Specialist","Sergeant Major",
+    "Staff Sergeant","Sergeant","Senior Operator","Corporal",
+    "Operator III","Operator II","Operator I","Operator","Recruit"
+];
+
+// Top 3 ranks = privileged (command access)
+const FBI_COMMAND_RANKS  = ["Director","Deputy Director","Associate Deputy Director"];
+const STF_COMMAND_RANKS  = ["Chief of STF","Deputy Chief of STF","Special Commander","Tactical Commander"];
+
+const FBI_LOGO = "https://upload.wikimedia.org/wikipedia/commons/d/da/Seal_of_the_Federal_Bureau_of_Investigation.svg";
+const STF_LOGO = "https://images-ext-1.discordapp.net/external/GD2zASQEW6XYLEDjS6UI4pNPNUDTQciZs75K7AFDSdw/%3Fsize%3D1024/https/cdn.discordapp.com/icons/1497354040496099431/fea2740930f5d8f433b000ed5f97b1d7.png?format=webp&quality=lossless&width=320&height=320";
+
+const MAP_URL_FBI = 'https://github.com/salmAlzaabi/FBI/blob/main/IMG_2479.jpg?raw=true';
+const MAP_URL_STF = 'https://github.com/salmAlzaabi/FBI/blob/main/IMG_2479.jpg?raw=true';
+
+/* ═══════════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════════ */
+const getSector = (email='') => {
+    if (email.toLowerCase().endsWith('@fbi.gov')) return 'fbi';
+    if (email.toLowerCase().endsWith('@stf.gov')) return 'stf';
+    return null;
+};
+
+const isCommandRank = (sector, rank) => {
+    if (!rank) return false;
+    if (sector === 'fbi') return FBI_COMMAND_RANKS.includes(rank) || rank === 'Director';
+    if (sector === 'stf') return STF_COMMAND_RANKS.includes(rank);
+    return false;
+};
+
+/* ═══════════════════════════════════════════════════════
+   SHARED TINY COMPONENTS
+═══════════════════════════════════════════════════════ */
+const Spinner = () => <i className="fas fa-circle-notch spin" style={{fontSize:'1.1rem',color:'inherit'}}/>;
+const Dot = ({status}) => <span className={`dot dot-${status}`}/>;
 const Divider = () => <hr className="divider"/>;
-const PulseDot = () => <div style={{width:8,height:8,borderRadius:'50%',background:'#16a34a',boxShadow:'0 0 0 0 rgba(22,163,74,0.5)',animation:'pulseAnim 2s ease-in-out infinite'}}/>;
-const Ticker = () => (
-    <div style={{overflow:'hidden',background:'rgba(0,0,0,0.5)',borderTop:'1px solid rgba(201,168,76,0.1)',borderBottom:'1px solid rgba(201,168,76,0.1)',padding:'4px 0'}}>
-        <p className="ticker-inner mono" style={{color:'#253525',fontSize:'0.55rem',letterSpacing:'0.08em'}}>{TICKER} &nbsp;&nbsp;&nbsp; {TICKER}</p>
+
+const Empty = ({icon, text}) => (
+    <div style={{textAlign:'center',padding:'48px 20px',color:'var(--text3)'}}>
+        <i className={`fas ${icon}`} style={{fontSize:'2rem',display:'block',marginBottom:12,opacity:.3}}/>
+        <p className="mono" style={{fontSize:'0.7rem',letterSpacing:'0.15em'}}>{text}</p>
     </div>
 );
 
+const FormField = ({label, children}) => (
+    <div style={{display:'flex',flexDirection:'column',gap:4}}>
+        <label className="label">{label}</label>
+        {children}
+    </div>
+);
+
+/* ═══════════════════════════════════════════════════════
+   ROOT APP
+═══════════════════════════════════════════════════════ */
 const App = () => {
-    const [screen,       setScreen]       = useState('home');
-    const [activeTab,    setActiveTab]    = useState('dashboard');
-    const [activeModal,  setActiveModal]  = useState(null);
-    const [itemToEdit,   setItemToEdit]   = useState(null);
-    const [currentUser,  setCurrentUser]  = useState(null);
-    const [searchQuery,  setSearchQuery]  = useState('');
-    const [activityLog,  setActivityLog]  = useState([]);
-    const [loginError,   setLoginError]   = useState('');
+    const [screen, setScreen] = useState('home'); // home | login | fbi | stf
+    const [currentUser, setCurrentUser] = useState(null);
+    const [loginError, setLoginError] = useState('');
     const [loginLoading, setLoginLoading] = useState(false);
-    const [allUsers,     setAllUsers]     = useState([]);
-    const [allWanted,    setAllWanted]    = useState([]);
-    const [allCases,     setAllCases]     = useState([]);
-    const [allCivilians, setAllCivilians] = useState([]);
-    const [allOnDuty,    setAllOnDuty]    = useState([]);
-    const [allMarkers,   setAllMarkers]   = useState([]);
-    const [allAlerts,    setAllAlerts]    = useState([]);
+    const [loginSector, setLoginSector] = useState(null); // detected sector during login
+
+    // Shared Firestore data
+    const [fbiUsers,     setFbiUsers]     = useState([]);
+    const [stfUsers,     setStfUsers]     = useState([]);
+    const [fbiCases,     setFbicases]     = useState([]);
+    const [stfCases,     setStfCases]     = useState([]);
+    const [fbiWanted,    setFbiWanted]    = useState([]);
+    const [stfWanted,    setStfWanted]    = useState([]);
+    const [fbiCivilians, setFbiCivilians] = useState([]);
+    const [stfCivilians, setStfCivilians] = useState([]);
+    const [fbiDuty,      setFbiDuty]      = useState([]);
+    const [stfDuty,      setStfDuty]      = useState([]);
+    const [fbiMarkers,   setFbiMarkers]   = useState([]);
+    const [stfMarkers,   setStfMarkers]   = useState([]);
+    const [jointMissions,setJointMissions]= useState([]);
+    const [activityLog,  setActivityLog]  = useState([]);
 
     useEffect(() => {
         if (!window.fbTools) return;
         const db = window.fbDB, T = window.fbTools;
-        const u1 = T.onSnapshot(T.collection(db,'users'),     s => setAllUsers(s.docs.map(d=>({...d.data(),id:d.id}))));
-        const u2 = T.onSnapshot(T.collection(db,'wanted'),    s => setAllWanted(s.docs.map(d=>({...d.data(),id:d.id}))));
-        const u3 = T.onSnapshot(T.collection(db,'civilians'), s => setAllCivilians(s.docs.map(d=>({...d.data(),id:d.id}))));
-        const q  = T.query(T.collection(db,'fbi_cases'),T.orderBy('createdAt','desc'));
-        const u4 = T.onSnapshot(q, s => setAllCases(s.docs.map(d=>({...d.data(),id:d.id}))));
-        const u5 = T.onSnapshot(T.collection(db,'ops_duty'),    s => setAllOnDuty(s.docs.map(d=>({...d.data(),id:d.id}))));
-        const u6 = T.onSnapshot(T.collection(db,'ops_markers'), s => setAllMarkers(s.docs.map(d=>({...d.data(),id:d.id}))));
-        const u7 = T.onSnapshot(T.query(T.collection(db,'map_alerts'),T.orderBy('timestamp','desc')), s => {
-            setAllAlerts(s.docs.map(d=>({...d.data(),id:d.id})));
-        });
-        return () => { u1(); u2(); u3(); u4(); u5(); u6(); u7(); };
+        const subs = [
+            T.onSnapshot(T.collection(db,'fbi_users'),      s => setFbiUsers(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.collection(db,'stf_users'),      s => setStfUsers(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.query(T.collection(db,'fbi_cases'),   T.orderBy('createdAt','desc')), s => setFbicases(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.query(T.collection(db,'stf_cases'),   T.orderBy('createdAt','desc')), s => setStfCases(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.collection(db,'fbi_wanted'),     s => setFbiWanted(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.collection(db,'stf_wanted'),     s => setStfWanted(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.collection(db,'fbi_civilians'),  s => setFbiCivilians(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.collection(db,'stf_civilians'),  s => setStfCivilians(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.collection(db,'fbi_duty'),       s => setFbiDuty(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.collection(db,'stf_duty'),       s => setStfDuty(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.collection(db,'fbi_markers'),    s => setFbiMarkers(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.collection(db,'stf_markers'),    s => setStfMarkers(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.query(T.collection(db,'joint_missions'), T.orderBy('createdAt','desc')), s => setJointMissions(s.docs.map(d=>({...d.data(),id:d.id})))),
+        ];
+        return () => subs.forEach(u => u());
     }, []);
 
-    const addLog = (action) => {
+    const addLog = useCallback((action) => {
         const now = new Date();
-        setActivityLog(prev => [{ time:now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'}), action, user:currentUser?.name||'SYSTEM' }, ...prev].slice(0,50));
-    };
+        setActivityLog(prev => [{
+            time: now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),
+            action, user: currentUser?.name||'SYSTEM', sector: currentUser?.sector||'—'
+        }, ...prev].slice(0,60));
+    }, [currentUser]);
 
-    const doLogin = () => {
-        const email = document.getElementById('auth_email').value.trim();
-        const pass  = document.getElementById('auth_password').value.trim();
+    /* ── LOGIN ── */
+    const doLogin = async () => {
+        const email = document.getElementById('auth_email')?.value?.trim();
+        const pass  = document.getElementById('auth_pass')?.value?.trim();
+        if (!email || !pass) { setLoginError('ENTER CREDENTIALS'); return; }
+
+        const sector = getSector(email);
+        if (!sector) { setLoginError('INVALID EMAIL DOMAIN — USE @fbi.gov OR @stf.gov'); return; }
+
         setLoginError(''); setLoginLoading(true);
-        setTimeout(() => {
-            if (email === 'admin@fbi.gov' && pass === '123456') {
-                const admin = { name:'System Administrator', rank:'Director', access:'command', id:'admin@fbi.gov' };
-                setCurrentUser(admin); setScreen('app'); setLoginLoading(false);
-                setTimeout(() => addLog('Authenticated — Director access granted'), 100);
-                return;
-            }
-            const match = allUsers.find(u => u.id === email && u.password === pass);
-            if (match) {
-                setCurrentUser(match); setScreen('app'); setLoginLoading(false);
-                setTimeout(() => addLog(`Authenticated — ${match.rank} access granted`), 100);
-            } else {
-                setLoginError('ACCESS DENIED — INVALID CREDENTIALS'); setLoginLoading(false);
-            }
-        }, 1200);
+
+        await new Promise(r => setTimeout(r, 900));
+
+        // Hardcoded admins
+        if (sector === 'fbi' && email === 'admin@fbi.gov' && pass === '123456') {
+            const u = { name:'System Administrator', rank:'Director', access:'command', id:'admin@fbi.gov', sector:'fbi' };
+            setCurrentUser(u); setScreen('fbi'); setLoginLoading(false);
+            setTimeout(() => addLog('Authenticated — Director access granted'), 200);
+            return;
+        }
+        if (sector === 'stf' && email === 'T0@stf.gov' && pass === '1234') {
+            const u = { name:'System Administrator', rank:'Chief of STF', access:'command', id:'T0@stf.gov', sector:'stf' };
+            setCurrentUser(u); setScreen('stf'); setLoginLoading(false);
+            setTimeout(() => addLog('Authenticated — Chief of STF access granted'), 200);
+            return;
+        }
+
+        // Firestore lookup
+        const col = sector === 'fbi' ? fbiUsers : stfUsers;
+        const match = col.find(u => u.id === email && u.password === pass);
+        if (match) {
+            const u = { ...match, sector };
+            setCurrentUser(u); setScreen(sector); setLoginLoading(false);
+            setTimeout(() => addLog(`Authenticated — ${match.rank}`), 200);
+        } else {
+            setLoginError('ACCESS DENIED — INVALID CREDENTIALS'); setLoginLoading(false);
+        }
     };
 
-    const doLogout = () => { addLog('Session terminated'); setCurrentUser(null); setScreen('home'); setActiveTab('dashboard'); };
-    const isPrivileged = currentUser?.access === 'command';
+    const doLogout = () => {
+        addLog('Session terminated');
+        setCurrentUser(null); setScreen('home');
+    };
 
-    const handleSubmit = async (e) => {
+    /* ── shared data bundles ── */
+    const fbiData = { users:fbiUsers, cases:fbiCases, wanted:fbiWanted, civilians:fbiCivilians, duty:fbiDuty, markers:fbiMarkers };
+    const stfData = { users:stfUsers, cases:stfCases, wanted:stfWanted, civilians:stfCivilians, duty:stfDuty, markers:stfMarkers };
+
+    /* ── SCREENS ── */
+    if (screen === 'home')  return <HomeScreen  onLogin={() => setScreen('login')} />;
+    if (screen === 'login') return <LoginScreen onBack={() => setScreen('home')} onLogin={doLogin} error={loginError} loading={loginLoading} setError={setLoginError} setLoginSector={setLoginSector} loginSector={loginSector}/>;
+    if (screen === 'fbi')   return <SectorApp sector="fbi"  currentUser={currentUser} onLogout={doLogout} data={fbiData} jointMissions={jointMissions} activityLog={activityLog} addLog={addLog} ranks={FBI_RANKS}/>;
+    if (screen === 'stf')   return <SectorApp sector="stf"  currentUser={currentUser} onLogout={doLogout} data={stfData} jointMissions={jointMissions} activityLog={activityLog} addLog={addLog} ranks={STF_RANKS}/>;
+    return null;
+};
+
+/* ═══════════════════════════════════════════════════════
+   HOME SCREEN
+═══════════════════════════════════════════════════════ */
+const HomeScreen = ({ onLogin }) => (
+    <div className="fade-in" style={{height:'100vh',display:'flex',flexDirection:'column',overflow:'auto'}}>
+        {/* Gov banner */}
+        <div style={{background:'#1a2a3e',color:'#94a3b8',padding:'6px 20px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <span className="mono" style={{fontSize:'0.6rem',letterSpacing:'0.15em'}}>OFFICIAL GOVERNMENT PORTAL — AUTHORIZED PERSONNEL ONLY</span>
+            <span className="mono" style={{fontSize:'0.6rem',color:'#64748b'}}>{new Date().toUTCString()}</span>
+        </div>
+
+        {/* Hero */}
+        <div className="gov-header" style={{flexShrink:0}}>
+            <div style={{display:'flex',justifyContent:'center',gap:48,marginBottom:32,flexWrap:'wrap'}}>
+                <img src={FBI_LOGO} style={{width:72,height:72,filter:'brightness(0) invert(1)',opacity:.85}} alt="FBI"/>
+                <div style={{width:1,background:'rgba(255,255,255,0.15)'}}/>
+                <img src={STF_LOGO} style={{width:72,height:72,objectFit:'contain',borderRadius:'50%',opacity:.85}} alt="STF"/>
+            </div>
+            <h1 className="display" style={{fontSize:'clamp(1.6rem,5vw,2.8rem)',letterSpacing:'0.08em',marginBottom:8,color:'#f8fafc'}}>
+                LAW ENFORCEMENT PORTAL
+            </h1>
+            <p className="mono" style={{color:'#64748b',fontSize:'0.7rem',letterSpacing:'0.2em',marginBottom:32}}>
+                JOINT GOVERNMENT OPERATIONS SYSTEM — v2.0
+            </p>
+            <button className="btn btn-primary-fbi" style={{padding:'14px 40px',fontSize:'0.9rem',letterSpacing:'0.1em'}} onClick={onLogin}>
+                <i className="fas fa-shield-halved"/>
+                SECURE LOGIN
+            </button>
+        </div>
+
+        {/* Sectors */}
+        <div style={{flex:1,padding:'32px 20px',maxWidth:680,margin:'0 auto',width:'100%'}}>
+            <p className="mono" style={{textAlign:'center',color:'var(--text3)',fontSize:'0.65rem',letterSpacing:'0.2em',marginBottom:24}}>SELECT YOUR SECTOR TO PROCEED</p>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
+                <div className="sector-choice fbi-choice" onClick={onLogin}>
+                    <img src={FBI_LOGO} style={{width:56,height:56,margin:'0 auto 16px',display:'block'}} alt="FBI"/>
+                    <div className="display" style={{fontSize:'1.3rem',letterSpacing:'0.1em',color:'var(--fbi)',marginBottom:6}}>FBI</div>
+                    <p style={{fontSize:'0.75rem',color:'var(--text2)'}}>Federal Bureau of Investigation</p>
+                    <div style={{marginTop:12}}><span className="badge badge-fbi">@fbi.gov</span></div>
+                </div>
+                <div className="sector-choice stf-choice" onClick={onLogin}>
+                    <img src={STF_LOGO} style={{width:56,height:56,margin:'0 auto 16px',display:'block',borderRadius:'50%',objectFit:'contain'}} alt="STF"/>
+                    <div className="display" style={{fontSize:'1.3rem',letterSpacing:'0.1em',color:'var(--stf)',marginBottom:6}}>STF</div>
+                    <p style={{fontSize:'0.75rem',color:'var(--text2)'}}>Special Task Force</p>
+                    <div style={{marginTop:12}}><span className="badge badge-stf">@stf.gov</span></div>
+                </div>
+            </div>
+            <div style={{marginTop:24,padding:'16px',background:'#fffbeb',border:'1px solid #fed7aa',borderRadius:6}}>
+                <p className="mono" style={{fontSize:'0.65rem',color:'#92400e',letterSpacing:'0.1em',textAlign:'center'}}>
+                    <i className="fas fa-triangle-exclamation" style={{marginRight:6}}/>
+                    UNAUTHORIZED ACCESS IS A CRIMINAL OFFENSE — 18 U.S.C. § 1030
+                </p>
+            </div>
+        </div>
+    </div>
+);
+
+/* ═══════════════════════════════════════════════════════
+   LOGIN SCREEN
+═══════════════════════════════════════════════════════ */
+const LoginScreen = ({ onBack, onLogin, error, loading, setError, setLoginSector, loginSector }) => {
+    const [email, setEmail] = useState('');
+    const detected = getSector(email);
+
+    const color = detected === 'fbi' ? 'var(--fbi)' : detected === 'stf' ? 'var(--stf)' : 'var(--text3)';
+    const logo  = detected === 'fbi' ? FBI_LOGO : detected === 'stf' ? STF_LOGO : null;
+    const name  = detected === 'fbi' ? 'Federal Bureau of Investigation' : detected === 'stf' ? 'Special Task Force' : 'Enter your email address';
+
+    return (
+        <div className="fade-in" style={{height:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:20,background:'var(--bg)'}}>
+            <div className="card" style={{width:'100%',maxWidth:400,overflow:'hidden'}}>
+                {/* Sector strip */}
+                <div style={{height:4,background: detected === 'fbi' ? 'var(--fbi)' : detected === 'stf' ? 'var(--stf)' : 'var(--border)',transition:'background .3s'}}/>
+
+                <div style={{padding:'28px 28px 24px'}}>
+                    {/* Header */}
+                    <div style={{textAlign:'center',marginBottom:28}}>
+                        {logo ? (
+                            <img src={logo} style={{width:52,height:52,margin:'0 auto 14px',display:'block',objectFit:'contain',borderRadius: detected==='stf'?'50%':'0'}} alt="logo"/>
+                        ) : (
+                            <div style={{width:52,height:52,margin:'0 auto 14px',display:'flex',alignItems:'center',justifyContent:'center',background:'var(--surface2)',borderRadius:8}}>
+                                <i className="fas fa-shield-halved" style={{fontSize:'1.4rem',color:'var(--text3)'}}/>
+                            </div>
+                        )}
+                        <h2 className="display" style={{fontSize:'1.2rem',letterSpacing:'0.1em',color: detected ? color : 'var(--text)',marginBottom:4}}>
+                            {detected ? (detected === 'fbi' ? 'FBI PORTAL' : 'STF PORTAL') : 'SECURE LOGIN'}
+                        </h2>
+                        <p className="mono" style={{fontSize:'0.6rem',color:'var(--text3)',letterSpacing:'0.15em'}}>{name.toUpperCase()}</p>
+                    </div>
+
+                    {/* Fields */}
+                    <div style={{display:'flex',flexDirection:'column',gap:16}}>
+                        <FormField label="Email Address">
+                            <input id="auth_email" type="email" className="input" placeholder="username@fbi.gov"
+                                value={email} onChange={e=>{setEmail(e.target.value);setError('');}}
+                                onKeyDown={e=>e.key==='Enter'&&onLogin()} autoComplete="off"/>
+                        </FormField>
+                        <FormField label="Password">
+                            <input id="auth_pass" type="password" className="input" placeholder="••••••••"
+                                onKeyDown={e=>e.key==='Enter'&&onLogin()} autoComplete="off"/>
+                        </FormField>
+
+                        {error && (
+                            <div className="alert alert-danger mono" style={{fontSize:'0.65rem',letterSpacing:'0.08em',padding:'10px 14px'}}>
+                                <i className="fas fa-exclamation-circle" style={{marginRight:8}}/>{error}
+                            </div>
+                        )}
+
+                        <button className={`btn ${detected==='stf'?'btn-primary-stf':detected==='fbi'?'btn-primary-fbi':'btn-outline'}`}
+                            style={{width:'100%',padding:'12px'}} onClick={onLogin} disabled={loading}>
+                            {loading ? <><Spinner/> AUTHENTICATING...</> : <><i className="fas fa-fingerprint"/> AUTHENTICATE</>}
+                        </button>
+                        <button className="btn btn-ghost" style={{width:'100%'}} onClick={onBack}>
+                            <i className="fas fa-arrow-left"/> Back to Portal
+                        </button>
+                    </div>
+                </div>
+                <div style={{padding:'12px 28px',background:'var(--surface2)',borderTop:'1px solid var(--border2)',textAlign:'center'}}>
+                    <p className="mono" style={{fontSize:'0.55rem',color:'var(--text3)',letterSpacing:'0.12em'}}>
+                        USE @fbi.gov FOR FBI · USE @stf.gov FOR STF
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+/* ═══════════════════════════════════════════════════════
+   SECTOR APP (shared shell for FBI & STF)
+═══════════════════════════════════════════════════════ */
+const SectorApp = ({ sector, currentUser, onLogout, data, jointMissions, activityLog, addLog, ranks }) => {
+    const [activeTab, setActiveTab] = useState('dashboard');
+    const [modal, setModal] = useState(null);
+    const [editItem, setEditItem] = useState(null);
+    const [search, setSearch] = useState('');
+
+    const color  = sector === 'fbi' ? 'var(--fbi)'  : 'var(--stf)';
+    const colorL = sector === 'fbi' ? 'var(--fbi-light)' : 'var(--stf-light)';
+    const logo   = sector === 'fbi' ? FBI_LOGO : STF_LOGO;
+    const label  = sector === 'fbi' ? 'FBI'    : 'STF';
+    const prefix = sector; // collection prefix
+
+    const isPrivileged = currentUser?.access === 'command' || isCommandRank(sector, currentUser?.rank);
+
+    // helpers
+    const openModal = (key, item=null) => { setModal(key); setEditItem(item); };
+    const closeModal = () => { setModal(null); setEditItem(null); };
+
+    const saveRecord = async (e) => {
         e.preventDefault();
-        const data = Object.fromEntries(new FormData(e.target));
+        const formData = new FormData(e.target);
+        const data2 = Object.fromEntries(formData);
         const db = window.fbDB, T = window.fbTools;
-        const colMap = { case_form:'fbi_cases', wanted_form:'wanted', civilian_form:'civilians', staff_form:'users' };
-        const col = colMap[activeModal];
+
+        const colMap = {
+            case_form:     `${prefix}_cases`,
+            wanted_form:   `${prefix}_wanted`,
+            civilian_form: `${prefix}_civilians`,
+            staff_form:    `${prefix}_users`,
+        };
+        const col = colMap[modal];
         try {
-            if (activeModal === 'civilian_form' && !itemToEdit) {
-                const dup = allCivilians.find(c => c.sonyId === data.sonyId);
-                if (dup) { alert(`ERROR: ID ${data.sonyId} already registered to ${dup.name}`); return; }
+            if (modal === 'civilian_form' && !editItem) {
+                const dup = data.civilians.find(c => c.sonyId === data2.sonyId);
+                if (dup) { alert(`ID ${data2.sonyId} is already registered to ${dup.name}`); return; }
             }
-            if (itemToEdit) {
-                await T.updateDoc(T.doc(db,col,itemToEdit.id), {...data, lastModifiedBy:currentUser.name});
+            if (editItem) {
+                await T.updateDoc(T.doc(db, col, editItem.id), {...data2, lastModifiedBy: currentUser.name});
                 addLog(`Record updated — ${col}`);
             } else {
-                const rec = {...data, author:currentUser.name, authorRank:currentUser.rank, createdAt:T.serverTimestamp()};
-                if (col === 'users') await T.setDoc(T.doc(db,col,data.id), rec);
-                else await T.addDoc(T.collection(db,col), rec);
+                const rec = { ...data2, author: currentUser.name, authorRank: currentUser.rank, createdAt: T.serverTimestamp() };
+                if (col.endsWith('_users')) await T.setDoc(T.doc(db, col, data2.id), rec);
+                else await T.addDoc(T.collection(db, col), rec);
                 addLog(`New record — ${col}`);
             }
-            setActiveModal(null); setItemToEdit(null);
-        } catch(err) { alert('Database error: '+err.message); }
+            closeModal();
+        } catch(err) { alert('Error: ' + err.message); }
     };
 
-    const deleteEntry = async (col, id) => {
+    const deleteRecord = async (col, id) => {
         if (!window.confirm('Confirm permanent deletion?')) return;
-        await window.fbTools.deleteDoc(window.fbTools.doc(window.fbDB,col,id));
-        addLog(`Deleted record — ${col}`);
+        await window.fbTools.deleteDoc(window.fbTools.doc(window.fbDB, col, id));
+        addLog(`Deleted — ${col}`);
     };
 
-    /* ─── HOME ─── */
-    if (screen === 'home') return (
-        <div style={{background:'radial-gradient(ellipse at 15% 50%, rgba(139,0,0,0.18) 0%, transparent 55%), linear-gradient(180deg,#010308 0%,#04091a 60%,#010308 100%)', minHeight:'100vh', display:'flex', flexDirection:'column', overflow:'hidden', position:'relative'}}>
-            <ScanLine/>
-            <Ticker/>
-            <div style={{background:'rgba(2,6,16,0.98)', borderBottom:'1px solid var(--border-gold)', padding:'12px 20px', display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-                <div style={{display:'flex', alignItems:'center', gap:12}}>
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/da/Seal_of_the_Federal_Bureau_of_Investigation.svg" style={{width:28,height:28,opacity:0.75}} alt="seal"/>
+    /* ── NAV items ── */
+    const NAV = [
+        { key:'dashboard', icon:'fa-grid-2',          label:'DASHBOARD' },
+        { key:'cases',     icon:'fa-folder-open',      label:'CASES' },
+        { key:'wanted',    icon:'fa-crosshairs',       label:'WANTED' },
+        { key:'civilians', icon:'fa-fingerprint',      label:'CIVILIANS' },
+        { key:'ops',       icon:'fa-map-location-dot', label:'OPS' },
+        { key:'staff',     icon:'fa-user-gear',        label:'STAFF' },
+        { key:'joint',     icon:'fa-handshake',        label:'JOINT' },
+        { key:'crypto',    icon:'fa-lock',             label:'CRYPTO' },
+        { key:'logs',      icon:'fa-terminal',         label:'LOGS' },
+    ];
+
+    const activeClass = `active-${sector === 'fbi' ? 'fbi' : 'stf'}`;
+
+    return (
+        <div style={{height:'100vh',display:'flex',flexDirection:'column',overflow:'hidden'}}>
+            {/* Sector strip */}
+            <div style={{height:3,background:color,flexShrink:0}}/>
+
+            {/* Top bar */}
+            <div className="topbar" style={{flexShrink:0}}>
+                <div style={{display:'flex',alignItems:'center',gap:10}}>
+                    <img src={logo} style={{width:28,height:28,objectFit:'contain',borderRadius:sector==='stf'?'50%':'0'}} alt="logo"/>
                     <div>
-                        <p className="mono" style={{color:'var(--gold)',fontSize:'0.55rem',letterSpacing:'0.22em'}}>FEDERAL BUREAU OF INVESTIGATION</p>
-                        <p className="mono" style={{color:'#1a2a1a',fontSize:'0.48rem',letterSpacing:'0.15em'}}>CRIMINAL JUSTICE INFORMATION SERVICES — TERMINAL v4.1</p>
+                        <div className="display" style={{fontSize:'0.9rem',letterSpacing:'0.08em',color:color}}>{label} — {currentUser.name}</div>
+                        <div className="mono" style={{fontSize:'0.55rem',color:'var(--text3)',letterSpacing:'0.1em'}}>{currentUser.rank}</div>
                     </div>
                 </div>
-                <div style={{display:'flex',alignItems:'center',gap:8}}>
-                    <PulseDot/>
-                    <span className="mono" style={{color:'#1a3a1a',fontSize:'0.5rem',letterSpacing:'0.1em'}}>UPLINK ACTIVE</span>
-                </div>
-            </div>
-            <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'0 24px',textAlign:'center',animation:'fadeUp 0.8s ease both'}}>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/d/da/Seal_of_the_Federal_Bureau_of_Investigation.svg"
-                     style={{width:110,height:110,marginBottom:28,animation:'sealPulse 4s ease-in-out infinite',filter:'drop-shadow(0 0 25px rgba(201,168,76,0.4))'}} alt="FBI Seal"/>
-                <p className="mono" style={{color:'#2a3a2a',letterSpacing:'0.5em',fontSize:'0.6rem',marginBottom:16}}>Truth is our priority… and justice is our mission.</p>
-                <h1 className="hero-title" style={{marginBottom:20, fontSize:'clamp(1.5rem, 5vw, 3.8rem)', whiteSpace:'nowrap', letterSpacing:'0.02em'}}>
-                    FEDERAL BUREAU OF INVESTIGATION
-                </h1>
-                <div className="classified-stripe" style={{padding:'5px 20px',margin:'20px 0'}}>
-                    <span className="display" style={{letterSpacing:'0.3em',fontSize:'0.85rem',color:'white'}}>LAW ENFORCEMENT SENSITIVE // FOUO</span>
-                </div>
-                <p className="mono" style={{color:'#2a2a40',fontSize:'0.65rem',letterSpacing:'0.2em',marginBottom:32,maxWidth:280,lineHeight:1.8}}>OFFICIAL USE ONLY<br/>FEDERAL LAW ENFORCEMENT NETWORK</p>
-                <div style={{width:'100%', maxWidth:320, marginTop:10}}>
-                    <button className="btn-gold" style={{width:'100%', display:'flex', alignItems:'center', justifyContent:'center', gap:12, padding:'16px 0'}} onClick={() => setScreen('login')}>
-                        <i className="fas fa-shield-halved" style={{fontSize:'1.1rem'}}/>
-                        <span style={{letterSpacing:'0.15em'}}>INITIALIZE SECURE LOGIN</span>
+                <div style={{display:'flex',alignItems:'center',gap:10}}>
+                    <div style={{display:'flex',alignItems:'center',gap:5}}>
+                        <Dot status="green"/>
+                        <span className="mono" style={{fontSize:'0.55rem',color:'var(--text3)'}}>ONLINE</span>
+                    </div>
+                    <button className="btn btn-outline btn-sm" onClick={onLogout} style={{color:'var(--danger)',borderColor:'#fecaca'}}>
+                        <i className="fas fa-right-from-bracket"/> Sign Out
                     </button>
                 </div>
             </div>
-            <div style={{padding:'12px 24px',borderTop:'1px solid rgba(255,255,255,0.04)',display:'flex',justifyContent:'space-between'}}>
-                <span className="mono" style={{color:'#111',fontSize:'0.5rem',letterSpacing:'0.12em'}}>DOJ // FBI // FIELD OFFICE</span>
-                <span className="mono" style={{color:'#111',fontSize:'0.5rem',letterSpacing:'0.12em'}}>{new Date().toUTCString().toUpperCase()}</span>
-            </div>
+
+            {/* Content */}
+            <main style={{flex:1,overflowY:'auto',padding:'16px 14px 90px'}}>
+                {activeTab === 'dashboard' && <DashboardTab sector={sector} data={data} jointMissions={jointMissions} color={color} isPrivileged={isPrivileged} openModal={openModal}/>}
+                {activeTab === 'cases'     && <CasesTab     sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal} deleteRecord={deleteRecord} setEditItem={setEditItem} setModal={setModal}/>}
+                {activeTab === 'wanted'    && <WantedTab    sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal} deleteRecord={deleteRecord}/>}
+                {activeTab === 'civilians' && <CiviliansTab sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal} deleteRecord={deleteRecord} search={search} setSearch={setSearch} setModal={setModal} setEditItem={setEditItem}/>}
+                {activeTab === 'ops'       && <OpsTab       sector={sector} data={data} color={color} currentUser={currentUser} addLog={addLog}/>}
+                {activeTab === 'staff'     && <StaffTab     sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal} deleteRecord={deleteRecord} ranks={ranks}/>}
+                {activeTab === 'joint'     && <JointTab     sector={sector} currentUser={currentUser} jointMissions={jointMissions} color={color} isPrivileged={isPrivileged} addLog={addLog}/>}
+                {activeTab === 'crypto'    && <CryptoTab    color={color}/>}
+                {activeTab === 'logs'      && <LogsTab      activityLog={activityLog} sector={sector}/>}
+            </main>
+
+            {/* Bottom nav */}
+            <nav style={{position:'fixed',bottom:0,width:'100%',background:'var(--surface)',borderTop:'1px solid var(--border)',padding:'8px 4px 10px',display:'flex',justifyContent:'space-around',zIndex:200,boxShadow:'0 -2px 8px rgba(0,0,0,0.06)'}}>
+                {NAV.map(n => (
+                    <div key={n.key} className={`nav-tab ${activeTab===n.key ? activeClass : 'inactive'}`}
+                        onClick={() => setActiveTab(n.key)}>
+                        <i className={`fas ${n.icon}`}/>
+                        <span>{n.label}</span>
+                    </div>
+                ))}
+            </nav>
+
+            {/* Modals */}
+            {modal && (
+                <RecordModal modal={modal} editItem={editItem} onClose={closeModal} onSave={saveRecord}
+                    sector={sector} color={color} ranks={ranks} data={data}/>
+            )}
         </div>
     );
+};
 
-    /* ─── LOGIN ─── */
-    if (screen === 'login') return (
-        <div style={{height:'100vh',width:'100vw',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:24,background:'radial-gradient(ellipse at center,#040b20 0%,#020610 100%)',animation:'fadeIn 0.4s ease'}}>
-            <ScanLine/>
-            <div className="glass-card" style={{width:'100%',maxWidth:400,padding:32,animation:'fadeUp 0.5s ease'}}>
-                <Corners/>
-                <ScanLine/>
-                <div style={{textAlign:'center',marginBottom:28}}>
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/da/Seal_of_the_Federal_Bureau_of_Investigation.svg"
-                         style={{width:64,height:64,margin:'0 auto 16px',filter:'drop-shadow(0 0 20px rgba(201,168,76,0.4))'}} alt="seal"/>
-                    <h2 className="display" style={{letterSpacing:'0.25em',fontSize:'1.3rem',color:'var(--gold)',marginBottom:4}}>FBI ACCESS TERMINAL</h2>
-                    <p className="mono" style={{color:'#223',fontSize:'0.55rem',letterSpacing:'0.3em'}}>CLASSIFIED INFORMATION SYSTEM</p>
-                </div>
-                <Divider/>
-                <div style={{display:'flex',flexDirection:'column',gap:16,marginTop:20}}>
-                    <div>
-                        <label className="mono" style={{display:'block',marginBottom:8,color:'#334',fontSize:'0.6rem',letterSpacing:'0.2em'}}>AGENT EMAIL</label>
-                        <input id="auth_email" type="text" placeholder="agent@fbi.gov" className="fbi-input" onKeyDown={e=>e.key==='Enter'&&doLogin()}/>
-                    </div>
-                    <div>
-                        <label className="mono" style={{display:'block',marginBottom:8,color:'#334',fontSize:'0.6rem',letterSpacing:'0.2em'}}>ACCESS CODE</label>
-                        <input id="auth_password" type="password" placeholder="••••••••" className="fbi-input" onKeyDown={e=>e.key==='Enter'&&doLogin()}/>
-                    </div>
-                    {loginError && (
-                        <div style={{display:'flex',alignItems:'center',gap:8,padding:'10px 14px',background:'rgba(139,0,0,0.15)',border:'1px solid rgba(139,0,0,0.3)',borderRadius:3}}>
-                            <i className="fas fa-exclamation-triangle" style={{color:'#cc1111',fontSize:'0.75rem'}}/>
-                            <span className="mono" style={{color:'#f87171',fontSize:'0.65rem',letterSpacing:'0.1em'}}>{loginError}</span>
-                        </div>
-                    )}
-                    <button className="btn-gold" style={{width:'100%',marginTop:8}} onClick={doLogin} disabled={loginLoading}>
-                        {loginLoading ? <><i className="fas fa-circle-notch fa-spin" style={{marginRight:8}}/>AUTHENTICATING...</> : <><i className="fas fa-fingerprint" style={{marginRight:8}}/>AUTHENTICATE</>}
-                    </button>
-                    <button className="btn-ghost" style={{width:'100%'}} onClick={()=>setScreen('home')}>
-                        <i className="fas fa-arrow-left" style={{marginRight:8}}/> BACK
-                    </button>
-                </div>
-                <Divider/>
-                <p className="mono" style={{textAlign:'center',color:'#112',fontSize:'0.5rem',letterSpacing:'0.2em',marginTop:8}}>UNAUTHORIZED ACCESS IS A FEDERAL OFFENSE — 18 U.S.C. § 1030</p>
-            </div>
-        </div>
-    );
+/* ═══════════════════════════════════════════════════════
+   DASHBOARD TAB
+═══════════════════════════════════════════════════════ */
+const DashboardTab = ({ sector, data, jointMissions, color, isPrivileged, openModal }) => {
+    const openCases   = data.cases.filter(c => c.status === 'Open').length;
+    const closedCases = data.cases.filter(c => c.status === 'Closed').length;
+    const total = data.cases.length;
+    const pct = total ? Math.round(closedCases/total*100) : 0;
+    const pendingJoint = jointMissions.filter(m => m.status === 'Pending').length;
+    const myJoint = jointMissions.filter(m => m.requesterSector === sector || m.targetSector === sector).length;
 
-    /* ─── DASHBOARD TAB ─── */
-    const DashboardTab = () => (
-        <div className="animate-fade-up" style={{display:'flex',flexDirection:'column',gap:16}}>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+    return (
+        <div className="fade-up" style={{display:'flex',flexDirection:'column',gap:14}}>
+            <div className="display" style={{fontSize:'1.1rem',letterSpacing:'0.08em',color}}>DASHBOARD</div>
+
+            {/* Stats grid */}
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
                 {[
-                    {label:'ACTIVE CASES',   val:allCases.filter(c=>c.status==='Open').length, cls:'blue',  icon:'fa-folder-open'},
-                    {label:'WANTED TARGETS', val:allWanted.length,                              cls:'red',   icon:'fa-crosshairs'},
-                    {label:'CIVILIANS REG.', val:allCivilians.length,                           cls:'gold',  icon:'fa-fingerprint'},
-                    {label:'AGENTS ACTIVE',  val:allUsers.length+1,                             cls:'green', icon:'fa-user-shield'},
+                    {label:'OPEN CASES',  val:openCases,       icon:'fa-folder-open', border:'var(--danger)'},
+                    {label:'WANTED',      val:data.wanted.length, icon:'fa-crosshairs', border:color},
+                    {label:'CIVILIANS',   val:data.civilians.length, icon:'fa-fingerprint', border:'var(--warning)'},
+                    {label:'JOINT OPS',   val:myJoint,          icon:'fa-handshake',  border:'var(--joint)'},
                 ].map(s => (
-                    <div key={s.label} className={`stat-card ${s.cls}`}>
-                        <p className="mono" style={{color:'#334',fontSize:'0.55rem',letterSpacing:'0.2em',marginBottom:4}}>{s.label}</p>
-                        <p className="display" style={{fontSize:'2.5rem',color:'#e8e4d8'}}>{s.val}</p>
-                        <i className={`fas ${s.icon}`} style={{position:'absolute',bottom:10,right:12,opacity:0.06,fontSize:'2rem'}}/>
+                    <div key={s.label} className="card stat-card" style={{borderTop:`3px solid ${s.border}`}}>
+                        <div className="stat-val" style={{color}}>{s.val}</div>
+                        <div className="stat-label">{s.label}</div>
+                        <i className={`fas ${s.icon}`} style={{position:'absolute',bottom:10,right:12,opacity:.06,fontSize:'1.8rem'}}/>
                     </div>
                 ))}
             </div>
-            <div className="glass-card" style={{padding:16}}>
-                <Corners/>
-                <p className="mono" style={{color:'#334',fontSize:'0.6rem',letterSpacing:'0.2em',marginBottom:8}}>CASE RESOLUTION RATE</p>
-                <div className="progress-bar">
-                    <div className="progress-fill" style={{width:allCases.length?`${Math.round(allCases.filter(c=>c.status==='Closed').length/allCases.length*100)}%`:'0%'}}/>
+
+            {/* Resolution rate */}
+            <div className="card" style={{padding:16}}>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+                    <span className="mono" style={{fontSize:'0.65rem',letterSpacing:'0.12em',color:'var(--text3)'}}>CASE RESOLUTION RATE</span>
+                    <span className="mono" style={{fontSize:'0.65rem',color,fontWeight:600}}>{pct}%</span>
                 </div>
-                <p className="mono" style={{textAlign:'right',color:'var(--gold)',fontSize:'0.65rem',marginTop:4}}>
-                    {allCases.length?`${Math.round(allCases.filter(c=>c.status==='Closed').length/allCases.length*100)}%`:'0%'} RESOLVED
-                </p>
+                <div className="progress-track">
+                    <div className="progress-fill" style={{width:`${pct}%`,background:color}}/>
+                </div>
+                <p style={{fontSize:'0.7rem',color:'var(--text3)',marginTop:8}}>{closedCases} closed · {openCases} active · {total} total</p>
             </div>
+
+            {/* Joint missions alert */}
+            {pendingJoint > 0 && (
+                <div className="alert alert-warning">
+                    <p className="mono" style={{fontSize:'0.68rem',letterSpacing:'0.08em'}}>
+                        <i className="fas fa-triangle-exclamation" style={{marginRight:8}}/>
+                        {pendingJoint} JOINT MISSION{pendingJoint>1?'S':''} AWAITING RESPONSE
+                    </p>
+                </div>
+            )}
+
+            {/* Recent cases */}
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                <p className="display" style={{fontSize:'1.1rem',color:'var(--gold)',letterSpacing:'0.15em'}}>CASE ARCHIVE</p>
-                <button className="btn-ghost" style={{fontSize:'0.7rem',padding:'6px 14px'}} onClick={()=>setActiveModal('case_form')}>
-                    <i className="fas fa-plus" style={{marginRight:6}}/> NEW CASE
+                <span className="display" style={{fontSize:'0.9rem',letterSpacing:'0.08em',color:'var(--text2)'}}>RECENT CASES</span>
+                <button className="btn btn-outline btn-sm" onClick={() => openModal('case_form')}>
+                    <i className="fas fa-plus"/> New Case
                 </button>
             </div>
-            {allCases.length===0 && <div style={{textAlign:'center',padding:'40px 0',color:'#223'}}><i className="fas fa-folder-open" style={{fontSize:'2rem',display:'block',marginBottom:12}}/><p className="mono" style={{fontSize:'0.65rem',letterSpacing:'0.2em'}}>NO CASES ON RECORD</p></div>}
-            {allCases.map(c => (
-                <div key={c.id} className={`data-row ${c.status==='Open'?'data-row-red':''}`}>
-                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
-                        <h4 style={{fontWeight:700,fontSize:'0.9rem',letterSpacing:'0.05em'}}>{c.title}</h4>
-                        <span className={`badge ${c.status==='Open'?'badge-open':'badge-closed'}`}>{c.status==='Open'?'OPEN':'CLOSED'}</span>
+            <div className="card" style={{overflow:'hidden'}}>
+                {data.cases.length === 0 ? <Empty icon="fa-folder-open" text="NO CASES ON RECORD"/> :
+                    data.cases.slice(0,4).map(c => (
+                        <div key={c.id} className="data-row">
+                            <div style={{flex:1,minWidth:0}}>
+                                <div style={{display:'flex',justifyContent:'space-between',gap:8,marginBottom:4}}>
+                                    <p style={{fontWeight:600,fontSize:'0.85rem',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{c.title}</p>
+                                    <span className={`badge ${c.status==='Open'?'badge-open':'badge-closed'}`}>{c.status}</span>
+                                </div>
+                                <p style={{fontSize:'0.75rem',color:'var(--text2)',lineHeight:1.5}}>{c.details?.slice(0,80)}...</p>
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
+        </div>
+    );
+};
+
+/* ═══════════════════════════════════════════════════════
+   CASES TAB
+═══════════════════════════════════════════════════════ */
+const CasesTab = ({ sector, data, color, isPrivileged, openModal, deleteRecord, setEditItem, setModal }) => (
+    <div className="fade-up" style={{display:'flex',flexDirection:'column',gap:12}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <div className="display" style={{fontSize:'1.1rem',letterSpacing:'0.08em',color}}>CASE ARCHIVE</div>
+            <button className="btn btn-outline btn-sm" onClick={() => openModal('case_form')}><i className="fas fa-plus"/> New Case</button>
+        </div>
+        <div className="card" style={{overflow:'hidden'}}>
+            {data.cases.length === 0 ? <Empty icon="fa-folder-open" text="NO CASES ON RECORD"/> :
+                data.cases.map(c => (
+                    <div key={c.id} className="data-row" style={{flexDirection:'column',gap:10}}>
+                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:8}}>
+                            <div style={{flex:1}}>
+                                <p style={{fontWeight:700,fontSize:'0.9rem',marginBottom:4}}>{c.title}</p>
+                                <p style={{fontSize:'0.78rem',color:'var(--text2)',lineHeight:1.6}}>{c.details}</p>
+                            </div>
+                            <span className={`badge ${c.status==='Open'?'badge-open':'badge-closed'}`}>{c.status}</span>
+                        </div>
+                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                            <span className="badge badge-blue">SUSPECTS: {c.suspects}</span>
+                            <div style={{display:'flex',gap:8}}>
+                                <button className="btn btn-ghost btn-xs" onClick={() => {setEditItem(c);setModal('case_form');}}>
+                                    <i className="fas fa-pen"/>
+                                </button>
+                                {isPrivileged && <button className="btn btn-ghost btn-xs" style={{color:'var(--danger)'}} onClick={() => deleteRecord(`${sector}_cases`, c.id)}>
+                                    <i className="fas fa-trash"/>
+                                </button>}
+                            </div>
+                        </div>
                     </div>
-                    <p style={{fontSize:'0.8rem',color:'#556',lineHeight:1.6,marginBottom:10}}>{c.details}</p>
-                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                        <span className="badge badge-gold">SUSPECTS: {c.suspects}</span>
-                        <div style={{display:'flex',gap:16}}>
-                            <button className="mono" style={{color:'#334',fontSize:'0.6rem',letterSpacing:'0.1em',background:'none',border:'none',cursor:'pointer'}} onClick={()=>{setItemToEdit(c);setActiveModal('case_form');}}>
-                                <i className="fas fa-edit" style={{marginRight:4}}/>EDIT
-                            </button>
-                            {isPrivileged && <button className="mono" style={{color:'#4a1a1a',fontSize:'0.6rem',letterSpacing:'0.1em',background:'none',border:'none',cursor:'pointer'}} onClick={()=>deleteEntry('fbi_cases',c.id)}>
-                                <i className="fas fa-trash" style={{marginRight:4}}/>DELETE
+                ))
+            }
+        </div>
+    </div>
+);
+
+/* ═══════════════════════════════════════════════════════
+   WANTED TAB
+═══════════════════════════════════════════════════════ */
+const WantedTab = ({ sector, data, color, isPrivileged, openModal, deleteRecord }) => (
+    <div className="fade-up" style={{display:'flex',flexDirection:'column',gap:12}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <div className="display" style={{fontSize:'1.1rem',letterSpacing:'0.08em',color:'var(--danger)'}}>WANTED TARGETS</div>
+            <button className="btn btn-danger btn-sm" onClick={() => openModal('wanted_form')}><i className="fas fa-plus"/> Add Target</button>
+        </div>
+        {data.wanted.length === 0 ? (
+            <div className="card"><Empty icon="fa-crosshairs" text="NO TARGETS ON FILE"/></div>
+        ) : (
+            data.wanted.map(w => (
+                <div key={w.id} className="card" style={{overflow:'hidden',borderLeft:'3px solid var(--danger)'}}>
+                    <img src={w.image} className="wanted-photo" alt="wanted"
+                        onError={e => e.target.src='https://placehold.co/400x160/1a1a1a/555?text=NO+PHOTO'}/>
+                    <div style={{padding:14}}>
+                        <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
+                            <p style={{fontWeight:700,fontSize:'0.9rem'}}>{w.name}</p>
+                            <span className="badge badge-open">WANTED</span>
+                        </div>
+                        <p className="mono" style={{color:'var(--danger)',fontSize:'0.65rem',letterSpacing:'0.1em',marginBottom:10}}>{w.charge}</p>
+                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                            <span style={{fontSize:'0.7rem',color:'var(--text3)'}}>By: {w.author}</span>
+                            {isPrivileged && <button className="btn btn-ghost btn-xs" style={{color:'var(--danger)'}} onClick={() => deleteRecord(`${sector}_wanted`, w.id)}>
+                                <i className="fas fa-trash"/>
                             </button>}
                         </div>
                     </div>
                 </div>
-            ))}
+            ))
+        )}
+    </div>
+);
+
+/* ═══════════════════════════════════════════════════════
+   CIVILIANS TAB
+═══════════════════════════════════════════════════════ */
+const CiviliansTab = ({ sector, data, color, isPrivileged, openModal, deleteRecord, search, setSearch, setModal, setEditItem }) => (
+    <div className="fade-up" style={{display:'flex',flexDirection:'column',gap:12}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <div className="display" style={{fontSize:'1.1rem',letterSpacing:'0.08em',color}}>CIVILIAN DATABASE</div>
+            <button className="btn btn-outline btn-sm" onClick={() => openModal('civilian_form')}><i className="fas fa-plus"/> Register</button>
         </div>
-    );
-
-    /* ─── WANTED TAB ─── */
-    const WantedTab = () => (
-        <div className="animate-fade-up" style={{display:'flex',flexDirection:'column',gap:14}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                <p className="display" style={{fontSize:'1.1rem',color:'#cc4444',letterSpacing:'0.15em'}}>WANTED TARGETS</p>
-                <button className="btn-red" style={{fontSize:'0.75rem',padding:'7px 14px'}} onClick={()=>setActiveModal('wanted_form')}>
-                    <i className="fas fa-plus" style={{marginRight:6}}/> ADD TARGET
-                </button>
-            </div>
-            {allWanted.length===0 && <div style={{textAlign:'center',padding:'50px 0',color:'#223'}}><i className="fas fa-crosshairs" style={{fontSize:'2.2rem',display:'block',marginBottom:12}}/><p className="mono" style={{fontSize:'0.65rem',letterSpacing:'0.2em'}}>NO TARGETS ON FILE</p></div>}
-            {allWanted.map(w => (
-                <div key={w.id} className="glass-card" style={{overflow:'hidden',borderLeft:'3px solid var(--crimson-bright)'}}>
-                    <img src={w.image} className="wanted-img" alt="wanted" onError={e=>e.target.src='https://placehold.co/400x180/0d0d0d/333?text=NO+PHOTO+AVAILABLE'}/>
-                    <div style={{padding:16}}>
-                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:4}}>
-                            <h3 style={{fontWeight:700,fontSize:'0.95rem',letterSpacing:'0.06em'}}>{w.name}</h3>
-                            <span className="badge badge-open">WANTED</span>
-                        </div>
-                        <p className="mono" style={{color:'#cc4444',fontSize:'0.65rem',letterSpacing:'0.15em',marginBottom:12}}>{w.charge}</p>
-                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                            <span className="mono" style={{color:'#223',fontSize:'0.55rem'}}>LOGGED BY: {w.author}</span>
-                            {isPrivileged && <button onClick={()=>deleteEntry('wanted',w.id)} style={{color:'#4a1a1a',background:'none',border:'none',cursor:'pointer'}}><i className="fas fa-trash" style={{fontSize:'0.75rem'}}/></button>}
-                        </div>
-                    </div>
-                </div>
-            ))}
+        <div style={{position:'relative'}}>
+            <i className="fas fa-search" style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',color:'var(--text3)',fontSize:'0.75rem'}}/>
+            <input className="input" style={{paddingLeft:36}} placeholder="Search by name or ID..." value={search} onChange={e=>setSearch(e.target.value)}/>
         </div>
-    );
-
-    /* ─── CIVILIAN TAB ─── */
-    const CivilianTab = () => (
-        <div className="animate-fade-up" style={{display:'flex',flexDirection:'column',gap:14}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                <p className="display" style={{fontSize:'1.1rem',color:'var(--gold)',letterSpacing:'0.15em'}}>CIVILIAN DATABASE</p>
-                <button className="btn-ghost" style={{fontSize:'0.7rem',padding:'6px 14px'}} onClick={()=>setActiveModal('civilian_form')}>
-                    <i className="fas fa-plus" style={{marginRight:6}}/> REGISTER
-                </button>
-            </div>
-            <div style={{position:'relative'}}>
-                <i className="fas fa-search" style={{position:'absolute',left:14,top:'50%',transform:'translateY(-50%)',color:'#223',fontSize:'0.7rem'}}/>
-                <input className="fbi-input" style={{paddingLeft:38}} placeholder="Search by name or ID..." value={searchQuery} onChange={e=>setSearchQuery(e.target.value)}/>
-            </div>
-            {allCivilians.length===0 && <div style={{textAlign:'center',padding:'40px 0',color:'#223'}}><i className="fas fa-fingerprint" style={{fontSize:'2.2rem',display:'block',marginBottom:12}}/><p className="mono" style={{fontSize:'0.65rem',letterSpacing:'0.2em'}}>NO CIVILIANS REGISTERED</p></div>}
-            {allCivilians.filter(c=>c.name?.toLowerCase().includes(searchQuery.toLowerCase())||c.sonyId?.includes(searchQuery)).map(c => (
-                <div key={c.id} className="data-row">
-                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                        <div style={{display:'flex',alignItems:'center',gap:12}}>
-                            <div style={{width:40,height:40,borderRadius:3,display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:'0.9rem',background:'rgba(201,168,76,0.1)',border:'1px solid var(--border-gold)',color:'var(--gold)'}}>{(c.name||'?')[0].toUpperCase()}</div>
-                            <div>
-                                <p style={{fontWeight:600,fontSize:'0.85rem'}}>{c.name}</p>
-                                <p className="mono" style={{color:'#334',fontSize:'0.6rem',letterSpacing:'0.1em'}}>ID: {c.sonyId}</p>
-                            </div>
+        <div className="card" style={{overflow:'hidden'}}>
+            {data.civilians.length === 0 ? <Empty icon="fa-fingerprint" text="NO CIVILIANS REGISTERED"/> :
+                data.civilians.filter(c => c.name?.toLowerCase().includes(search.toLowerCase()) || c.sonyId?.includes(search))
+                .map(c => (
+                    <div key={c.id} className="data-row">
+                        <div style={{width:36,height:36,borderRadius:6,background:'var(--surface2)',border:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,color,flexShrink:0}}>
+                            {(c.name||'?')[0].toUpperCase()}
                         </div>
-                        {isPrivileged && <div style={{display:'flex',gap:8}}>
-                            <button onClick={()=>{setItemToEdit(c);setActiveModal('civilian_form');}} style={{color:'#2a4a6a',padding:6,background:'none',border:'none',cursor:'pointer'}}><i className="fas fa-edit" style={{fontSize:'0.75rem'}}/></button>
-                            <button onClick={()=>deleteEntry('civilians',c.id)} style={{color:'#4a1a1a',padding:6,background:'none',border:'none',cursor:'pointer'}}><i className="fas fa-trash" style={{fontSize:'0.75rem'}}/></button>
-                        </div>}
+                        <div style={{flex:1,minWidth:0}}>
+                            <p style={{fontWeight:600,fontSize:'0.85rem'}}>{c.name}</p>
+                            <p className="mono" style={{fontSize:'0.62rem',color:'var(--text3)'}}>ID: {c.sonyId}</p>
+                        </div>
+                        {isPrivileged && (
+                            <div style={{display:'flex',gap:4,flexShrink:0}}>
+                                <button className="btn btn-ghost btn-xs" onClick={() => {setEditItem(c);setModal('civilian_form');}}>
+                                    <i className="fas fa-pen"/>
+                                </button>
+                                <button className="btn btn-ghost btn-xs" style={{color:'var(--danger)'}} onClick={() => deleteRecord(`${sector}_civilians`, c.id)}>
+                                    <i className="fas fa-trash"/>
+                                </button>
+                            </div>
+                        )}
                     </div>
-                    <button onClick={()=>{setItemToEdit({suspects:c.name});setActiveModal('case_form');}}
-                        style={{width:'100%',marginTop:12,padding:'8px',background:'rgba(139,0,0,0.1)',border:'1px solid rgba(139,0,0,0.25)',borderRadius:3,color:'#cc4444',fontFamily:'Share Tech Mono',fontSize:'0.6rem',letterSpacing:'0.15em',cursor:'pointer'}}>
-                        <i className="fas fa-file-circle-exclamation" style={{marginRight:8}}/>ISSUE CRIMINAL WARRANT
-                    </button>
-                </div>
-            ))}
+                ))
+            }
         </div>
-    );
+    </div>
+);
 
-    /* ─── STAFF TAB ─── */
-    const StaffTab = () => (
-        <div className="animate-fade-up" style={{display:'flex',flexDirection:'column',gap:14}}>
-            <p className="display" style={{fontSize:'1.1rem',color:'var(--gold-bright)',letterSpacing:'0.15em'}}>FEDERAL PERSONNEL</p>
-            {!isPrivileged ? (
-                <div className="glass-card" style={{padding:60,textAlign:'center'}}>
-                    <Corners/>
-                    <i className="fas fa-lock" style={{fontSize:'2.5rem',color:'var(--crimson-bright)',display:'block',marginBottom:14}}/>
-                    <p className="display" style={{letterSpacing:'0.3em',color:'#334',fontSize:'1rem'}}>RESTRICTED ACCESS</p>
-                    <p className="mono" style={{color:'#223',fontSize:'0.6rem',letterSpacing:'0.2em',marginTop:8}}>COMMAND CLEARANCE REQUIRED</p>
-                </div>
-            ) : (<>
-                <div className="data-row" style={{borderLeftColor:'var(--gold)'}}>
-                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                        <div style={{display:'flex',alignItems:'center',gap:12}}>
-                            <div style={{width:40,height:40,borderRadius:3,display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(201,168,76,0.1)',border:'1px solid var(--border-gold)',color:'var(--gold)'}}><i className="fas fa-shield-halved" style={{fontSize:'0.85rem'}}/></div>
-                            <div>
-                                <p style={{fontWeight:600,fontSize:'0.85rem'}}>System Administrator</p>
-                                <p className="mono" style={{color:'var(--gold)',fontSize:'0.6rem',letterSpacing:'0.1em'}}>DIRECTOR</p>
-                            </div>
-                        </div>
-                        <span className="badge badge-gold">COMMAND</span>
-                    </div>
-                </div>
-                {allUsers.map(u => (
-                    <div key={u.id} className="data-row">
-                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                            <div style={{display:'flex',alignItems:'center',gap:12}}>
-                                <div style={{width:40,height:40,borderRadius:3,display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(255,255,255,0.04)',border:'1px solid var(--border-dim)',color:'#445'}}><i className={`fas ${u.access==='command'?'fa-shield-halved':'fa-user-shield'}`} style={{fontSize:'0.85rem'}}/></div>
-                                <div>
-                                    <p style={{fontWeight:600,fontSize:'0.85rem'}}>{u.name}</p>
-                                    <p className="mono" style={{color:'#334',fontSize:'0.6rem',letterSpacing:'0.1em'}}>{u.rank}</p>
-                                </div>
-                            </div>
-                            <div style={{display:'flex',alignItems:'center',gap:12}}>
-                                <span className={`badge ${u.access==='command'?'badge-gold':''}`} style={u.access!=='command'?{background:'rgba(255,255,255,0.04)',color:'#334',border:'1px solid var(--border-dim)',fontFamily:'Share Tech Mono',fontSize:'0.55rem',padding:'3px 8px',borderRadius:2,letterSpacing:'0.15em',textTransform:'uppercase'}:{}}>{u.access==='command'?'COMMAND':'FIELD'}</span>
-                                <button onClick={()=>{setItemToEdit(u);setActiveModal('staff_form');}} style={{color:'#2a4a6a',background:'none',border:'none',cursor:'pointer'}}><i className="fas fa-user-pen" style={{fontSize:'0.75rem'}}/></button>
-                                <button onClick={()=>deleteEntry('users',u.id)} style={{color:'#4a1a1a',background:'none',border:'none',cursor:'pointer'}}><i className="fas fa-user-slash" style={{fontSize:'0.75rem'}}/></button>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-                <button className="btn-gold" style={{width:'100%'}} onClick={()=>setActiveModal('staff_form')}>
-                    <i className="fas fa-user-plus" style={{marginRight:8}}/> ENROLL NEW AGENT
-                </button>
-            </>)}
-        </div>
-    );
+/* ═══════════════════════════════════════════════════════
+   OPS TAB
+═══════════════════════════════════════════════════════ */
+const OpsTab = ({ sector, data, color, currentUser, addLog }) => {
+    const [isDeploying, setIsDeploying] = useState(false);
+    const [selectedUnit, setSelectedUnit] = useState(null);
+    const [mapLoaded, setMapLoaded] = useState(false);
+    const [mapError, setMapError]   = useState(false);
+    const mapUrl = sector === 'fbi' ? MAP_URL_FBI : MAP_URL_STF;
 
-    /* ─── CHAT TAB (Crypto) ─── */
-    const ChatTab = () => {
-        const [rawText, setRawText] = useState('');
-        const [cipherText, setCipherText] = useState('');
-        const [decodeInput, setDecodeInput] = useState('');
-        const [decodedResult, setDecodedResult] = useState('');
+    const db = window.fbDB, T = window.fbTools;
+    const dutyCol    = `${sector}_duty`;
+    const markerCol  = `${sector}_markers`;
 
-        const encrypt = (text) => {
-            if (!text) return '';
-            try {
-                const encoder = new TextEncoder();
-                const v = encoder.encode(text);
-                let hex = Array.from(v).map(b => b.toString(16).padStart(2, '0')).join('');
-                const map = {'0':'X', '1':'V', '2':'I', '3':'A', '4':'B', '5':'S', '6':'T', '7':'Z', '8':'K', '9':'P'};
-                return hex.split('').map(char => map[char] || char).join('·').toUpperCase();
-            } catch(e) { return "ERROR"; }
-        };
-
-        const decrypt = (cipher) => {
-            if (!cipher) return '';
-            try {
-                const rev = {'X':'0', 'V':'1', 'I':'2', 'A':'3', 'B':'4', 'S':'5', 'T':'6', 'Z':'7', 'K':'8', 'P':'9'};
-                const clean = cipher.split('·').map(c => rev[c] || c).join('').toLowerCase();
-                const bytes = new Uint8Array(clean.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
-                const decoder = new TextDecoder();
-                return decoder.decode(bytes);
-            } catch (e) { return "خطأ: تأكد من نسخ الشفرة كاملة وبدون مسافات"; }
-        };
-
-        return (
-            <div className="animate-fade-up" style={{display:'flex', flexDirection:'column', gap:20}}>
-                <p className="display" style={{fontSize:'1.1rem', color:'var(--gold)', letterSpacing:'0.15em'}}>ENIGMA CRYPTOGRAPHIC TERMINAL</p>
-                <div className="glass-card" style={{padding:24, borderLeft:'4px solid var(--gold)'}}>
-                    <Corners/>
-                    <p className="display" style={{fontSize:'0.75rem', color:'var(--gold)', marginBottom:15}}>ENCRYPTION UNIT</p>
-                    <textarea className="fbi-input" style={{height:80, fontSize:'0.9rem', marginBottom:15}} placeholder="اكتب رسالتك بالعربي هنا..."
-                        value={rawText} onChange={(e) => { setRawText(e.target.value); setCipherText(encrypt(e.target.value)); }}/>
-                    <div className="mono" style={{background:'rgba(0,0,0,0.5)', padding:15, border:'1px dashed var(--border-gold)'}}>
-                        <p style={{fontSize:'0.5rem', color:'#556', marginBottom:5}}>GENERATED CIPHER:</p>
-                        <p style={{fontSize:'0.8rem', color:'#4ade80', wordBreak:'break-all'}}>{cipherText || "AWAITING DATA..."}</p>
-                        {cipherText && <button onClick={() => navigator.clipboard.writeText(cipherText)} style={{marginTop:10, color:'var(--gold)', fontSize:'0.6rem', background:'none', border:'1px solid rgba(201,168,76,0.2)', padding:'4px 8px', cursor:'pointer'}}>COPY CODE</button>}
-                    </div>
-                </div>
-                <div className="glass-card" style={{padding:24, borderLeft:'4px solid var(--crimson-bright)'}}>
-                    <Corners/>
-                    <p className="display" style={{fontSize:'0.75rem', color:'var(--crimson-bright)', marginBottom:15}}>DECRYPTION UNIT</p>
-                    <textarea className="fbi-input" style={{height:80, fontSize:'0.9rem', marginBottom:15}} placeholder="الصق الشفرة هنا..."
-                        value={decodeInput} onChange={(e) => setDecodeInput(e.target.value)}/>
-                    <button className="btn-gold" style={{width:'100%', marginBottom:15}} onClick={() => setDecodedResult(decrypt(decodeInput))}>DECODE SIGNAL</button>
-                    <div className="mono" style={{background:'rgba(255,255,255,0.02)', padding:15, border:'1px solid var(--border-dim)'}}>
-                        <p style={{fontSize:'0.5rem', color:'#556', marginBottom:5}}>ORIGINAL MESSAGE:</p>
-                        <p style={{fontSize:'1rem', color:'#fff'}}>{decodedResult || "---"}</p>
-                    </div>
-                </div>
-            </div>
-        );
+    const toggleDuty = async () => {
+        const on = data.duty.find(u => u.name === currentUser.name);
+        if (!on) {
+            await T.setDoc(T.doc(db, dutyCol, currentUser.name), { name: currentUser.name, rank: currentUser.rank, startTime: new Date().toISOString() });
+        } else {
+            await T.deleteDoc(T.doc(db, dutyCol, currentUser.name));
+            await T.deleteDoc(T.doc(db, markerCol, currentUser.name));
+        }
     };
 
-    /* ─── OPS CENTER TAB ─── */
-    // ★ غيّر هذا الرابط برابط GitHub Raw بعد ما ترفع الصورة ★
-    const MAP_IMAGE_URL = 'https://github.com/salmAlzaabi/FBI/blob/main/IMG_2479.jpg?raw=true';
+    const handleMapClick = async (e) => {
+        if (!isDeploying || !selectedUnit) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        await T.setDoc(T.doc(db, markerCol, selectedUnit.name), { name: selectedUnit.name, x, y });
+        setIsDeploying(false); setSelectedUnit(null);
+    };
 
-    const OpsCenterTab = () => {
-        const [isDistributing, setIsDistributing] = useState(false);
-        const [selectedForDist, setSelectedForDist] = useState(null);
-        const [mapLoaded, setMapLoaded] = useState(false);
-        const [mapError, setMapError] = useState(false);
-        const db = window.fbDB;
-        const T = window.fbTools;
+    const isOnDuty = data.duty.find(u => u.name === currentUser.name);
 
-        const toggleDuty = async () => {
-            const myStatus = allOnDuty.find(u => u.name === currentUser.name);
-            if (!myStatus) {
-                await T.setDoc(T.doc(db, "ops_duty", currentUser.name), {
-                    name: currentUser.name,
-                    rank: currentUser.rank || "Officer",
-                    startTime: new Date().toISOString()
-                });
-            } else {
-                await T.deleteDoc(T.doc(db, "ops_duty", currentUser.name));
-                await T.deleteDoc(T.doc(db, "ops_markers", currentUser.name));
-            }
-        };
+    return (
+        <div className="fade-up" style={{display:'flex',flexDirection:'column',gap:12}}>
+            <div className="display" style={{fontSize:'1.1rem',letterSpacing:'0.08em',color}}>OPS CENTER</div>
 
-        const handleMapClick = async (e) => {
-            if (!isDistributing || !selectedForDist) return;
-            const rect = e.currentTarget.getBoundingClientRect();
-            const x = ((e.clientX - rect.left) / rect.width) * 100;
-            const y = ((e.clientY - rect.top) / rect.height) * 100;
-            await T.setDoc(T.doc(db, "ops_markers", selectedForDist.name), {
-                name: selectedForDist.name, x, y
-            });
-            setIsDistributing(false);
-            setSelectedForDist(null);
-        };
+            <button className={`btn ${isOnDuty ? 'btn-danger' : 'btn-outline'}`} style={{width:'100%',padding:'12px'}} onClick={toggleDuty}>
+                <i className={`fas ${isOnDuty ? 'fa-circle-stop' : 'fa-satellite-dish'}`}/>
+                {isOnDuty ? 'LEAVE FIELD OPERATIONS' : 'JOIN FIELD OPERATIONS'}
+            </button>
 
-        const isOnDuty = allOnDuty.find(u => u.name === currentUser.name);
-        const isPlaceholder = MAP_IMAGE_URL === 'GITHUB_RAW_URL_HERE';
-
-        return (
-            <div className="animate-fade-up" style={{display:'flex', flexDirection:'column', gap:14}}>
-
-                {/* زر الدخول/الخروج من الميدان */}
-                <button
-                    className={isOnDuty ? "btn-red" : "btn-gold"}
-                    style={{padding:'14px 0', width:'100%'}}
-                    onClick={toggleDuty}
-                >
-                    <i className="fas fa-satellite-dish" style={{marginRight:10}}/>
-                    {isOnDuty ? "◼ LEAVE FIELD OPERATIONS" : "◆ JOIN FIELD OPERATIONS"}
-                </button>
-
-                {/* تنبيه وضع DEPLOY */}
-                {isDistributing && (
-                    <div style={{background:'rgba(201,168,76,0.12)', border:'2px solid var(--gold)', padding:'12px 16px', borderRadius:3, display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-                        <div>
-                            <p className="mono" style={{color:'var(--gold)', fontSize:'0.65rem', fontWeight:'bold'}}>
-                                <i className="fas fa-crosshairs" style={{marginRight:8}}/>DEPLOY MODE — انقر على الخريطة
-                            </p>
-                            <p className="mono" style={{color:'#aaa', fontSize:'0.6rem', marginTop:3}}>الوحدة: {selectedForDist?.name}</p>
-                        </div>
-                        <button
-                            onClick={() => { setIsDistributing(false); setSelectedForDist(null); }}
-                            style={{color:'#cc4444', fontSize:'0.7rem', background:'none', border:'1px solid rgba(200,0,0,0.3)', padding:'5px 10px', cursor:'pointer', borderRadius:3, fontFamily:'Share Tech Mono'}}
-                        >CANCEL</button>
+            {isDeploying && (
+                <div className="alert alert-warning" style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                    <div>
+                        <p className="mono" style={{fontSize:'0.65rem',fontWeight:600}}><i className="fas fa-crosshairs" style={{marginRight:6}}/>DEPLOY MODE — TAP ON MAP</p>
+                        <p style={{fontSize:'0.7rem',color:'var(--text2)',marginTop:2}}>Unit: {selectedUnit?.name}</p>
                     </div>
-                )}
-
-                {/* الخريطة */}
-                <div className="glass-card" style={{overflow:'hidden'}}>
-                    <div style={{padding:'8px 14px', borderBottom:'1px solid var(--border-gold)', display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-                        <span className="display" style={{fontSize:'0.75rem', color:'var(--gold)', letterSpacing:'0.2em'}}>TACTICAL MAP</span>
-                        <div style={{display:'flex', alignItems:'center', gap:6}}>
-                            <PulseDot/>
-                            <span className="mono" style={{fontSize:'0.5rem', color:'#1a3a1a'}}>LIVE</span>
-                        </div>
-                    </div>
-
-                    <div
-                        style={{position:'relative', width:'100%', cursor: isDistributing ? 'crosshair' : 'default'}}
-                        onClick={handleMapClick}
-                    >
-                        {/* placeholder لو الرابط لسه ما اتحط أو الصورة فشلت */}
-                        {(isPlaceholder || mapError) ? (
-                            <div style={{width:'100%', minHeight:240, background:'#050a15', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:12, padding:30}}>
-                                <i className="fas fa-map-location-dot" style={{fontSize:'3rem', color:'rgba(201,168,76,0.15)'}}/>
-                                <p className="mono" style={{color:'var(--gold)', fontSize:'0.65rem', textAlign:'center', letterSpacing:'0.15em', opacity:0.5}}>
-                                    {isPlaceholder ? 'AWAITING MAP IMAGE' : 'MAP IMAGE UNAVAILABLE'}
-                                </p>
-                                <p className="mono" style={{color:'#334', fontSize:'0.55rem', textAlign:'center', lineHeight:1.8}}>
-                                    {isPlaceholder
-                                        ? 'ارفع الصورة على GitHub وحط الرابط الـ Raw\nفي المتغير MAP_IMAGE_URL داخل الكود'
-                                        : 'تأكد إن الرابط صحيح ويدعم CORS\n(GitHub Raw يشتغل دائماً)'
-                                    }
-                                </p>
-                            </div>
-                        ) : (
-                            <>
-                                {/* loading skeleton */}
-                                {!mapLoaded && (
-                                    <div style={{width:'100%', minHeight:240, background:'linear-gradient(90deg, #050a15 25%, #0a1020 50%, #050a15 75%)', display:'flex', alignItems:'center', justifyContent:'center'}}>
-                                        <i className="fas fa-circle-notch fa-spin" style={{color:'var(--gold)', fontSize:'1.5rem', opacity:0.4}}/>
-                                    </div>
-                                )}
-                                <img
-                                    src={MAP_IMAGE_URL}
-                                    style={{width:'100%', height:'auto', display: mapLoaded ? 'block' : 'none'}}
-                                    alt="Tactical Map"
-                                    onLoad={() => setMapLoaded(true)}
-                                    onError={() => setMapError(true)}
-                                />
-                            </>
-                        )}
-
-                        {/* دبابيس الوحدات */}
-                        {!isPlaceholder && !mapError && mapLoaded && allMarkers.map(marker => (
-                            <div key={marker.id} style={{
-                                position:'absolute',
-                                left:`${marker.x}%`,
-                                top:`${marker.y}%`,
-                                transform:'translate(-50%, -100%)',
-                                zIndex:10,
-                                pointerEvents:'none',
-                                textAlign:'center'
-                            }}>
-                                <i className="fas fa-location-dot" style={{color:'var(--gold)', fontSize:'1.6rem', filter:'drop-shadow(0 2px 6px rgba(0,0,0,0.9))'}}/>
-                                <div className="mono" style={{background:'rgba(0,0,0,0.92)', color:'#fff', padding:'2px 7px', fontSize:'0.55rem', border:'1px solid var(--gold)', whiteSpace:'nowrap', borderRadius:2, marginTop:2}}>
-                                    {marker.name}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    <button className="btn btn-outline btn-sm" style={{color:'var(--danger)',borderColor:'#fecaca'}}
+                        onClick={() => {setIsDeploying(false);setSelectedUnit(null);}}>Cancel</button>
                 </div>
+            )}
 
-                {/* الوحدات النشطة */}
-                <div className="glass-card" style={{padding:14}}>
-                    <p className="display" style={{fontSize:'0.85rem', color:'var(--gold)', marginBottom:12, letterSpacing:'0.15em'}}>
-                        ACTIVE UNITS <span style={{color:'#555', fontSize:'0.7rem'}}>({allOnDuty.length})</span>
-                    </p>
-                    {allOnDuty.length === 0 ? (
-                        <div style={{textAlign:'center', padding:'20px 0', color:'#223'}}>
-                            <i className="fas fa-user-slash" style={{display:'block', fontSize:'1.5rem', marginBottom:8, opacity:0.2}}/>
-                            <p className="mono" style={{fontSize:'0.6rem', letterSpacing:'0.15em'}}>NO UNITS ACTIVE</p>
+            {/* Map */}
+            <div className="card" style={{overflow:'hidden'}}>
+                <div style={{padding:'8px 14px',borderBottom:'1px solid var(--border2)',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                    <span className="display" style={{fontSize:'0.8rem',letterSpacing:'0.12em',color:'var(--text2)'}}>TACTICAL MAP</span>
+                    <div style={{display:'flex',alignItems:'center',gap:6}}><Dot status="green"/><span className="mono" style={{fontSize:'0.55rem',color:'var(--text3)'}}>LIVE</span></div>
+                </div>
+                <div style={{position:'relative',cursor:isDeploying?'crosshair':'default'}} onClick={handleMapClick}>
+                    {mapError ? (
+                        <div style={{padding:40,textAlign:'center',color:'var(--text3)'}}>
+                            <i className="fas fa-map" style={{fontSize:'2rem',display:'block',marginBottom:8,opacity:.2}}/>
+                            <p className="mono" style={{fontSize:'0.65rem'}}>MAP UNAVAILABLE</p>
                         </div>
                     ) : (
-                        <div style={{display:'flex', flexDirection:'column', gap:8}}>
-                            {allOnDuty.map(unit => (
-                                <div key={unit.id} className="unit-card" style={{borderRadius:3}}>
-                                    <div style={{display:'flex', alignItems:'center', gap:10}}>
-                                        <div style={{width:32, height:32, borderRadius:3, background:'rgba(201,168,76,0.08)', border:'1px solid var(--border-gold)', display:'flex', alignItems:'center', justifyContent:'center'}}>
-                                            <i className="fas fa-user-shield" style={{color:'var(--gold)', fontSize:'0.75rem'}}/>
-                                        </div>
-                                        <div>
-                                            <div style={{fontSize:'0.82rem', fontWeight:'bold'}}>{unit.name}</div>
-                                            <div className="mono" style={{fontSize:'0.52rem', color:'var(--gold)'}}>{unit.rank}</div>
-                                        </div>
-                                    </div>
-                                    <button
-                                        className="btn-gold"
-                                        style={{padding:'6px 14px', fontSize:'0.62rem'}}
-                                        onClick={() => { setSelectedForDist(unit); setIsDistributing(true); }}
-                                    >
-                                        <i className="fas fa-map-pin" style={{marginRight:5}}/>DEPLOY
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
+                        <>
+                            {!mapLoaded && <div style={{padding:40,textAlign:'center'}}><Spinner/></div>}
+                            <img src={mapUrl} style={{width:'100%',height:'auto',display:mapLoaded?'block':'none'}}
+                                onLoad={()=>setMapLoaded(true)} onError={()=>setMapError(true)} alt="Tactical Map"/>
+                        </>
                     )}
+                    {mapLoaded && !mapError && data.markers.map(m => (
+                        <div key={m.id} style={{position:'absolute',left:`${m.x}%`,top:`${m.y}%`,transform:'translate(-50%,-100%)',zIndex:10,pointerEvents:'none',textAlign:'center'}}>
+                            <i className="fas fa-location-dot" style={{color,fontSize:'1.4rem',filter:'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'}}/>
+                            <div className="mono" style={{background:'rgba(0,0,0,0.85)',color:'#fff',padding:'2px 6px',fontSize:'0.52rem',borderRadius:3,marginTop:2,whiteSpace:'nowrap'}}>{m.name}</div>
+                        </div>
+                    ))}
                 </div>
-
             </div>
-        );
-    };
 
-    /* ─── LOGS TAB ─── */
-    const LogsTab = () => (
-        <div className="animate-fade-up" style={{display:'flex',flexDirection:'column',gap:14}}>
-            <p className="display" style={{fontSize:'1.1rem',color:'var(--gold)',letterSpacing:'0.15em'}}>ACTIVITY LOG</p>
-            <div className="glass-card" style={{overflow:'hidden'}}>
-                <Corners/>
-                {activityLog.length===0 && <div style={{textAlign:'center',padding:40,color:'#112'}}><p className="mono" style={{fontSize:'0.65rem',letterSpacing:'0.2em'}}>NO ACTIVITY RECORDED</p></div>}
-                {activityLog.map((l,i)=>(
-                    <div key={i} className="log-entry">
-                        [<span className="t">{l.time}</span>] &nbsp;<span className="u">{l.user}</span>&nbsp;—&nbsp;<span className="a">{l.action}</span>
-                    </div>
-                ))}
+            {/* Active units */}
+            <div className="card" style={{overflow:'hidden'}}>
+                <div style={{padding:'10px 14px',borderBottom:'1px solid var(--border2)'}}>
+                    <span className="display" style={{fontSize:'0.8rem',letterSpacing:'0.12em',color:'var(--text2)'}}>ACTIVE UNITS ({data.duty.length})</span>
+                </div>
+                {data.duty.length === 0 ? <Empty icon="fa-user-slash" text="NO UNITS ACTIVE"/> :
+                    data.duty.map(u => (
+                        <div key={u.id} className="unit-item">
+                            <div style={{display:'flex',alignItems:'center',gap:10}}>
+                                <div style={{width:32,height:32,borderRadius:4,background:'var(--surface2)',border:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                                    <i className="fas fa-user-shield" style={{color,fontSize:'0.75rem'}}/>
+                                </div>
+                                <div>
+                                    <p style={{fontWeight:600,fontSize:'0.82rem'}}>{u.name}</p>
+                                    <p className="mono" style={{fontSize:'0.55rem',color:'var(--text3)'}}>{u.rank}</p>
+                                </div>
+                            </div>
+                            <button className="btn btn-outline btn-sm" style={{borderColor:color,color}} onClick={() => {setSelectedUnit(u);setIsDeploying(true);}}>
+                                <i className="fas fa-map-pin"/> Deploy
+                            </button>
+                        </div>
+                    ))
+                }
             </div>
         </div>
     );
+};
 
-    /* ─── MODAL ─── */
-    const titles = { case_form:'CASE FILE', wanted_form:'WANTED TARGET', civilian_form:'CIVILIAN RECORD', staff_form:'AGENT PROFILE' };
-    const Modal = () => !activeModal ? null : (
-        <div className="modal-overlay">
-            <div className="glass-card" style={{width:'100%',maxWidth:420,padding:24,overflowY:'auto',maxHeight:'90vh'}}>
-                <Corners/>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20}}>
-                    <h3 className="display" style={{fontSize:'1.1rem',color:'var(--gold)',letterSpacing:'0.2em'}}>{itemToEdit?'EDIT':'NEW'} {titles[activeModal]}</h3>
-                    <button className="mono" style={{color:'#334',fontSize:'0.65rem',letterSpacing:'0.1em',background:'none',border:'none',cursor:'pointer'}} onClick={()=>{setActiveModal(null);setItemToEdit(null);}}>
-                        <i className="fas fa-times" style={{marginRight:4}}/> CLOSE
-                    </button>
+/* ═══════════════════════════════════════════════════════
+   STAFF TAB
+═══════════════════════════════════════════════════════ */
+const StaffTab = ({ sector, data, color, isPrivileged, openModal, deleteRecord, ranks }) => (
+    <div className="fade-up" style={{display:'flex',flexDirection:'column',gap:12}}>
+        <div className="display" style={{fontSize:'1.1rem',letterSpacing:'0.08em',color}}>PERSONNEL</div>
+        {!isPrivileged ? (
+            <div className="card" style={{padding:48,textAlign:'center'}}>
+                <i className="fas fa-lock" style={{fontSize:'2rem',color:'var(--text3)',display:'block',marginBottom:12,opacity:.3}}/>
+                <div className="display" style={{fontSize:'1rem',letterSpacing:'0.15em',color:'var(--text3)',marginBottom:6}}>RESTRICTED ACCESS</div>
+                <p className="mono" style={{fontSize:'0.65rem',color:'var(--text3)'}}>COMMAND CLEARANCE REQUIRED</p>
+            </div>
+        ) : (
+            <>
+                {/* Admin row */}
+                <div className="card" style={{overflow:'hidden',borderTop:`3px solid ${color}`}}>
+                    <div className="data-row">
+                        <div style={{width:36,height:36,borderRadius:4,background:'var(--surface2)',border:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                            <i className="fas fa-shield-halved" style={{color,fontSize:'0.85rem'}}/>
+                        </div>
+                        <div style={{flex:1}}>
+                            <p style={{fontWeight:700,fontSize:'0.85rem'}}>System Administrator</p>
+                            <p className="mono" style={{fontSize:'0.6rem',color}}>
+                                {sector === 'fbi' ? 'DIRECTOR' : 'CHIEF OF STF'}
+                            </p>
+                        </div>
+                        <span className="badge" style={{background:'var(--surface2)',color,border:`1px solid ${color}`,fontFamily:'var(--mono)',fontSize:'0.55rem',padding:'3px 8px',borderRadius:4,letterSpacing:'0.1em'}}>COMMAND</span>
+                    </div>
                 </div>
-                <Divider/>
-                <form onSubmit={handleSubmit} style={{display:'flex',flexDirection:'column',gap:14,marginTop:16}}>
-                    {activeModal==='case_form' && <>
-                        <div><label className="mono" style={{display:'block',marginBottom:6,color:'#334',fontSize:'0.6rem',letterSpacing:'0.2em'}}>CASE TITLE</label><input name="title" className="fbi-input" placeholder="Case codename..." defaultValue={itemToEdit?.title} required/></div>
-                        <div><label className="mono" style={{display:'block',marginBottom:6,color:'#334',fontSize:'0.6rem',letterSpacing:'0.2em'}}>INCIDENT REPORT</label><textarea name="details" className="fbi-input" style={{height:88}} placeholder="Detailed incident description..." defaultValue={itemToEdit?.details} required/></div>
-                        <div><label className="mono" style={{display:'block',marginBottom:6,color:'#334',fontSize:'0.6rem',letterSpacing:'0.2em'}}>SUSPECTS</label><input name="suspects" className="fbi-input" placeholder="Known suspects..." defaultValue={itemToEdit?.suspects} required/></div>
-                        <div><label className="mono" style={{display:'block',marginBottom:6,color:'#334',fontSize:'0.6rem',letterSpacing:'0.2em'}}>STATUS</label>
-                            <select name="status" className="fbi-input" defaultValue={itemToEdit?.status||'Open'}>
-                                <option value="Open">OPEN — Under Investigation</option>
-                                <option value="Closed">CLOSED — Case Resolved</option>
-                            </select>
+
+                <div className="card" style={{overflow:'hidden'}}>
+                    {data.users.length === 0 ? <Empty icon="fa-users" text="NO AGENTS ENROLLED"/> :
+                        data.users.map(u => (
+                            <div key={u.id} className="data-row" style={{alignItems:'center'}}>
+                                <div style={{width:36,height:36,borderRadius:4,background:'var(--surface2)',border:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                                    <i className={`fas ${u.access==='command'?'fa-shield-halved':'fa-user-shield'}`} style={{color:'var(--text3)',fontSize:'0.75rem'}}/>
+                                </div>
+                                <div style={{flex:1}}>
+                                    <p style={{fontWeight:600,fontSize:'0.85rem'}}>{u.name}</p>
+                                    <p className="mono" style={{fontSize:'0.6rem',color:'var(--text3)'}}>{u.rank}</p>
+                                </div>
+                                <div style={{display:'flex',alignItems:'center',gap:8,flexShrink:0}}>
+                                    {u.access === 'command' && <span className="badge" style={{background:'var(--surface2)',color,border:`1px solid ${color}`,fontFamily:'var(--mono)',fontSize:'0.55rem',padding:'3px 8px',borderRadius:4,letterSpacing:'0.1em'}}>CMD</span>}
+                                    <button className="btn btn-ghost btn-xs" onClick={() => {openModal('staff_form', u);}}>
+                                        <i className="fas fa-pen"/>
+                                    </button>
+                                    <button className="btn btn-ghost btn-xs" style={{color:'var(--danger)'}} onClick={() => deleteRecord(`${sector}_users`, u.id)}>
+                                        <i className="fas fa-user-slash"/>
+                                    </button>
+                                </div>
+                            </div>
+                        ))
+                    }
+                </div>
+                <button className="btn btn-outline" style={{width:'100%',borderColor:color,color}} onClick={() => openModal('staff_form')}>
+                    <i className="fas fa-user-plus"/> Enroll New Agent
+                </button>
+            </>
+        )}
+    </div>
+);
+
+/* ═══════════════════════════════════════════════════════
+   JOINT MISSIONS TAB
+═══════════════════════════════════════════════════════ */
+const JointTab = ({ sector, currentUser, jointMissions, color, isPrivileged, addLog }) => {
+    const [showForm, setShowForm] = useState(false);
+    const [title, setTitle] = useState('');
+    const [details, setDetails] = useState('');
+    const [saving, setSaving] = useState(false);
+
+    const otherSector = sector === 'fbi' ? 'stf' : 'fbi';
+    const otherLabel  = sector === 'fbi' ? 'STF' : 'FBI';
+
+    const myMissions = jointMissions.filter(m => m.requesterSector === sector || m.targetSector === sector);
+
+    const canCreate = isPrivileged; // top 3 ranks
+
+    const createMission = async () => {
+        if (!title || !details) return;
+        setSaving(true);
+        const db = window.fbDB, T = window.fbTools;
+        await T.addDoc(T.collection(db, 'joint_missions'), {
+            title, details,
+            requesterSector: sector,
+            requesterName:   currentUser.name,
+            requesterRank:   currentUser.rank,
+            targetSector:    otherSector,
+            status:          'Pending',
+            createdAt:       T.serverTimestamp(),
+        });
+        addLog(`Joint mission created: ${title}`);
+        setTitle(''); setDetails(''); setShowForm(false); setSaving(false);
+    };
+
+    const respond = async (id, approve) => {
+        const db = window.fbDB, T = window.fbTools;
+        await T.updateDoc(T.doc(db, 'joint_missions', id), {
+            status: approve ? 'Approved' : 'Rejected',
+            respondedBy: currentUser.name,
+            respondedAt: T.serverTimestamp(),
+        });
+        addLog(`Joint mission ${approve ? 'approved' : 'rejected'}`);
+    };
+
+    const deleteMission = async (id) => {
+        if (!window.confirm('Delete this joint mission?')) return;
+        await window.fbTools.deleteDoc(window.fbTools.doc(window.fbDB, 'joint_missions', id));
+        addLog('Joint mission deleted');
+    };
+
+    const statusBadge = (s) => {
+        if (s === 'Approved') return <span className="badge badge-closed">APPROVED</span>;
+        if (s === 'Rejected') return <span className="badge badge-open">REJECTED</span>;
+        return <span className="badge badge-pending">PENDING</span>;
+    };
+
+    return (
+        <div className="fade-up" style={{display:'flex',flexDirection:'column',gap:12}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <div className="display" style={{fontSize:'1.1rem',letterSpacing:'0.08em',color:'var(--joint)'}}>JOINT OPERATIONS</div>
+                {canCreate && !showForm && (
+                    <button className="btn btn-primary-joint btn-sm" onClick={() => setShowForm(true)}>
+                        <i className="fas fa-plus"/> New Mission
+                    </button>
+                )}
+            </div>
+
+            {!canCreate && (
+                <div className="alert alert-warning">
+                    <p className="mono" style={{fontSize:'0.65rem'}}>
+                        <i className="fas fa-lock" style={{marginRight:6}}/>
+                        COMMAND CLEARANCE REQUIRED TO CREATE JOINT MISSIONS
+                    </p>
+                </div>
+            )}
+
+            {/* Create form */}
+            {showForm && (
+                <div className="card" style={{padding:20,borderTop:'3px solid var(--joint)'}}>
+                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
+                        <span className="display" style={{fontSize:'0.9rem',letterSpacing:'0.1em',color:'var(--joint)'}}>NEW JOINT MISSION → {otherLabel}</span>
+                        <button className="btn btn-ghost btn-xs" onClick={() => setShowForm(false)}><i className="fas fa-times"/></button>
+                    </div>
+                    <div style={{display:'flex',flexDirection:'column',gap:12}}>
+                        <FormField label="Mission Title">
+                            <input className="input" placeholder="Operation codename..." value={title} onChange={e=>setTitle(e.target.value)}/>
+                        </FormField>
+                        <FormField label="Mission Details">
+                            <textarea className="input" style={{height:80}} placeholder="Detailed briefing and objectives..." value={details} onChange={e=>setDetails(e.target.value)}/>
+                        </FormField>
+                        <div style={{display:'flex',gap:8}}>
+                            <button className="btn btn-primary-joint" style={{flex:1}} onClick={createMission} disabled={saving||!title||!details}>
+                                {saving ? <><Spinner/> Sending...</> : <><i className="fas fa-paper-plane"/> Submit to {otherLabel}</>}
+                            </button>
+                            <button className="btn btn-outline" onClick={() => setShowForm(false)}>Cancel</button>
                         </div>
-                    </>}
-                    {activeModal==='wanted_form' && <>
-                        <div><label className="mono" style={{display:'block',marginBottom:6,color:'#334',fontSize:'0.6rem',letterSpacing:'0.2em'}}>FULL NAME</label><input name="name" className="fbi-input" placeholder="Subject full name..." required/></div>
-                        <div><label className="mono" style={{display:'block',marginBottom:6,color:'#334',fontSize:'0.6rem',letterSpacing:'0.2em'}}>PRIMARY CHARGE</label><input name="charge" className="fbi-input" placeholder="e.g. Armed Robbery, Homicide..." required/></div>
-                        <div><label className="mono" style={{display:'block',marginBottom:6,color:'#334',fontSize:'0.6rem',letterSpacing:'0.2em'}}>PHOTO URL</label><input name="image" className="fbi-input" placeholder="Direct image link..." required/></div>
-                        <div><label className="mono" style={{display:'block',marginBottom:6,color:'#334',fontSize:'0.6rem',letterSpacing:'0.2em'}}>THREAT LEVEL</label>
-                            <select name="dangerLevel" className="fbi-input">
-                                <option value="Extremely Dangerous">EXTREMELY DANGEROUS</option>
-                                <option value="Moderate">MODERATE THREAT</option>
-                                <option value="Low">LOW THREAT</option>
-                            </select>
+                    </div>
+                </div>
+            )}
+
+            {/* Missions list */}
+            {myMissions.length === 0 ? (
+                <div className="card"><Empty icon="fa-handshake" text="NO JOINT MISSIONS"/></div>
+            ) : (
+                myMissions.map(m => {
+                    const isTarget    = m.targetSector === sector;
+                    const canRespond  = isTarget && m.status === 'Pending' && isPrivileged;
+                    const dirLabel    = m.requesterSector === sector ? `→ ${m.targetSector.toUpperCase()}` : `← ${m.requesterSector.toUpperCase()}`;
+
+                    return (
+                        <div key={m.id} className={`card mission-card ${m.status==='Approved'?'approved':m.status==='Pending'?'pending':''}`} style={{borderLeftColor: m.status==='Approved'?'var(--success)':m.status==='Rejected'?'var(--danger)':'var(--warning)'}}>
+                            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
+                                <div>
+                                    <p style={{fontWeight:700,fontSize:'0.9rem',marginBottom:2}}>{m.title}</p>
+                                    <div style={{display:'flex',gap:6,alignItems:'center'}}>
+                                        <span className="badge badge-joint">{dirLabel}</span>
+                                        {statusBadge(m.status)}
+                                    </div>
+                                </div>
+                            </div>
+                            <p style={{fontSize:'0.78rem',color:'var(--text2)',lineHeight:1.6,marginBottom:10}}>{m.details}</p>
+                            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:8}}>
+                                <span style={{fontSize:'0.68rem',color:'var(--text3)'}}>By: {m.requesterName} · {m.requesterRank}</span>
+                                <div style={{display:'flex',gap:6}}>
+                                    {canRespond && (
+                                        <>
+                                            <button className="btn btn-sm" style={{background:'var(--success)',color:'#fff'}} onClick={() => respond(m.id, true)}>
+                                                <i className="fas fa-check"/> Approve
+                                            </button>
+                                            <button className="btn btn-danger btn-sm" onClick={() => respond(m.id, false)}>
+                                                <i className="fas fa-times"/> Reject
+                                            </button>
+                                        </>
+                                    )}
+                                    {m.requesterSector === sector && isPrivileged && (
+                                        <button className="btn btn-ghost btn-xs" style={{color:'var(--danger)'}} onClick={() => deleteMission(m.id)}>
+                                            <i className="fas fa-trash"/>
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
                         </div>
-                    </>}
-                    {activeModal==='civilian_form' && <>
-                        <div><label className="mono" style={{display:'block',marginBottom:6,color:'#334',fontSize:'0.6rem',letterSpacing:'0.2em'}}>FULL NAME</label><input name="name" className="fbi-input" placeholder="Civilian full name..." defaultValue={itemToEdit?.name} required/></div>
-                        <div><label className="mono" style={{display:'block',marginBottom:6,color:'#334',fontSize:'0.6rem',letterSpacing:'0.2em'}}>NATIONAL ID</label><input name="sonyId" className="fbi-input" placeholder="Citizen ID number..." defaultValue={itemToEdit?.sonyId} required disabled={!!itemToEdit}/></div>
-                    </>}
-                    {activeModal==='staff_form' && <>
-                        <div><label className="mono" style={{display:'block',marginBottom:6,color:'#334',fontSize:'0.6rem',letterSpacing:'0.2em'}}>AGENT EMAIL</label><input name="id" className="fbi-input" placeholder="agent@fbi.gov" defaultValue={itemToEdit?.id} required/></div>
-                        <div><label className="mono" style={{display:'block',marginBottom:6,color:'#334',fontSize:'0.6rem',letterSpacing:'0.2em'}}>FULL NAME</label><input name="name" className="fbi-input" placeholder="Agent full name..." defaultValue={itemToEdit?.name} required/></div>
-                        <div><label className="mono" style={{display:'block',marginBottom:6,color:'#334',fontSize:'0.6rem',letterSpacing:'0.2em'}}>RANK</label>
-                            <select name="rank" className="fbi-input" defaultValue={itemToEdit?.rank||'Special Agent'}>
-                                {FBI_RANKS.map(r=><option key={r} value={r}>{r}</option>)}
-                            </select>
-                        </div>
-                        <div><label className="mono" style={{display:'block',marginBottom:6,color:'#334',fontSize:'0.6rem',letterSpacing:'0.2em'}}>CLEARANCE LEVEL</label>
-                            <select name="access" className="fbi-input" defaultValue={itemToEdit?.access||'field'}>
-                                <option value="field">FIELD AGENT</option>
-                                <option value="command">COMMAND ACCESS</option>
-                            </select>
-                        </div>
-                        <div><label className="mono" style={{display:'block',marginBottom:6,color:'#334',fontSize:'0.6rem',letterSpacing:'0.2em'}}>ACCESS CODE</label><input name="password" type="password" className="fbi-input" placeholder="Assign secure password..." defaultValue={itemToEdit?.password} required/></div>
-                    </>}
-                    <div style={{display:'flex',gap:10,paddingTop:8}}>
-                        <button type="submit" className="btn-gold" style={{flex:1}}><i className="fas fa-save" style={{marginRight:8}}/>SAVE RECORD</button>
-                        <button type="button" className="btn-ghost" style={{flex:1}} onClick={()=>{setActiveModal(null);setItemToEdit(null);}}>CANCEL</button>
+                    );
+                })
+            )}
+        </div>
+    );
+};
+
+/* ═══════════════════════════════════════════════════════
+   CRYPTO TAB
+═══════════════════════════════════════════════════════ */
+const CryptoTab = ({ color }) => {
+    const [raw, setRaw] = useState('');
+    const [cipher, setCipher] = useState('');
+    const [decInput, setDecInput] = useState('');
+    const [decoded, setDecoded] = useState('');
+
+    const encrypt = (text) => {
+        if (!text) return '';
+        try {
+            const v = new TextEncoder().encode(text);
+            let hex = Array.from(v).map(b=>b.toString(16).padStart(2,'0')).join('');
+            const map = {'0':'X','1':'V','2':'I','3':'A','4':'B','5':'S','6':'T','7':'Z','8':'K','9':'P'};
+            return hex.split('').map(c=>map[c]||c).join('·').toUpperCase();
+        } catch(e) { return 'ERROR'; }
+    };
+
+    const decrypt = (c) => {
+        if (!c) return '';
+        try {
+            const rev = {'X':'0','V':'1','I':'2','A':'3','B':'4','S':'5','T':'6','Z':'7','K':'8','P':'9'};
+            const clean = c.split('·').map(ch=>rev[ch]||ch).join('').toLowerCase();
+            const bytes = new Uint8Array(clean.match(/.{1,2}/g).map(b=>parseInt(b,16)));
+            return new TextDecoder().decode(bytes);
+        } catch(e) { return 'ERROR: Check cipher integrity'; }
+    };
+
+    return (
+        <div className="fade-up" style={{display:'flex',flexDirection:'column',gap:14}}>
+            <div className="display" style={{fontSize:'1.1rem',letterSpacing:'0.08em',color}}>ENIGMA CRYPTO TERMINAL</div>
+
+            <div className="card" style={{padding:20,borderTop:`3px solid ${color}`}}>
+                <div className="display" style={{fontSize:'0.8rem',letterSpacing:'0.1em',color:'var(--text2)',marginBottom:14}}>ENCRYPTION UNIT</div>
+                <FormField label="Plaintext Message">
+                    <textarea className="input" style={{height:80}} placeholder="Type your message here..."
+                        value={raw} onChange={e=>{setRaw(e.target.value);setCipher(encrypt(e.target.value));}}/>
+                </FormField>
+                {cipher && (
+                    <div style={{marginTop:12,padding:12,background:'var(--surface2)',border:'1px dashed var(--border)',borderRadius:4}}>
+                        <p className="label" style={{marginBottom:6}}>Generated Cipher:</p>
+                        <p className="mono" style={{fontSize:'0.75rem',color:'var(--success)',wordBreak:'break-all',lineHeight:1.6}}>{cipher}</p>
+                        <button className="btn btn-ghost btn-xs" style={{marginTop:8,color}} onClick={()=>navigator.clipboard.writeText(cipher)}>
+                            <i className="fas fa-copy"/> Copy
+                        </button>
+                    </div>
+                )}
+            </div>
+
+            <div className="card" style={{padding:20,borderTop:'3px solid var(--danger)'}}>
+                <div className="display" style={{fontSize:'0.8rem',letterSpacing:'0.1em',color:'var(--text2)',marginBottom:14}}>DECRYPTION UNIT</div>
+                <FormField label="Cipher Text">
+                    <textarea className="input" style={{height:80}} placeholder="Paste cipher here..." value={decInput} onChange={e=>setDecInput(e.target.value)}/>
+                </FormField>
+                <button className="btn btn-outline" style={{width:'100%',marginTop:10,marginBottom:12,borderColor:color,color}} onClick={()=>setDecoded(decrypt(decInput))}>
+                    <i className="fas fa-unlock"/> Decode Signal
+                </button>
+                {decoded && (
+                    <div style={{padding:12,background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:4}}>
+                        <p className="label" style={{marginBottom:6}}>Decoded Message:</p>
+                        <p style={{fontSize:'0.9rem',color:'var(--text)',lineHeight:1.6}}>{decoded}</p>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+/* ═══════════════════════════════════════════════════════
+   LOGS TAB
+═══════════════════════════════════════════════════════ */
+const LogsTab = ({ activityLog, sector }) => (
+    <div className="fade-up" style={{display:'flex',flexDirection:'column',gap:12}}>
+        <div className="display" style={{fontSize:'1.1rem',letterSpacing:'0.08em',color:'var(--text2)'}}>ACTIVITY LOG</div>
+        <div className="card" style={{overflow:'hidden'}}>
+            {activityLog.length === 0 ? <Empty icon="fa-terminal" text="NO ACTIVITY RECORDED"/> :
+                activityLog.map((l,i) => (
+                    <div key={i} className="log-entry">
+                        <span className="log-time">[{l.time}]</span>
+                        {' '}<span className="log-user" style={{color: l.sector==='fbi'?'var(--fbi)':'var(--stf)'}}>{l.user}</span>
+                        {' — '}{l.action}
+                    </div>
+                ))
+            }
+        </div>
+    </div>
+);
+
+/* ═══════════════════════════════════════════════════════
+   RECORD MODAL
+═══════════════════════════════════════════════════════ */
+const RecordModal = ({ modal, editItem, onClose, onSave, sector, color, ranks, data }) => {
+    const titles = { case_form:'Case File', wanted_form:'Wanted Target', civilian_form:'Civilian Record', staff_form:'Agent Profile' };
+
+    return (
+        <div className="modal-backdrop" onClick={e => e.target === e.currentTarget && onClose()}>
+            <div className="modal-box">
+                <div className="modal-header" style={{borderTop:`3px solid ${color}`}}>
+                    <span className="display" style={{fontSize:'1rem',letterSpacing:'0.1em',color}}>
+                        {editItem ? 'EDIT' : 'NEW'} {titles[modal]?.toUpperCase()}
+                    </span>
+                    <button className="btn btn-ghost btn-xs" onClick={onClose}><i className="fas fa-times"/></button>
+                </div>
+                <form onSubmit={onSave}>
+                    <div className="modal-body" style={{display:'flex',flexDirection:'column',gap:14}}>
+                        {modal === 'case_form' && <>
+                            <FormField label="Case Title">
+                                <input name="title" className="input" placeholder="Case codename..." defaultValue={editItem?.title} required/>
+                            </FormField>
+                            <FormField label="Incident Report">
+                                <textarea name="details" className="input" style={{height:88}} placeholder="Detailed incident description..." defaultValue={editItem?.details} required/>
+                            </FormField>
+                            <FormField label="Suspects">
+                                <input name="suspects" className="input" placeholder="Known suspects..." defaultValue={editItem?.suspects} required/>
+                            </FormField>
+                            <FormField label="Status">
+                                <select name="status" className="input" defaultValue={editItem?.status||'Open'}>
+                                    <option value="Open">OPEN — Under Investigation</option>
+                                    <option value="Closed">CLOSED — Case Resolved</option>
+                                </select>
+                            </FormField>
+                        </>}
+
+                        {modal === 'wanted_form' && <>
+                            <FormField label="Full Name">
+                                <input name="name" className="input" placeholder="Subject full name..." required/>
+                            </FormField>
+                            <FormField label="Primary Charge">
+                                <input name="charge" className="input" placeholder="e.g. Armed Robbery, Homicide..." required/>
+                            </FormField>
+                            <FormField label="Photo URL">
+                                <input name="image" className="input" placeholder="Direct image URL..." required/>
+                            </FormField>
+                            <FormField label="Threat Level">
+                                <select name="dangerLevel" className="input">
+                                    <option value="Extremely Dangerous">EXTREMELY DANGEROUS</option>
+                                    <option value="Moderate">MODERATE THREAT</option>
+                                    <option value="Low">LOW THREAT</option>
+                                </select>
+                            </FormField>
+                        </>}
+
+                        {modal === 'civilian_form' && <>
+                            <FormField label="Full Name">
+                                <input name="name" className="input" placeholder="Civilian full name..." defaultValue={editItem?.name} required/>
+                            </FormField>
+                            <FormField label="National ID">
+                                <input name="sonyId" className="input" placeholder="Citizen ID number..." defaultValue={editItem?.sonyId} required disabled={!!editItem}/>
+                            </FormField>
+                        </>}
+
+                        {modal === 'staff_form' && <>
+                            <FormField label="Email (Login ID)">
+                                <input name="id" className="input" placeholder={`agent@${sector}.gov`} defaultValue={editItem?.id} required/>
+                            </FormField>
+                            <FormField label="Full Name">
+                                <input name="name" className="input" placeholder="Agent full name..." defaultValue={editItem?.name} required/>
+                            </FormField>
+                            <FormField label="Rank">
+                                <select name="rank" className="input" defaultValue={editItem?.rank||ranks[ranks.length-1]}>
+                                    {ranks.map(r => <option key={r} value={r}>{r}</option>)}
+                                </select>
+                            </FormField>
+                            <FormField label="Clearance Level">
+                                <select name="access" className="input" defaultValue={editItem?.access||'field'}>
+                                    <option value="field">FIELD AGENT</option>
+                                    <option value="command">COMMAND ACCESS</option>
+                                </select>
+                            </FormField>
+                            <FormField label="Password">
+                                <input name="password" type="password" className="input" placeholder="Assign secure password..." defaultValue={editItem?.password} required/>
+                            </FormField>
+                        </>}
+                    </div>
+                    <div className="modal-footer">
+                        <button type="submit" className="btn" style={{background:color,color:'#fff'}}>
+                            <i className="fas fa-save"/> Save Record
+                        </button>
+                        <button type="button" className="btn btn-outline" onClick={onClose}>Cancel</button>
                     </div>
                 </form>
             </div>
         </div>
     );
-
-    /* ─── MAIN LAYOUT ─── */
-    const NAV = [
-        {key:'dashboard', icon:'fa-shield-heart',    label:'ARCHIVE'},
-        {key:'wanted',    icon:'fa-crosshairs',       label:'WANTED'},
-        {key:'civilians', icon:'fa-fingerprint',      label:'CIVS'},
-        {key:'ops',       icon:'fa-map-location-dot', label:'OPS'},
-        {key:'staff',     icon:'fa-user-gear',        label:'AGENTS'},
-        {key:'chat',      icon:'fa-satellite-dish',   label:'CHANNEL'},
-        {key:'logs',      icon:'fa-terminal',         label:'LOGS'},
-    ];
-
-    return (
-        <div style={{height:'100vh',width:'100vw',display:'flex',flexDirection:'column',overflow:'hidden'}}>
-            <ScanLine/>
-            <div style={{background:'rgba(2,6,16,0.98)',borderBottom:'1px solid var(--border-gold)',padding:'12px 18px',display:'flex',justifyContent:'space-between',alignItems:'center',flexShrink:0}}>
-                <div style={{display:'flex',alignItems:'center',gap:12}}>
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/da/Seal_of_the_Federal_Bureau_of_Investigation.svg" style={{width:26,height:26,opacity:0.7}} alt="seal"/>
-                    <div>
-                        <p style={{fontWeight:700,fontSize:'0.85rem',letterSpacing:'0.05em'}}>{currentUser.name}</p>
-                        <p className="mono" style={{color:'var(--gold)',fontSize:'0.55rem',letterSpacing:'0.2em'}}>{currentUser.rank}</p>
-                    </div>
-                </div>
-                <div style={{display:'flex',alignItems:'center',gap:12}}>
-                    <div style={{display:'flex',alignItems:'center',gap:6}}><PulseDot/><span className="mono" style={{color:'#1a3a1a',fontSize:'0.5rem',letterSpacing:'0.1em'}}>SECURE</span></div>
-                    <button className="btn-ghost" style={{fontSize:'0.7rem',padding:'6px 12px',borderColor:'rgba(139,0,0,0.4)',color:'#cc4444'}} onClick={doLogout}>SIGN OUT</button>
-                </div>
-            </div>
-            <Ticker/>
-            <main style={{flex:1,overflowY:'auto',padding:'18px 16px 100px',scrollbarWidth:'thin'}}>
-                {activeTab==='dashboard' && <DashboardTab/>}
-                {activeTab==='wanted'    && <WantedTab/>}
-                {activeTab==='civilians' && <CivilianTab/>}
-                {activeTab==='staff'     && <StaffTab/>}
-                {activeTab==='chat'      && <ChatTab/>}
-                {activeTab==='logs'      && <LogsTab/>}
-                {activeTab==='ops'       && <OpsCenterTab/>}
-            </main>
-            <nav className="bottom-nav" style={{position:'fixed',bottom:0,width:'100%',padding:'10px 4px',display:'flex',justifyContent:'space-around',alignItems:'center',zIndex:200}}>
-                {NAV.map(n => (
-                    <div key={n.key} className={`nav-item ${activeTab===n.key?'active':''}`} onClick={()=>setActiveTab(n.key)}>
-                        <i className={`fas ${n.icon}`} style={{fontSize:'1.05rem'}}/>
-                        <span className="mono" style={{fontSize:'0.42rem',letterSpacing:'0.12em'}}>{n.label}</span>
-                    </div>
-                ))}
-            </nav>
-            <Modal/>
-        </div>
-    );
 };
 
+/* ── Mount ── */
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App/>);
 </script>
