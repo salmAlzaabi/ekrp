@@ -1,14 +1,14 @@
 // بيانات تجريبية (سيتم استبدالها بـ Firebase لاحقاً)
 let currentUser = null;
 const users = [
-    { email: "admin@fbi.gov", pass: "123456", name: "القائد", role: "مطلقة", code: "001" }
+    { email: "vv@fbi.gov", pass: "vv11", name: "القائد", role: "مطلقة", code: "001" }
 ];
 
 function login() {
     const email = document.getElementById('email').value;
     const pass = document.getElementById('password').value;
 
-    if(email === "admin@fbi.gov" && pass === "123456") {
+    if(email === "vv@fbi.gov" && pass === "vv11") {
         currentUser = users[0];
         document.getElementById('login-page').classList.add('hidden');
         document.getElementById('dashboard').classList.remove('hidden');
