@@ -30,16 +30,6 @@
             --fbi-light:#2756a8;
             --fbi-glow: rgba(26,58,110,0.12);
 
-            /* STF accent */
-            --stf:      #1a5c2e;
-            --stf-dark: #0f3a1c;
-            --stf-light:#22803f;
-            --stf-glow: rgba(26,92,46,0.12);
-
-            /* Joint */
-            --joint:    #7c1d1d;
-            --joint-light:#a52828;
-
             --danger:   #dc2626;
             --warning:  #d97706;
             --success:  #16a34a;
@@ -101,10 +91,6 @@
         }
         .btn-primary-fbi { background: var(--fbi); color: #fff; }
         .btn-primary-fbi:hover { background: var(--fbi-light); box-shadow: 0 4px 12px rgba(26,58,110,.3); }
-        .btn-primary-stf { background: var(--stf); color: #fff; }
-        .btn-primary-stf:hover { background: var(--stf-light); box-shadow: 0 4px 12px rgba(26,92,46,.3); }
-        .btn-primary-joint { background: var(--joint); color: #fff; }
-        .btn-primary-joint:hover { background: var(--joint-light); }
         .btn-outline { background: transparent; color: var(--text2); border: 1px solid var(--border); }
         .btn-outline:hover { background: var(--surface2); border-color: var(--text3); }
         .btn-ghost  { background: transparent; color: var(--text2); border: none; padding: 8px 12px; }
@@ -123,7 +109,6 @@
             color: var(--text); outline: none; transition: border-color .15s, box-shadow .15s;
         }
         .input:focus { border-color: var(--fbi); box-shadow: 0 0 0 3px rgba(26,58,110,.08); }
-        .input-stf:focus { border-color: var(--stf); box-shadow: 0 0 0 3px rgba(26,92,46,.08); }
         .input::placeholder { color: var(--text3); }
         select.input option { background: var(--surface); }
         textarea.input { resize: none; }
@@ -135,8 +120,6 @@
         .badge-closed  { background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0; }
         .badge-pending { background:#fffbeb;color:#d97706;border:1px solid #fed7aa; }
         .badge-fbi     { background:#eff6ff;color:var(--fbi);border:1px solid #bfdbfe; }
-        .badge-stf     { background:#f0fdf4;color:var(--stf);border:1px solid #bbf7d0; }
-        .badge-joint   { background:#fef2f2;color:var(--joint);border:1px solid #fecaca; }
         .badge-blue    { background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe; }
 
         /* ── Table rows ── */
@@ -157,15 +140,11 @@
         .nav-tab span { font-size: 0.5rem; font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
         .nav-tab i { font-size: 1rem; }
         .nav-tab.active-fbi   { color: var(--fbi); }
-        .nav-tab.active-stf   { color: var(--stf); }
-        .nav-tab.active-joint { color: var(--joint); }
         .nav-tab.inactive { color: var(--text3); }
-        .nav-tab.active-fbi::after, .nav-tab.active-stf::after, .nav-tab.active-joint::after {
+        .nav-tab.active-fbi::after {
             content: ''; position: absolute; bottom: -10px; left: 20%; width: 60%; height: 2px; border-radius: 2px 2px 0 0;
         }
         .nav-tab.active-fbi::after   { background: var(--fbi); }
-        .nav-tab.active-stf::after   { background: var(--stf); }
-        .nav-tab.active-joint::after { background: var(--joint); }
 
         /* ── Status dot ── */
         .dot { width:7px;height:7px;border-radius:50%;display:inline-block; }
@@ -194,8 +173,6 @@
 
         /* ── Sector strip ── */
         .sector-strip-fbi   { background:var(--fbi);height:3px;width:100%; }
-        .sector-strip-stf   { background:var(--stf);height:3px;width:100%; }
-        .sector-strip-joint { background:var(--joint);height:3px;width:100%; }
 
         /* ── Stat card ── */
         .stat-card { padding:16px;display:flex;flex-direction:column;gap:4px; }
@@ -230,11 +207,6 @@
         /* ── Wanted card ── */
         .wanted-photo { width:100%;height:160px;object-fit:cover;border-bottom:3px solid var(--danger);display:block; }
 
-        /* ── Joint mission card ── */
-        .mission-card { padding:16px;border-left:4px solid var(--joint); }
-        .mission-card.approved { border-left-color:var(--success); }
-        .mission-card.pending  { border-left-color:var(--warning); }
-
         /* ── Unit card ── */
         .unit-item { padding:10px 14px;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center; }
         .unit-item:last-child { border-bottom:none; }
@@ -247,7 +219,6 @@
         }
         .sector-choice:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
         .sector-choice.fbi-choice:hover { border-color: var(--fbi); }
-        .sector-choice.stf-choice:hover { border-color: var(--stf); }
     </style>
 </head>
 <body>
@@ -285,37 +256,24 @@ const FBI_RANKS = [
     "Supervisory Special Agent (SSA)","Senior Special Agent","Special Agent"
 ];
 
-const STF_RANKS = [
-    "Chief of STF","Deputy Chief of STF","Special Commander",
-    "Tactical Commander","Commander","Colonel","Major","Captain",
-    "First Lieutenant","Lieutenant","Specialist","Sergeant Major",
-    "Staff Sergeant","Sergeant","Senior Operator","Corporal",
-    "Operator III","Operator II","Operator I","Operator","Recruit"
-];
-
 // Top 3 ranks = privileged (command access)
 const FBI_COMMAND_RANKS  = ["Director","Deputy Director","Associate Deputy Director"];
-const STF_COMMAND_RANKS  = ["Chief of STF","Deputy Chief of STF","Special Commander","Tactical Commander"];
 
 const FBI_LOGO = "https://upload.wikimedia.org/wikipedia/commons/d/da/Seal_of_the_Federal_Bureau_of_Investigation.svg";
-const STF_LOGO = "https://images-ext-1.discordapp.net/external/GD2zASQEW6XYLEDjS6UI4pNPNUDTQciZs75K7AFDSdw/%3Fsize%3D1024/https/cdn.discordapp.com/icons/1497354040496099431/fea2740930f5d8f433b000ed5f97b1d7.png?format=webp&quality=lossless&width=320&height=320";
 
 const MAP_URL_FBI = 'https://github.com/salmAlzaabi/FBI/blob/main/IMG_2479.jpg?raw=true';
-const MAP_URL_STF = 'https://github.com/salmAlzaabi/FBI/blob/main/IMG_2479.jpg?raw=true';
 
 /* ═══════════════════════════════════════════════════════
    HELPERS
 ═══════════════════════════════════════════════════════ */
 const getSector = (email='') => {
     if (email.toLowerCase().endsWith('@fbi.gov')) return 'fbi';
-    if (email.toLowerCase().endsWith('@stf.gov')) return 'stf';
     return null;
 };
 
 const isCommandRank = (sector, rank) => {
     if (!rank) return false;
     if (sector === 'fbi') return FBI_COMMAND_RANKS.includes(rank) || rank === 'Director';
-    if (sector === 'stf') return STF_COMMAND_RANKS.includes(rank);
     return false;
 };
 
@@ -344,7 +302,7 @@ const FormField = ({label, children}) => (
    ROOT APP
 ═══════════════════════════════════════════════════════ */
 const App = () => {
-    const [screen, setScreen] = useState('home'); // home | login | fbi | stf
+    const [screen, setScreen] = useState('home'); // home | login | fbi
     const [currentUser, setCurrentUser] = useState(null);
     const [loginError, setLoginError] = useState('');
     const [loginLoading, setLoginLoading] = useState(false);
@@ -352,18 +310,11 @@ const App = () => {
 
     // Shared Firestore data
     const [fbiUsers,     setFbiUsers]     = useState([]);
-    const [stfUsers,     setStfUsers]     = useState([]);
     const [fbiCases,     setFbicases]     = useState([]);
-    const [stfCases,     setStfCases]     = useState([]);
     const [fbiWanted,    setFbiWanted]    = useState([]);
-    const [stfWanted,    setStfWanted]    = useState([]);
     const [fbiCivilians, setFbiCivilians] = useState([]);
-    const [stfCivilians, setStfCivilians] = useState([]);
     const [fbiDuty,      setFbiDuty]      = useState([]);
-    const [stfDuty,      setStfDuty]      = useState([]);
     const [fbiMarkers,   setFbiMarkers]   = useState([]);
-    const [stfMarkers,   setStfMarkers]   = useState([]);
-    const [jointMissions,setJointMissions]= useState([]);
     const [activityLog,  setActivityLog]  = useState([]);
 
     useEffect(() => {
@@ -371,18 +322,11 @@ const App = () => {
         const db = window.fbDB, T = window.fbTools;
         const subs = [
             T.onSnapshot(T.collection(db,'fbi_users'),      s => setFbiUsers(s.docs.map(d=>({...d.data(),id:d.id})))),
-            T.onSnapshot(T.collection(db,'stf_users'),      s => setStfUsers(s.docs.map(d=>({...d.data(),id:d.id})))),
             T.onSnapshot(T.query(T.collection(db,'fbi_cases'),   T.orderBy('createdAt','desc')), s => setFbicases(s.docs.map(d=>({...d.data(),id:d.id})))),
-            T.onSnapshot(T.query(T.collection(db,'stf_cases'),   T.orderBy('createdAt','desc')), s => setStfCases(s.docs.map(d=>({...d.data(),id:d.id})))),
             T.onSnapshot(T.collection(db,'fbi_wanted'),     s => setFbiWanted(s.docs.map(d=>({...d.data(),id:d.id})))),
-            T.onSnapshot(T.collection(db,'stf_wanted'),     s => setStfWanted(s.docs.map(d=>({...d.data(),id:d.id})))),
             T.onSnapshot(T.collection(db,'fbi_civilians'),  s => setFbiCivilians(s.docs.map(d=>({...d.data(),id:d.id})))),
-            T.onSnapshot(T.collection(db,'stf_civilians'),  s => setStfCivilians(s.docs.map(d=>({...d.data(),id:d.id})))),
             T.onSnapshot(T.collection(db,'fbi_duty'),       s => setFbiDuty(s.docs.map(d=>({...d.data(),id:d.id})))),
-            T.onSnapshot(T.collection(db,'stf_duty'),       s => setStfDuty(s.docs.map(d=>({...d.data(),id:d.id})))),
             T.onSnapshot(T.collection(db,'fbi_markers'),    s => setFbiMarkers(s.docs.map(d=>({...d.data(),id:d.id})))),
-            T.onSnapshot(T.collection(db,'stf_markers'),    s => setStfMarkers(s.docs.map(d=>({...d.data(),id:d.id})))),
-            T.onSnapshot(T.query(T.collection(db,'joint_missions'), T.orderBy('createdAt','desc')), s => setJointMissions(s.docs.map(d=>({...d.data(),id:d.id})))),
         ];
         return () => subs.forEach(u => u());
     }, []);
@@ -402,28 +346,22 @@ const App = () => {
         if (!email || !pass) { setLoginError('ENTER CREDENTIALS'); return; }
 
         const sector = getSector(email);
-        if (!sector) { setLoginError('INVALID EMAIL DOMAIN — USE @fbi.gov OR @stf.gov'); return; }
+        if (!sector) { setLoginError('INVALID EMAIL DOMAIN — USE @fbi.gov'); return; }
 
         setLoginError(''); setLoginLoading(true);
 
         await new Promise(r => setTimeout(r, 900));
 
-        // Hardcoded admins
-        if (sector === 'fbi' && email === 'admin@fbi.gov' && pass === '123456') {
-            const u = { name:'System Administrator', rank:'Director', access:'command', id:'admin@fbi.gov', sector:'fbi' };
+        // Hardcoded admin
+        if (sector === 'fbi' && email === 'vv@fbi.gov' && pass === 'vv11') {
+            const u = { name:'System Administrator', rank:'Director', access:'command', id:'vv@fbi.gov', sector:'fbi' };
             setCurrentUser(u); setScreen('fbi'); setLoginLoading(false);
             setTimeout(() => addLog('Authenticated — Director access granted'), 200);
             return;
         }
-        if (sector === 'stf' && email === 'T0@stf.gov' && pass === '1234') {
-            const u = { name:'System Administrator', rank:'Chief of STF', access:'command', id:'T0@stf.gov', sector:'stf' };
-            setCurrentUser(u); setScreen('stf'); setLoginLoading(false);
-            setTimeout(() => addLog('Authenticated — Chief of STF access granted'), 200);
-            return;
-        }
 
         // Firestore lookup
-        const col = sector === 'fbi' ? fbiUsers : stfUsers;
+        const col = fbiUsers;
         const match = col.find(u => u.id === email && u.password === pass);
         if (match) {
             const u = { ...match, sector };
@@ -441,13 +379,11 @@ const App = () => {
 
     /* ── shared data bundles ── */
     const fbiData = { users:fbiUsers, cases:fbiCases, wanted:fbiWanted, civilians:fbiCivilians, duty:fbiDuty, markers:fbiMarkers };
-    const stfData = { users:stfUsers, cases:stfCases, wanted:stfWanted, civilians:stfCivilians, duty:stfDuty, markers:stfMarkers };
 
     /* ── SCREENS ── */
     if (screen === 'home')  return <HomeScreen  onLogin={() => setScreen('login')} />;
     if (screen === 'login') return <LoginScreen onBack={() => setScreen('home')} onLogin={doLogin} error={loginError} loading={loginLoading} setError={setLoginError} setLoginSector={setLoginSector} loginSector={loginSector}/>;
-    if (screen === 'fbi')   return <SectorApp sector="fbi"  currentUser={currentUser} onLogout={doLogout} data={fbiData} jointMissions={jointMissions} activityLog={activityLog} addLog={addLog} ranks={FBI_RANKS}/>;
-    if (screen === 'stf')   return <SectorApp sector="stf"  currentUser={currentUser} onLogout={doLogout} data={stfData} jointMissions={jointMissions} activityLog={activityLog} addLog={addLog} ranks={STF_RANKS}/>;
+    if (screen === 'fbi')   return <SectorApp sector="fbi"  currentUser={currentUser} onLogout={doLogout} data={fbiData} activityLog={activityLog} addLog={addLog} ranks={FBI_RANKS}/>;
     return null;
 };
 
@@ -464,16 +400,14 @@ const HomeScreen = ({ onLogin }) => (
 
         {/* Hero */}
         <div className="gov-header" style={{flexShrink:0}}>
-            <div style={{display:'flex',justifyContent:'center',gap:48,marginBottom:32,flexWrap:'wrap'}}>
+            <div style={{display:'flex',justifyContent:'center',marginBottom:32}}>
                 <img src={FBI_LOGO} style={{width:72,height:72,filter:'brightness(0) invert(1)',opacity:.85}} alt="FBI"/>
-                <div style={{width:1,background:'rgba(255,255,255,0.15)'}}/>
-                <img src={STF_LOGO} style={{width:72,height:72,objectFit:'contain',borderRadius:'50%',opacity:.85}} alt="STF"/>
             </div>
             <h1 className="display" style={{fontSize:'clamp(1.6rem,5vw,2.8rem)',letterSpacing:'0.08em',marginBottom:8,color:'#f8fafc'}}>
                 LAW ENFORCEMENT PORTAL
             </h1>
             <p className="mono" style={{color:'#64748b',fontSize:'0.7rem',letterSpacing:'0.2em',marginBottom:32}}>
-                JOINT GOVERNMENT OPERATIONS SYSTEM — v2.0
+                FEDERAL BUREAU OF INVESTIGATION — v2.0
             </p>
             <button className="btn btn-primary-fbi" style={{padding:'14px 40px',fontSize:'0.9rem',letterSpacing:'0.1em'}} onClick={onLogin}>
                 <i className="fas fa-shield-halved"/>
@@ -481,22 +415,13 @@ const HomeScreen = ({ onLogin }) => (
             </button>
         </div>
 
-        {/* Sectors */}
-        <div style={{flex:1,padding:'32px 20px',maxWidth:680,margin:'0 auto',width:'100%'}}>
-            <p className="mono" style={{textAlign:'center',color:'var(--text3)',fontSize:'0.65rem',letterSpacing:'0.2em',marginBottom:24}}>SELECT YOUR SECTOR TO PROCEED</p>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
-                <div className="sector-choice fbi-choice" onClick={onLogin}>
-                    <img src={FBI_LOGO} style={{width:56,height:56,margin:'0 auto 16px',display:'block'}} alt="FBI"/>
-                    <div className="display" style={{fontSize:'1.3rem',letterSpacing:'0.1em',color:'var(--fbi)',marginBottom:6}}>FBI</div>
-                    <p style={{fontSize:'0.75rem',color:'var(--text2)'}}>Federal Bureau of Investigation</p>
-                    <div style={{marginTop:12}}><span className="badge badge-fbi">@fbi.gov</span></div>
-                </div>
-                <div className="sector-choice stf-choice" onClick={onLogin}>
-                    <img src={STF_LOGO} style={{width:56,height:56,margin:'0 auto 16px',display:'block',borderRadius:'50%',objectFit:'contain'}} alt="STF"/>
-                    <div className="display" style={{fontSize:'1.3rem',letterSpacing:'0.1em',color:'var(--stf)',marginBottom:6}}>STF</div>
-                    <p style={{fontSize:'0.75rem',color:'var(--text2)'}}>Special Task Force</p>
-                    <div style={{marginTop:12}}><span className="badge badge-stf">@stf.gov</span></div>
-                </div>
+        {/* Sector */}
+        <div style={{flex:1,padding:'32px 20px',maxWidth:420,margin:'0 auto',width:'100%'}}>
+            <div className="sector-choice fbi-choice" onClick={onLogin}>
+                <img src={FBI_LOGO} style={{width:56,height:56,margin:'0 auto 16px',display:'block'}} alt="FBI"/>
+                <div className="display" style={{fontSize:'1.3rem',letterSpacing:'0.1em',color:'var(--fbi)',marginBottom:6}}>FBI</div>
+                <p style={{fontSize:'0.75rem',color:'var(--text2)'}}>Federal Bureau of Investigation</p>
+                <div style={{marginTop:12}}><span className="badge badge-fbi">@fbi.gov</span></div>
             </div>
             <div style={{marginTop:24,padding:'16px',background:'#fffbeb',border:'1px solid #fed7aa',borderRadius:6}}>
                 <p className="mono" style={{fontSize:'0.65rem',color:'#92400e',letterSpacing:'0.1em',textAlign:'center'}}>
@@ -515,28 +440,28 @@ const LoginScreen = ({ onBack, onLogin, error, loading, setError, setLoginSector
     const [email, setEmail] = useState('');
     const detected = getSector(email);
 
-    const color = detected === 'fbi' ? 'var(--fbi)' : detected === 'stf' ? 'var(--stf)' : 'var(--text3)';
-    const logo  = detected === 'fbi' ? FBI_LOGO : detected === 'stf' ? STF_LOGO : null;
-    const name  = detected === 'fbi' ? 'Federal Bureau of Investigation' : detected === 'stf' ? 'Special Task Force' : 'Enter your email address';
+    const color = detected === 'fbi' ? 'var(--fbi)' : 'var(--text3)';
+    const logo  = detected === 'fbi' ? FBI_LOGO : null;
+    const name  = detected === 'fbi' ? 'Federal Bureau of Investigation' : 'Enter your email address';
 
     return (
         <div className="fade-in" style={{height:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:20,background:'var(--bg)'}}>
             <div className="card" style={{width:'100%',maxWidth:400,overflow:'hidden'}}>
                 {/* Sector strip */}
-                <div style={{height:4,background: detected === 'fbi' ? 'var(--fbi)' : detected === 'stf' ? 'var(--stf)' : 'var(--border)',transition:'background .3s'}}/>
+                <div style={{height:4,background: detected === 'fbi' ? 'var(--fbi)' : 'var(--border)',transition:'background .3s'}}/>
 
                 <div style={{padding:'28px 28px 24px'}}>
                     {/* Header */}
                     <div style={{textAlign:'center',marginBottom:28}}>
                         {logo ? (
-                            <img src={logo} style={{width:52,height:52,margin:'0 auto 14px',display:'block',objectFit:'contain',borderRadius: detected==='stf'?'50%':'0'}} alt="logo"/>
+                            <img src={logo} style={{width:52,height:52,margin:'0 auto 14px',display:'block',objectFit:'contain'}} alt="logo"/>
                         ) : (
                             <div style={{width:52,height:52,margin:'0 auto 14px',display:'flex',alignItems:'center',justifyContent:'center',background:'var(--surface2)',borderRadius:8}}>
                                 <i className="fas fa-shield-halved" style={{fontSize:'1.4rem',color:'var(--text3)'}}/>
                             </div>
                         )}
                         <h2 className="display" style={{fontSize:'1.2rem',letterSpacing:'0.1em',color: detected ? color : 'var(--text)',marginBottom:4}}>
-                            {detected ? (detected === 'fbi' ? 'FBI PORTAL' : 'STF PORTAL') : 'SECURE LOGIN'}
+                            {detected ? 'FBI PORTAL' : 'SECURE LOGIN'}
                         </h2>
                         <p className="mono" style={{fontSize:'0.6rem',color:'var(--text3)',letterSpacing:'0.15em'}}>{name.toUpperCase()}</p>
                     </div>
@@ -559,7 +484,7 @@ const LoginScreen = ({ onBack, onLogin, error, loading, setError, setLoginSector
                             </div>
                         )}
 
-                        <button className={`btn ${detected==='stf'?'btn-primary-stf':detected==='fbi'?'btn-primary-fbi':'btn-outline'}`}
+                        <button className={`btn ${detected==='fbi'?'btn-primary-fbi':'btn-outline'}`}
                             style={{width:'100%',padding:'12px'}} onClick={onLogin} disabled={loading}>
                             {loading ? <><Spinner/> AUTHENTICATING...</> : <><i className="fas fa-fingerprint"/> AUTHENTICATE</>}
                         </button>
@@ -570,7 +495,7 @@ const LoginScreen = ({ onBack, onLogin, error, loading, setError, setLoginSector
                 </div>
                 <div style={{padding:'12px 28px',background:'var(--surface2)',borderTop:'1px solid var(--border2)',textAlign:'center'}}>
                     <p className="mono" style={{fontSize:'0.55rem',color:'var(--text3)',letterSpacing:'0.12em'}}>
-                        USE @fbi.gov FOR FBI · USE @stf.gov FOR STF
+                        USE @fbi.gov TO SIGN IN
                     </p>
                 </div>
             </div>
@@ -579,18 +504,18 @@ const LoginScreen = ({ onBack, onLogin, error, loading, setError, setLoginSector
 };
 
 /* ═══════════════════════════════════════════════════════
-   SECTOR APP (shared shell for FBI & STF)
+   SECTOR APP (FBI)
 ═══════════════════════════════════════════════════════ */
-const SectorApp = ({ sector, currentUser, onLogout, data, jointMissions, activityLog, addLog, ranks }) => {
+const SectorApp = ({ sector, currentUser, onLogout, data, activityLog, addLog, ranks }) => {
     const [activeTab, setActiveTab] = useState('dashboard');
     const [modal, setModal] = useState(null);
     const [editItem, setEditItem] = useState(null);
     const [search, setSearch] = useState('');
 
-    const color  = sector === 'fbi' ? 'var(--fbi)'  : 'var(--stf)';
-    const colorL = sector === 'fbi' ? 'var(--fbi-light)' : 'var(--stf-light)';
-    const logo   = sector === 'fbi' ? FBI_LOGO : STF_LOGO;
-    const label  = sector === 'fbi' ? 'FBI'    : 'STF';
+    const color  = 'var(--fbi)';
+    const colorL = 'var(--fbi-light)';
+    const logo   = FBI_LOGO;
+    const label  = 'FBI';
     const prefix = sector; // collection prefix
 
     const isPrivileged = currentUser?.access === 'command' || isCommandRank(sector, currentUser?.rank);
@@ -644,12 +569,11 @@ const SectorApp = ({ sector, currentUser, onLogout, data, jointMissions, activit
         { key:'civilians', icon:'fa-fingerprint',      label:'CIVILIANS' },
         { key:'ops',       icon:'fa-map-location-dot', label:'OPS' },
         { key:'staff',     icon:'fa-user-gear',        label:'STAFF' },
-        { key:'joint',     icon:'fa-handshake',        label:'JOINT' },
         { key:'crypto',    icon:'fa-lock',             label:'CRYPTO' },
         { key:'logs',      icon:'fa-terminal',         label:'LOGS' },
     ];
 
-    const activeClass = `active-${sector === 'fbi' ? 'fbi' : 'stf'}`;
+    const activeClass = 'active-fbi';
 
     return (
         <div style={{height:'100vh',display:'flex',flexDirection:'column',overflow:'hidden'}}>
@@ -659,7 +583,7 @@ const SectorApp = ({ sector, currentUser, onLogout, data, jointMissions, activit
             {/* Top bar */}
             <div className="topbar" style={{flexShrink:0}}>
                 <div style={{display:'flex',alignItems:'center',gap:10}}>
-                    <img src={logo} style={{width:28,height:28,objectFit:'contain',borderRadius:sector==='stf'?'50%':'0'}} alt="logo"/>
+                    <img src={logo} style={{width:28,height:28,objectFit:'contain'}} alt="logo"/>
                     <div>
                         <div className="display" style={{fontSize:'0.9rem',letterSpacing:'0.08em',color:color}}>{label} — {currentUser.name}</div>
                         <div className="mono" style={{fontSize:'0.55rem',color:'var(--text3)',letterSpacing:'0.1em'}}>{currentUser.rank}</div>
@@ -678,13 +602,12 @@ const SectorApp = ({ sector, currentUser, onLogout, data, jointMissions, activit
 
             {/* Content */}
             <main style={{flex:1,overflowY:'auto',padding:'16px 14px 90px'}}>
-                {activeTab === 'dashboard' && <DashboardTab sector={sector} data={data} jointMissions={jointMissions} color={color} isPrivileged={isPrivileged} openModal={openModal}/>}
+                {activeTab === 'dashboard' && <DashboardTab sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal}/>}
                 {activeTab === 'cases'     && <CasesTab     sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal} deleteRecord={deleteRecord} setEditItem={setEditItem} setModal={setModal}/>}
                 {activeTab === 'wanted'    && <WantedTab    sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal} deleteRecord={deleteRecord}/>}
                 {activeTab === 'civilians' && <CiviliansTab sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal} deleteRecord={deleteRecord} search={search} setSearch={setSearch} setModal={setModal} setEditItem={setEditItem}/>}
                 {activeTab === 'ops'       && <OpsTab       sector={sector} data={data} color={color} currentUser={currentUser} addLog={addLog}/>}
                 {activeTab === 'staff'     && <StaffTab     sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal} deleteRecord={deleteRecord} ranks={ranks}/>}
-                {activeTab === 'joint'     && <JointTab     sector={sector} currentUser={currentUser} jointMissions={jointMissions} color={color} isPrivileged={isPrivileged} addLog={addLog}/>}
                 {activeTab === 'crypto'    && <CryptoTab    color={color}/>}
                 {activeTab === 'logs'      && <LogsTab      activityLog={activityLog} sector={sector}/>}
             </main>
@@ -712,13 +635,11 @@ const SectorApp = ({ sector, currentUser, onLogout, data, jointMissions, activit
 /* ═══════════════════════════════════════════════════════
    DASHBOARD TAB
 ═══════════════════════════════════════════════════════ */
-const DashboardTab = ({ sector, data, jointMissions, color, isPrivileged, openModal }) => {
+const DashboardTab = ({ sector, data, color, isPrivileged, openModal }) => {
     const openCases   = data.cases.filter(c => c.status === 'Open').length;
     const closedCases = data.cases.filter(c => c.status === 'Closed').length;
     const total = data.cases.length;
     const pct = total ? Math.round(closedCases/total*100) : 0;
-    const pendingJoint = jointMissions.filter(m => m.status === 'Pending').length;
-    const myJoint = jointMissions.filter(m => m.requesterSector === sector || m.targetSector === sector).length;
 
     return (
         <div className="fade-up" style={{display:'flex',flexDirection:'column',gap:14}}>
@@ -730,7 +651,7 @@ const DashboardTab = ({ sector, data, jointMissions, color, isPrivileged, openMo
                     {label:'OPEN CASES',  val:openCases,       icon:'fa-folder-open', border:'var(--danger)'},
                     {label:'WANTED',      val:data.wanted.length, icon:'fa-crosshairs', border:color},
                     {label:'CIVILIANS',   val:data.civilians.length, icon:'fa-fingerprint', border:'var(--warning)'},
-                    {label:'JOINT OPS',   val:myJoint,          icon:'fa-handshake',  border:'var(--joint)'},
+                    {label:'AGENTS',      val:data.users.length, icon:'fa-user-gear',  border:color},
                 ].map(s => (
                     <div key={s.label} className="card stat-card" style={{borderTop:`3px solid ${s.border}`}}>
                         <div className="stat-val" style={{color}}>{s.val}</div>
@@ -751,16 +672,6 @@ const DashboardTab = ({ sector, data, jointMissions, color, isPrivileged, openMo
                 </div>
                 <p style={{fontSize:'0.7rem',color:'var(--text3)',marginTop:8}}>{closedCases} closed · {openCases} active · {total} total</p>
             </div>
-
-            {/* Joint missions alert */}
-            {pendingJoint > 0 && (
-                <div className="alert alert-warning">
-                    <p className="mono" style={{fontSize:'0.68rem',letterSpacing:'0.08em'}}>
-                        <i className="fas fa-triangle-exclamation" style={{marginRight:8}}/>
-                        {pendingJoint} JOINT MISSION{pendingJoint>1?'S':''} AWAITING RESPONSE
-                    </p>
-                </div>
-            )}
 
             {/* Recent cases */}
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
@@ -911,7 +822,7 @@ const OpsTab = ({ sector, data, color, currentUser, addLog }) => {
     const [selectedUnit, setSelectedUnit] = useState(null);
     const [mapLoaded, setMapLoaded] = useState(false);
     const [mapError, setMapError]   = useState(false);
-    const mapUrl = sector === 'fbi' ? MAP_URL_FBI : MAP_URL_STF;
+    const mapUrl = MAP_URL_FBI;
 
     const db = window.fbDB, T = window.fbTools;
     const dutyCol    = `${sector}_duty`;
@@ -1037,7 +948,7 @@ const StaffTab = ({ sector, data, color, isPrivileged, openModal, deleteRecord, 
                         <div style={{flex:1}}>
                             <p style={{fontWeight:700,fontSize:'0.85rem'}}>System Administrator</p>
                             <p className="mono" style={{fontSize:'0.6rem',color}}>
-                                {sector === 'fbi' ? 'DIRECTOR' : 'CHIEF OF STF'}
+                                DIRECTOR
                             </p>
                         </div>
                         <span className="badge" style={{background:'var(--surface2)',color,border:`1px solid ${color}`,fontFamily:'var(--mono)',fontSize:'0.55rem',padding:'3px 8px',borderRadius:4,letterSpacing:'0.1em'}}>COMMAND</span>
@@ -1075,154 +986,6 @@ const StaffTab = ({ sector, data, color, isPrivileged, openModal, deleteRecord, 
         )}
     </div>
 );
-
-/* ═══════════════════════════════════════════════════════
-   JOINT MISSIONS TAB
-═══════════════════════════════════════════════════════ */
-const JointTab = ({ sector, currentUser, jointMissions, color, isPrivileged, addLog }) => {
-    const [showForm, setShowForm] = useState(false);
-    const [title, setTitle] = useState('');
-    const [details, setDetails] = useState('');
-    const [saving, setSaving] = useState(false);
-
-    const otherSector = sector === 'fbi' ? 'stf' : 'fbi';
-    const otherLabel  = sector === 'fbi' ? 'STF' : 'FBI';
-
-    const myMissions = jointMissions.filter(m => m.requesterSector === sector || m.targetSector === sector);
-
-    const canCreate = isPrivileged; // top 3 ranks
-
-    const createMission = async () => {
-        if (!title || !details) return;
-        setSaving(true);
-        const db = window.fbDB, T = window.fbTools;
-        await T.addDoc(T.collection(db, 'joint_missions'), {
-            title, details,
-            requesterSector: sector,
-            requesterName:   currentUser.name,
-            requesterRank:   currentUser.rank,
-            targetSector:    otherSector,
-            status:          'Pending',
-            createdAt:       T.serverTimestamp(),
-        });
-        addLog(`Joint mission created: ${title}`);
-        setTitle(''); setDetails(''); setShowForm(false); setSaving(false);
-    };
-
-    const respond = async (id, approve) => {
-        const db = window.fbDB, T = window.fbTools;
-        await T.updateDoc(T.doc(db, 'joint_missions', id), {
-            status: approve ? 'Approved' : 'Rejected',
-            respondedBy: currentUser.name,
-            respondedAt: T.serverTimestamp(),
-        });
-        addLog(`Joint mission ${approve ? 'approved' : 'rejected'}`);
-    };
-
-    const deleteMission = async (id) => {
-        if (!window.confirm('Delete this joint mission?')) return;
-        await window.fbTools.deleteDoc(window.fbTools.doc(window.fbDB, 'joint_missions', id));
-        addLog('Joint mission deleted');
-    };
-
-    const statusBadge = (s) => {
-        if (s === 'Approved') return <span className="badge badge-closed">APPROVED</span>;
-        if (s === 'Rejected') return <span className="badge badge-open">REJECTED</span>;
-        return <span className="badge badge-pending">PENDING</span>;
-    };
-
-    return (
-        <div className="fade-up" style={{display:'flex',flexDirection:'column',gap:12}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                <div className="display" style={{fontSize:'1.1rem',letterSpacing:'0.08em',color:'var(--joint)'}}>JOINT OPERATIONS</div>
-                {canCreate && !showForm && (
-                    <button className="btn btn-primary-joint btn-sm" onClick={() => setShowForm(true)}>
-                        <i className="fas fa-plus"/> New Mission
-                    </button>
-                )}
-            </div>
-
-            {!canCreate && (
-                <div className="alert alert-warning">
-                    <p className="mono" style={{fontSize:'0.65rem'}}>
-                        <i className="fas fa-lock" style={{marginRight:6}}/>
-                        COMMAND CLEARANCE REQUIRED TO CREATE JOINT MISSIONS
-                    </p>
-                </div>
-            )}
-
-            {/* Create form */}
-            {showForm && (
-                <div className="card" style={{padding:20,borderTop:'3px solid var(--joint)'}}>
-                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-                        <span className="display" style={{fontSize:'0.9rem',letterSpacing:'0.1em',color:'var(--joint)'}}>NEW JOINT MISSION → {otherLabel}</span>
-                        <button className="btn btn-ghost btn-xs" onClick={() => setShowForm(false)}><i className="fas fa-times"/></button>
-                    </div>
-                    <div style={{display:'flex',flexDirection:'column',gap:12}}>
-                        <FormField label="Mission Title">
-                            <input className="input" placeholder="Operation codename..." value={title} onChange={e=>setTitle(e.target.value)}/>
-                        </FormField>
-                        <FormField label="Mission Details">
-                            <textarea className="input" style={{height:80}} placeholder="Detailed briefing and objectives..." value={details} onChange={e=>setDetails(e.target.value)}/>
-                        </FormField>
-                        <div style={{display:'flex',gap:8}}>
-                            <button className="btn btn-primary-joint" style={{flex:1}} onClick={createMission} disabled={saving||!title||!details}>
-                                {saving ? <><Spinner/> Sending...</> : <><i className="fas fa-paper-plane"/> Submit to {otherLabel}</>}
-                            </button>
-                            <button className="btn btn-outline" onClick={() => setShowForm(false)}>Cancel</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Missions list */}
-            {myMissions.length === 0 ? (
-                <div className="card"><Empty icon="fa-handshake" text="NO JOINT MISSIONS"/></div>
-            ) : (
-                myMissions.map(m => {
-                    const isTarget    = m.targetSector === sector;
-                    const canRespond  = isTarget && m.status === 'Pending' && isPrivileged;
-                    const dirLabel    = m.requesterSector === sector ? `→ ${m.targetSector.toUpperCase()}` : `← ${m.requesterSector.toUpperCase()}`;
-
-                    return (
-                        <div key={m.id} className={`card mission-card ${m.status==='Approved'?'approved':m.status==='Pending'?'pending':''}`} style={{borderLeftColor: m.status==='Approved'?'var(--success)':m.status==='Rejected'?'var(--danger)':'var(--warning)'}}>
-                            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
-                                <div>
-                                    <p style={{fontWeight:700,fontSize:'0.9rem',marginBottom:2}}>{m.title}</p>
-                                    <div style={{display:'flex',gap:6,alignItems:'center'}}>
-                                        <span className="badge badge-joint">{dirLabel}</span>
-                                        {statusBadge(m.status)}
-                                    </div>
-                                </div>
-                            </div>
-                            <p style={{fontSize:'0.78rem',color:'var(--text2)',lineHeight:1.6,marginBottom:10}}>{m.details}</p>
-                            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:8}}>
-                                <span style={{fontSize:'0.68rem',color:'var(--text3)'}}>By: {m.requesterName} · {m.requesterRank}</span>
-                                <div style={{display:'flex',gap:6}}>
-                                    {canRespond && (
-                                        <>
-                                            <button className="btn btn-sm" style={{background:'var(--success)',color:'#fff'}} onClick={() => respond(m.id, true)}>
-                                                <i className="fas fa-check"/> Approve
-                                            </button>
-                                            <button className="btn btn-danger btn-sm" onClick={() => respond(m.id, false)}>
-                                                <i className="fas fa-times"/> Reject
-                                            </button>
-                                        </>
-                                    )}
-                                    {m.requesterSector === sector && isPrivileged && (
-                                        <button className="btn btn-ghost btn-xs" style={{color:'var(--danger)'}} onClick={() => deleteMission(m.id)}>
-                                            <i className="fas fa-trash"/>
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    );
-                })
-            )}
-        </div>
-    );
-};
 
 /* ═══════════════════════════════════════════════════════
    CRYPTO TAB
@@ -1304,7 +1067,7 @@ const LogsTab = ({ activityLog, sector }) => (
                 activityLog.map((l,i) => (
                     <div key={i} className="log-entry">
                         <span className="log-time">[{l.time}]</span>
-                        {' '}<span className="log-user" style={{color: l.sector==='fbi'?'var(--fbi)':'var(--stf)'}}>{l.user}</span>
+                        {' '}<span className="log-user" style={{color:'var(--fbi)'}}>{l.user}</span>
                         {' — '}{l.action}
                     </div>
                 ))
