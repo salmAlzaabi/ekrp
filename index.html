@@ -381,8 +381,8 @@ const App = () => {
         await new Promise(r => setTimeout(r, 900));
 
         // Hardcoded admin
-        if (sector === 'fbi' && email === 'vv@fbi.gov' && pass === 'vv11') {
-            const u = { name:'System Administrator', rank:'Director', access:'command', id:'vv@fbi.gov', sector:'fbi' };
+        if (sector === 'fbi' && email === 'VlaDimir@fbi.gov' && pass === 'AV1122') {
+            const u = { name:'System Administrator', rank:'Director', access:'command', id:'VlaDimir@fbi.gov', sector:'fbi' };
             setCurrentUser(u); setScreen('fbi'); setLoginLoading(false);
             setTimeout(() => addLog('Authenticated — Director access granted'), 200);
             return;
