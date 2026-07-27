@@ -332,12 +332,10 @@ const FormField = ({label, children}) => (
    ROOT APP
 ═══════════════════════════════════════════════════════ */
 const App = () => {
-    const [screen, setScreen] = useState('home'); // home | login | fbi
+    const [screen, setScreen] = useState('home'); // home | fbi
     const [currentUser, setCurrentUser] = useState(null);
     const [loginError, setLoginError] = useState('');
     const [loginLoading, setLoginLoading] = useState(false);
-    const [loginSector, setLoginSector] = useState(null); // detected sector during login
-
     // Shared Firestore data
     const [fbiUsers,     setFbiUsers]     = useState([]);
     const [fbiCases,     setFbicases]     = useState([]);
@@ -411,8 +409,7 @@ const App = () => {
     const fbiData = { users:fbiUsers, cases:fbiCases, wanted:fbiWanted, civilians:fbiCivilians, duty:fbiDuty, markers:fbiMarkers };
 
     /* ── SCREENS ── */
-    if (screen === 'home')  return <HomeScreen  onLogin={() => setScreen('login')} />;
-    if (screen === 'login') return <LoginScreen onBack={() => setScreen('home')} onLogin={doLogin} error={loginError} loading={loginLoading} setError={setLoginError} setLoginSector={setLoginSector} loginSector={loginSector}/>;
+    if (screen === 'home')  return <HomeScreen onLogin={doLogin} error={loginError} loading={loginLoading} setError={setLoginError}/>;
     if (screen === 'fbi')   return <SectorApp sector="fbi"  currentUser={currentUser} onLogout={doLogout} data={fbiData} activityLog={activityLog} addLog={addLog} ranks={FBI_RANKS}/>;
     return null;
 };
@@ -420,118 +417,85 @@ const App = () => {
 /* ═══════════════════════════════════════════════════════
    HOME SCREEN
 ═══════════════════════════════════════════════════════ */
-const HomeScreen = ({ onLogin }) => (
-    <div className="fade-in" style={{height:'100vh',display:'flex',flexDirection:'column',overflow:'auto'}}>
-        {/* Gov banner */}
-        <div style={{background:'#000000',color:'#b8a878',padding:'6px 20px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <span className="mono" style={{fontSize:'0.6rem',letterSpacing:'0.15em'}}>OFFICIAL GOVERNMENT PORTAL — AUTHORIZED PERSONNEL ONLY</span>
-            <span className="mono" style={{fontSize:'0.6rem',color:'#7a6f4f'}}>{new Date().toUTCString()}</span>
-        </div>
-
-        {/* Hero */}
-        <div className="gov-header" style={{flexShrink:0}}>
-            <div style={{display:'flex',justifyContent:'center',marginBottom:32}}>
-                <img src={FBI_LOGO} style={{width:72,height:72,filter:'brightness(0) invert(1)',opacity:.85}} alt="FBI"/>
-            </div>
-            <h1 className="display" style={{fontSize:'clamp(1.6rem,5vw,2.8rem)',letterSpacing:'0.08em',marginBottom:8,color:'#f0d67a'}}>
-                FBI
-            </h1>
-            <p className="mono" style={{color:'#8a7f5f',fontSize:'0.7rem',letterSpacing:'0.2em',marginBottom:32}}>
-                FEDERAL BUREAU OF INVESTIGATION — v2.0
-            </p>
-            <button className="btn btn-primary-fbi" style={{padding:'14px 40px',fontSize:'0.9rem',letterSpacing:'0.1em'}} onClick={onLogin}>
-                <i className="fas fa-shield-halved"/>
-                SECURE LOGIN
-            </button>
-        </div>
-
-        {/* Sector */}
-        <div style={{flex:1,padding:'32px 20px',maxWidth:420,margin:'0 auto',width:'100%'}}>
-            <div className="sector-choice fbi-choice" onClick={onLogin}>
-                <img src={FBI_LOGO} style={{width:56,height:56,margin:'0 auto 16px',display:'block'}} alt="FBI"/>
-                <div className="display" style={{fontSize:'1.3rem',letterSpacing:'0.1em',color:'var(--fbi)',marginBottom:6}}>FBI</div>
-                <p style={{fontSize:'0.75rem',color:'var(--text2)'}}>Federal Bureau of Investigation</p>
-                <div style={{marginTop:12}}><span className="badge badge-fbi">@fbi.gov</span></div>
-            </div>
-            <div style={{marginTop:24,padding:'16px',background:'#fffbeb',border:'1px solid #fed7aa',borderRadius:6}}>
-                <p className="mono" style={{fontSize:'0.65rem',color:'#92400e',letterSpacing:'0.1em',textAlign:'center'}}>
-                    <i className="fas fa-triangle-exclamation" style={{marginRight:6}}/>
-                    UNAUTHORIZED ACCESS IS A CRIMINAL OFFENSE — 18 U.S.C. § 1030
-                </p>
-            </div>
-        </div>
-    </div>
-);
-
-/* ═══════════════════════════════════════════════════════
-   LOGIN SCREEN
-═══════════════════════════════════════════════════════ */
-const LoginScreen = ({ onBack, onLogin, error, loading, setError, setLoginSector, loginSector }) => {
+const HomeScreen = ({ onLogin, error, loading, setError }) => {
+    const [showLogin, setShowLogin] = useState(false);
     const [email, setEmail] = useState('');
-    const detected = getSector(email);
-
-    const color = detected === 'fbi' ? 'var(--fbi)' : 'var(--text3)';
-    const logo  = detected === 'fbi' ? FBI_LOGO : null;
-    const name  = detected === 'fbi' ? 'Federal Bureau of Investigation' : 'Enter your email address';
 
     return (
-        <div className="fade-in" style={{height:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:20,background:'var(--bg)'}}>
-            <div className="card login-split" style={{overflow:'hidden'}}>
-                {/* Left brand panel */}
-                <div className="login-brand">
-                    <button className="btn btn-ghost btn-sm" style={{color:'rgba(26,21,8,0.85)',alignSelf:'flex-start',padding:0}} onClick={onBack}>
-                        <i className="fas fa-arrow-left"/> Back
-                    </button>
-                    <div style={{textAlign:'center'}}>
-                        {logo ? (
-                            <img src={logo} style={{width:60,height:60,margin:'0 auto 14px',display:'block',objectFit:'contain',filter:'brightness(0)'}} alt="logo"/>
-                        ) : (
-                            <div style={{width:60,height:60,margin:'0 auto 14px',display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(26,21,8,0.12)',borderRadius:8}}>
-                                <i className="fas fa-shield-halved" style={{fontSize:'1.5rem',color:'#1a1508'}}/>
-                            </div>
-                        )}
-                        <h2 className="display" style={{fontSize:'1.3rem',letterSpacing:'0.1em',color:'#1a1508',marginBottom:6}}>
-                            {detected ? 'FBI PORTAL' : 'SECURE LOGIN'}
-                        </h2>
-                        <p className="mono" style={{fontSize:'0.6rem',color:'rgba(26,21,8,0.75)',letterSpacing:'0.15em'}}>{name.toUpperCase()}</p>
-                    </div>
-                    <p className="mono" style={{fontSize:'0.55rem',color:'rgba(26,21,8,0.55)',letterSpacing:'0.1em'}}>
-                        AUTHORIZED PERSONNEL ONLY
-                    </p>
+        <div className="fade-in" style={{height:'100vh',display:'flex',flexDirection:'column',overflow:'auto'}}>
+            {/* Gov banner */}
+            <div style={{background:'#000000',color:'#b8a878',padding:'6px 20px',display:'flex',justifyContent:'space-between',alignItems:'center',flexShrink:0}}>
+                <span className="mono" style={{fontSize:'0.6rem',letterSpacing:'0.15em'}}>OFFICIAL GOVERNMENT PORTAL — AUTHORIZED PERSONNEL ONLY</span>
+                <span className="mono" style={{fontSize:'0.6rem',color:'#7a6f4f'}}>{new Date().toUTCString()}</span>
+            </div>
+
+            {/* Hero */}
+            <div className="gov-header" style={{flex:1,display:'flex',flexDirection:'column',justifyContent:'center'}}>
+                <div style={{display:'flex',justifyContent:'center',marginBottom:32}}>
+                    <img src={FBI_LOGO} style={{width:88,height:88,filter:'brightness(0) invert(1)',opacity:.9}} alt="FBI"/>
                 </div>
+                <h1 className="display" style={{fontSize:'clamp(2rem,7vw,3.4rem)',letterSpacing:'0.1em',marginBottom:8,color:'#f0d67a'}}>
+                    FBI
+                </h1>
+                <p className="mono" style={{color:'#8a7f5f',fontSize:'0.7rem',letterSpacing:'0.2em',marginBottom:36}}>
+                    FEDERAL BUREAU OF INVESTIGATION — v2.0
+                </p>
 
-                {/* Right form panel */}
-                <div className="login-form-side">
-                    <div style={{marginBottom:22}}>
-                        <span className="display" style={{fontSize:'1rem',letterSpacing:'0.08em',color:'var(--text)'}}>SIGN IN</span>
-                        <p className="mono" style={{fontSize:'0.6rem',color:'var(--text3)',letterSpacing:'0.1em',marginTop:4}}>ENTER YOUR CREDENTIALS TO CONTINUE</p>
+                {!showLogin && (
+                    <button className="btn btn-primary-fbi fade-up" style={{padding:'14px 40px',fontSize:'0.9rem',letterSpacing:'0.1em',margin:'0 auto'}} onClick={() => setShowLogin(true)}>
+                        <i className="fas fa-shield-halved"/>
+                        SECURE LOGIN
+                    </button>
+                )}
+
+                {/* Animated login panel */}
+                <div style={{
+                    maxWidth:380, margin:'0 auto', width:'100%', padding:'0 20px',
+                    maxHeight: showLogin ? 480 : 0,
+                    opacity: showLogin ? 1 : 0,
+                    overflow:'hidden',
+                    transition:'max-height .45s cubic-bezier(.4,0,.2,1), opacity .35s ease .05s',
+                }}>
+                    <div className="card" style={{padding:'24px 22px',textAlign:'left',marginTop:8}}>
+                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:18}}>
+                            <span className="display" style={{fontSize:'0.95rem',letterSpacing:'0.08em',color:'var(--text)'}}>SIGN IN</span>
+                            <button className="btn btn-ghost btn-xs" onClick={() => setShowLogin(false)}><i className="fas fa-times"/></button>
+                        </div>
+                        <div style={{display:'flex',flexDirection:'column',gap:14}}>
+                            <FormField label="Email Address">
+                                <input id="auth_email" type="email" className="input" placeholder="username@fbi.gov"
+                                    value={email} onChange={e=>{setEmail(e.target.value); setError('');}}
+                                    onKeyDown={e=>e.key==='Enter'&&onLogin()} autoComplete="off"/>
+                            </FormField>
+                            <FormField label="Password">
+                                <input id="auth_pass" type="password" className="input" placeholder="••••••••"
+                                    onKeyDown={e=>e.key==='Enter'&&onLogin()} autoComplete="off"/>
+                            </FormField>
+
+                            {error && (
+                                <div className="alert alert-danger mono" style={{fontSize:'0.65rem',letterSpacing:'0.08em',padding:'10px 14px'}}>
+                                    <i className="fas fa-exclamation-circle" style={{marginRight:8}}/>{error}
+                                </div>
+                            )}
+
+                            <button className="btn btn-primary-fbi" style={{width:'100%',padding:'12px'}} onClick={onLogin} disabled={loading}>
+                                {loading ? <><Spinner/> AUTHENTICATING...</> : <><i className="fas fa-fingerprint"/> AUTHENTICATE</>}
+                            </button>
+                            <p className="mono" style={{fontSize:'0.58rem',color:'var(--text3)',letterSpacing:'0.1em',textAlign:'center'}}>
+                                USE @fbi.gov TO SIGN IN
+                            </p>
+                        </div>
                     </div>
+                </div>
+            </div>
 
-                    <div style={{display:'flex',flexDirection:'column',gap:16}}>
-                        <FormField label="Email Address">
-                            <input id="auth_email" type="email" className="input" placeholder="username@fbi.gov"
-                                value={email} onChange={e=>{setEmail(e.target.value);setError('');}}
-                                onKeyDown={e=>e.key==='Enter'&&onLogin()} autoComplete="off"/>
-                        </FormField>
-                        <FormField label="Password">
-                            <input id="auth_pass" type="password" className="input" placeholder="••••••••"
-                                onKeyDown={e=>e.key==='Enter'&&onLogin()} autoComplete="off"/>
-                        </FormField>
-
-                        {error && (
-                            <div className="alert alert-danger mono" style={{fontSize:'0.65rem',letterSpacing:'0.08em',padding:'10px 14px'}}>
-                                <i className="fas fa-exclamation-circle" style={{marginRight:8}}/>{error}
-                            </div>
-                        )}
-
-                        <button className={`btn ${detected==='fbi'?'btn-primary-fbi':'btn-outline'}`}
-                            style={{width:'100%',padding:'12px',marginTop:4}} onClick={onLogin} disabled={loading}>
-                            {loading ? <><Spinner/> AUTHENTICATING...</> : <><i className="fas fa-fingerprint"/> AUTHENTICATE</>}
-                        </button>
-                        <p className="mono" style={{fontSize:'0.58rem',color:'var(--text3)',letterSpacing:'0.1em',textAlign:'center',marginTop:2}}>
-                            USE @fbi.gov TO SIGN IN
-                        </p>
-                    </div>
+            {/* Warning strip */}
+            <div style={{padding:'0 20px 28px',maxWidth:420,margin:'0 auto',width:'100%',flexShrink:0}}>
+                <div style={{padding:'16px',background:'#fffbeb',border:'1px solid #fed7aa',borderRadius:6}}>
+                    <p className="mono" style={{fontSize:'0.65rem',color:'#92400e',letterSpacing:'0.1em',textAlign:'center'}}>
+                        <i className="fas fa-triangle-exclamation" style={{marginRight:6}}/>
+                        UNAUTHORIZED ACCESS IS A CRIMINAL OFFENSE — 18 U.S.C. § 1030
+                    </p>
                 </div>
             </div>
         </div>
