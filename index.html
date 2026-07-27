@@ -15,20 +15,20 @@
     <style>
         :root {
             /* Government palette */
-            --bg:       #f0f2f5;
-            --surface:  #ffffff;
-            --surface2: #f7f8fa;
-            --border:   #d1d5db;
-            --border2:  #e5e8ec;
-            --text:     #0f1923;
-            --text2:    #4b5563;
-            --text3:    #9ca3af;
+            --bg:       #0a0a0a;
+            --surface:  #161310;
+            --surface2: #100e0b;
+            --border:   #3d3627;
+            --border2:  #2b2620;
+            --text:     #f2e9d8;
+            --text2:    #c4b795;
+            --text3:    #8f8567;
 
             /* FBI accent */
-            --fbi:      #1a3a6e;
-            --fbi-dark: #0f2347;
-            --fbi-light:#2756a8;
-            --fbi-glow: rgba(26,58,110,0.12);
+            --fbi:      #d4af37;
+            --fbi-dark: #a8841f;
+            --fbi-light:#f0d67a;
+            --fbi-glow: rgba(212,175,55,0.15);
 
             --danger:   #dc2626;
             --warning:  #d97706;
@@ -89,8 +89,8 @@
             font-family: var(--sans); font-weight: 600; font-size: 0.82rem;
             letter-spacing: 0.04em; transition: all .18s ease; white-space: nowrap;
         }
-        .btn-primary-fbi { background: var(--fbi); color: #fff; }
-        .btn-primary-fbi:hover { background: var(--fbi-light); box-shadow: 0 4px 12px rgba(26,58,110,.3); }
+        .btn-primary-fbi { background: var(--fbi); color: #1a1508; }
+        .btn-primary-fbi:hover { background: var(--fbi-light); box-shadow: 0 4px 12px rgba(212,175,55,.35); }
         .btn-outline { background: transparent; color: var(--text2); border: 1px solid var(--border); }
         .btn-outline:hover { background: var(--surface2); border-color: var(--text3); }
         .btn-ghost  { background: transparent; color: var(--text2); border: none; padding: 8px 12px; }
@@ -108,7 +108,7 @@
             border-radius: var(--radius); font-family: var(--sans); font-size: 0.85rem;
             color: var(--text); outline: none; transition: border-color .15s, box-shadow .15s;
         }
-        .input:focus { border-color: var(--fbi); box-shadow: 0 0 0 3px rgba(26,58,110,.08); }
+        .input:focus { border-color: var(--fbi); box-shadow: 0 0 0 3px rgba(212,175,55,.15); }
         .input::placeholder { color: var(--text3); }
         select.input option { background: var(--surface); }
         textarea.input { resize: none; }
@@ -119,8 +119,8 @@
         .badge-open    { background:#fef2f2;color:#dc2626;border:1px solid #fecaca; }
         .badge-closed  { background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0; }
         .badge-pending { background:#fffbeb;color:#d97706;border:1px solid #fed7aa; }
-        .badge-fbi     { background:#eff6ff;color:var(--fbi);border:1px solid #bfdbfe; }
-        .badge-blue    { background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe; }
+        .badge-fbi     { background:rgba(212,175,55,0.12);color:var(--fbi);border:1px solid rgba(212,175,55,0.4); }
+        .badge-blue    { background:rgba(212,175,55,0.08);color:#c9a13a;border:1px solid rgba(212,175,55,0.3); }
 
         /* ── Table rows ── */
         .data-row {
@@ -188,14 +188,14 @@
 
         /* ── Alert banner ── */
         .alert { padding:12px 16px;border-radius:var(--radius);border-left:4px solid;margin-bottom:10px; }
-        .alert-info    { background:#eff6ff;border-color:var(--fbi);color:var(--fbi-dark); }
+        .alert-info    { background:rgba(212,175,55,0.1);border-color:var(--fbi);color:var(--fbi-light); }
         .alert-warning { background:#fffbeb;border-color:var(--warning);color:#92400e; }
         .alert-danger  { background:#fef2f2;border-color:var(--danger);color:#991b1b; }
         .alert-success { background:#f0fdf4;border-color:var(--success);color:#14532d; }
 
         /* ── Home hero ── */
         .gov-header {
-            background: linear-gradient(135deg, #0f1923 0%, #1a2a3e 50%, #0f1923 100%);
+            background: linear-gradient(135deg, #000000 0%, #1a1508 50%, #000000 100%);
             color: white; padding: 48px 24px; text-align: center;
         }
 
@@ -223,7 +223,7 @@
         /* ── Login split layout ── */
         .login-split { display:flex; width:100%; max-width:760px; min-height:460px; }
         .login-brand {
-            flex:0 0 40%; background:var(--fbi); color:#fff; padding:36px 30px;
+            flex:0 0 40%; background:var(--fbi); color:#1a1508; padding:36px 30px;
             display:flex; flex-direction:column; justify-content:space-between;
         }
         .login-form-side { flex:1; padding:40px 36px; display:flex; flex-direction:column; justify-content:center; }
@@ -423,9 +423,9 @@ const App = () => {
 const HomeScreen = ({ onLogin }) => (
     <div className="fade-in" style={{height:'100vh',display:'flex',flexDirection:'column',overflow:'auto'}}>
         {/* Gov banner */}
-        <div style={{background:'#1a2a3e',color:'#94a3b8',padding:'6px 20px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <div style={{background:'#000000',color:'#b8a878',padding:'6px 20px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
             <span className="mono" style={{fontSize:'0.6rem',letterSpacing:'0.15em'}}>OFFICIAL GOVERNMENT PORTAL — AUTHORIZED PERSONNEL ONLY</span>
-            <span className="mono" style={{fontSize:'0.6rem',color:'#64748b'}}>{new Date().toUTCString()}</span>
+            <span className="mono" style={{fontSize:'0.6rem',color:'#7a6f4f'}}>{new Date().toUTCString()}</span>
         </div>
 
         {/* Hero */}
@@ -433,10 +433,10 @@ const HomeScreen = ({ onLogin }) => (
             <div style={{display:'flex',justifyContent:'center',marginBottom:32}}>
                 <img src={FBI_LOGO} style={{width:72,height:72,filter:'brightness(0) invert(1)',opacity:.85}} alt="FBI"/>
             </div>
-            <h1 className="display" style={{fontSize:'clamp(1.6rem,5vw,2.8rem)',letterSpacing:'0.08em',marginBottom:8,color:'#f8fafc'}}>
+            <h1 className="display" style={{fontSize:'clamp(1.6rem,5vw,2.8rem)',letterSpacing:'0.08em',marginBottom:8,color:'#f0d67a'}}>
                 FBI
             </h1>
-            <p className="mono" style={{color:'#64748b',fontSize:'0.7rem',letterSpacing:'0.2em',marginBottom:32}}>
+            <p className="mono" style={{color:'#8a7f5f',fontSize:'0.7rem',letterSpacing:'0.2em',marginBottom:32}}>
                 FEDERAL BUREAU OF INVESTIGATION — v2.0
             </p>
             <button className="btn btn-primary-fbi" style={{padding:'14px 40px',fontSize:'0.9rem',letterSpacing:'0.1em'}} onClick={onLogin}>
@@ -479,23 +479,23 @@ const LoginScreen = ({ onBack, onLogin, error, loading, setError, setLoginSector
             <div className="card login-split" style={{overflow:'hidden'}}>
                 {/* Left brand panel */}
                 <div className="login-brand">
-                    <button className="btn btn-ghost btn-sm" style={{color:'rgba(255,255,255,0.85)',alignSelf:'flex-start',padding:0}} onClick={onBack}>
+                    <button className="btn btn-ghost btn-sm" style={{color:'rgba(26,21,8,0.85)',alignSelf:'flex-start',padding:0}} onClick={onBack}>
                         <i className="fas fa-arrow-left"/> Back
                     </button>
                     <div style={{textAlign:'center'}}>
                         {logo ? (
-                            <img src={logo} style={{width:60,height:60,margin:'0 auto 14px',display:'block',objectFit:'contain',filter:'brightness(0) invert(1)'}} alt="logo"/>
+                            <img src={logo} style={{width:60,height:60,margin:'0 auto 14px',display:'block',objectFit:'contain',filter:'brightness(0)'}} alt="logo"/>
                         ) : (
-                            <div style={{width:60,height:60,margin:'0 auto 14px',display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(255,255,255,0.1)',borderRadius:8}}>
-                                <i className="fas fa-shield-halved" style={{fontSize:'1.5rem',color:'#fff'}}/>
+                            <div style={{width:60,height:60,margin:'0 auto 14px',display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(26,21,8,0.12)',borderRadius:8}}>
+                                <i className="fas fa-shield-halved" style={{fontSize:'1.5rem',color:'#1a1508'}}/>
                             </div>
                         )}
-                        <h2 className="display" style={{fontSize:'1.3rem',letterSpacing:'0.1em',color:'#fff',marginBottom:6}}>
+                        <h2 className="display" style={{fontSize:'1.3rem',letterSpacing:'0.1em',color:'#1a1508',marginBottom:6}}>
                             {detected ? 'FBI PORTAL' : 'SECURE LOGIN'}
                         </h2>
-                        <p className="mono" style={{fontSize:'0.6rem',color:'rgba(255,255,255,0.75)',letterSpacing:'0.15em'}}>{name.toUpperCase()}</p>
+                        <p className="mono" style={{fontSize:'0.6rem',color:'rgba(26,21,8,0.75)',letterSpacing:'0.15em'}}>{name.toUpperCase()}</p>
                     </div>
-                    <p className="mono" style={{fontSize:'0.55rem',color:'rgba(255,255,255,0.55)',letterSpacing:'0.1em'}}>
+                    <p className="mono" style={{fontSize:'0.55rem',color:'rgba(26,21,8,0.55)',letterSpacing:'0.1em'}}>
                         AUTHORIZED PERSONNEL ONLY
                     </p>
                 </div>
