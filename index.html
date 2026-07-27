@@ -3,53 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FBI — Case File Access Terminal</title>
+    <title>GOV — Law Enforcement Portal</title>
 
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone@7.23.5/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Special+Elite&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            /* Case-file palette — dark room, single desk lamp */
-            --bg:       #0b0a08;
-            --surface:  #17140f;
-            --surface2: #1e1a13;
-            --border:   #3a3226;
-            --border2: #2a2419;
-            --text:     #ece4d3;
-            --text2:    #a89b7d;
-            --text3:    #6b6047;
+            /* Government palette */
+            --bg:       #f0f2f5;
+            --surface:  #ffffff;
+            --surface2: #f7f8fa;
+            --border:   #d1d5db;
+            --border2:  #e5e8ec;
+            --text:     #0f1923;
+            --text2:    #4b5563;
+            --text3:    #9ca3af;
 
-            /* Brass / gold accent — the stamp ink */
-            --fbi:      #c9a24d;
-            --fbi-dark: #8f7433;
-            --fbi-light:#e0bd6e;
-            --fbi-glow: rgba(201,162,77,0.16);
+            /* FBI accent */
+            --fbi:      #1a3a6e;
+            --fbi-dark: #0f2347;
+            --fbi-light:#2756a8;
+            --fbi-glow: rgba(26,58,110,0.12);
 
-            --danger:   #a4372f;
-            --warning:  #b5842c;
-            --success:  #55794f;
+            --danger:   #dc2626;
+            --warning:  #d97706;
+            --success:  #16a34a;
             --mono:     'IBM Plex Mono', monospace;
             --sans:     'IBM Plex Sans', sans-serif;
-            --display:  'Special Elite', 'IBM Plex Mono', monospace;
+            --display:  'Oswald', sans-serif;
 
-            --radius: 2px;
-            --shadow: 0 1px 0 rgba(0,0,0,0.5), 0 2px 10px rgba(0,0,0,0.45);
-            --shadow-md: 0 8px 24px rgba(0,0,0,0.55);
-            --shadow-lg: 0 20px 48px rgba(0,0,0,0.65);
+            --radius: 6px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.12);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background:
-                radial-gradient(1100px 500px at 50% -8%, rgba(201,162,77,0.07), transparent 60%),
-                var(--bg);
-            color: var(--text); font-family: var(--sans); height: 100vh; width: 100vw; overflow: hidden; font-size: 14px;
-        }
+        body { background: var(--bg); color: var(--text); font-family: var(--sans); height: 100vh; width: 100vw; overflow: hidden; font-size: 14px; }
 
         /* ── Scrollbar ── */
         ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -58,7 +53,7 @@
 
         /* ── Typography ── */
         .mono   { font-family: var(--mono); }
-        .display{ font-family: var(--display); letter-spacing: 0.03em; }
+        .display{ font-family: var(--display); }
 
         /* ── Animations ── */
         @keyframes fadeIn  { from { opacity:0 } to { opacity:1 } }
@@ -94,14 +89,14 @@
             font-family: var(--sans); font-weight: 600; font-size: 0.82rem;
             letter-spacing: 0.04em; transition: all .18s ease; white-space: nowrap;
         }
-        .btn-primary-fbi { background: var(--fbi); color: #16130c; }
-        .btn-primary-fbi:hover { background: var(--fbi-light); box-shadow: 0 4px 14px rgba(201,162,77,.35); }
+        .btn-primary-fbi { background: var(--fbi); color: #fff; }
+        .btn-primary-fbi:hover { background: var(--fbi-light); box-shadow: 0 4px 12px rgba(26,58,110,.3); }
         .btn-outline { background: transparent; color: var(--text2); border: 1px solid var(--border); }
         .btn-outline:hover { background: var(--surface2); border-color: var(--text3); }
         .btn-ghost  { background: transparent; color: var(--text2); border: none; padding: 8px 12px; }
         .btn-ghost:hover  { background: var(--surface2); }
-        .btn-danger { background: var(--danger); color: #f4e9e4; }
-        .btn-danger:hover { background: #8a2c25; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-danger:hover { background: #b91c1c; }
         .btn:disabled { opacity: .5; cursor: not-allowed; }
         .btn-sm { padding: 6px 12px; font-size: 0.75rem; }
         .btn-xs { padding: 4px 8px; font-size: 0.7rem; }
@@ -109,23 +104,23 @@
         /* ── Form inputs ── */
         .input {
             width: 100%; padding: 10px 14px;
-            background: var(--surface2); border: 1px solid var(--border);
+            background: var(--surface); border: 1px solid var(--border);
             border-radius: var(--radius); font-family: var(--sans); font-size: 0.85rem;
             color: var(--text); outline: none; transition: border-color .15s, box-shadow .15s;
         }
-        .input:focus { border-color: var(--fbi); box-shadow: 0 0 0 3px var(--fbi-glow); }
+        .input:focus { border-color: var(--fbi); box-shadow: 0 0 0 3px rgba(26,58,110,.08); }
         .input::placeholder { color: var(--text3); }
-        select.input option { background: var(--surface2); color: var(--text); }
+        select.input option { background: var(--surface); }
         textarea.input { resize: none; }
         .label { display: block; font-size: 0.72rem; font-weight: 600; color: var(--text2); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
 
-        /* ── Badges (redaction-stamp style) ── */
-        .badge { display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:2px;font-family:var(--mono);font-size:0.62rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase; }
-        .badge-open    { background:rgba(164,55,47,0.14);color:#d98f86;border:1px solid rgba(164,55,47,0.4); }
-        .badge-closed  { background:rgba(85,121,79,0.14);color:#a3c49c;border:1px solid rgba(85,121,79,0.4); }
-        .badge-pending { background:rgba(181,132,44,0.14);color:#dfb567;border:1px solid rgba(181,132,44,0.4); }
-        .badge-fbi     { background:rgba(201,162,77,0.12);color:var(--fbi-light);border:1px solid rgba(201,162,77,0.4); }
-        .badge-blue    { background:rgba(201,162,77,0.12);color:var(--fbi-light);border:1px solid rgba(201,162,77,0.35); }
+        /* ── Badges ── */
+        .badge { display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-family:var(--mono);font-size:0.62rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase; }
+        .badge-open    { background:#fef2f2;color:#dc2626;border:1px solid #fecaca; }
+        .badge-closed  { background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0; }
+        .badge-pending { background:#fffbeb;color:#d97706;border:1px solid #fed7aa; }
+        .badge-fbi     { background:#eff6ff;color:var(--fbi);border:1px solid #bfdbfe; }
+        .badge-blue    { background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe; }
 
         /* ── Table rows ── */
         .data-row {
@@ -136,15 +131,15 @@
         .data-row:last-child { border-bottom: none; }
         .data-row:hover { background: var(--surface2); }
 
-        /* ── Nav (folder tabs) ── */
+        /* ── Nav ── */
         .nav-tab {
             display: flex; flex-direction: column; align-items: center; gap: 3px;
-            padding: 8px 6px; cursor: pointer; border-radius: 4px 4px 0 0;
+            padding: 8px 6px; cursor: pointer; border-radius: var(--radius);
             transition: all .15s; position: relative; min-width: 48px;
         }
         .nav-tab span { font-size: 0.5rem; font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
         .nav-tab i { font-size: 1rem; }
-        .nav-tab.active-fbi   { color: var(--fbi-light); background: var(--surface2); }
+        .nav-tab.active-fbi   { color: var(--fbi); }
         .nav-tab.inactive { color: var(--text3); }
         .nav-tab.active-fbi::after {
             content: ''; position: absolute; bottom: -10px; left: 20%; width: 60%; height: 2px; border-radius: 2px 2px 0 0;
@@ -153,19 +148,19 @@
 
         /* ── Status dot ── */
         .dot { width:7px;height:7px;border-radius:50%;display:inline-block; }
-        .dot-green  { background:#5fae5a;box-shadow:0 0 0 0 rgba(95,174,90,.5);animation:dotPulse 2s ease-in-out infinite; }
-        .dot-red    { background:#c0554b; }
-        .dot-orange { background:#d9a13e; }
-        @keyframes dotPulse { 0%{box-shadow:0 0 0 0 rgba(95,174,90,.5)}70%{box-shadow:0 0 0 5px rgba(95,174,90,0)}100%{box-shadow:0 0 0 0 rgba(95,174,90,0)} }
+        .dot-green  { background:#16a34a;box-shadow:0 0 0 0 rgba(22,163,74,.5);animation:dotPulse 2s ease-in-out infinite; }
+        .dot-red    { background:#dc2626; }
+        .dot-orange { background:#d97706; }
+        @keyframes dotPulse { 0%{box-shadow:0 0 0 0 rgba(22,163,74,.5)}70%{box-shadow:0 0 0 5px rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)} }
 
         /* ── Modal ── */
         .modal-backdrop {
-            position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);
+            position:fixed;inset:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);
             z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;
             animation:fadeIn .2s ease;
         }
         .modal-box {
-            background:var(--surface);border:1px solid var(--border);border-radius:4px;
+            background:var(--surface);border:1px solid var(--border);border-radius:8px;
             width:100%;max-width:480px;max-height:90vh;overflow-y:auto;
             box-shadow:var(--shadow-lg);animation:fadeUp .25s ease;
         }
@@ -181,7 +176,7 @@
 
         /* ── Stat card ── */
         .stat-card { padding:16px;display:flex;flex-direction:column;gap:4px; }
-        .stat-val   { font-family:var(--display);font-size:1.9rem;line-height:1; }
+        .stat-val   { font-family:var(--display);font-size:2rem;line-height:1; }
         .stat-label { font-size:0.65rem;font-family:var(--mono);letter-spacing:0.12em;text-transform:uppercase;color:var(--text3); }
 
         /* ── Progress ── */
@@ -193,25 +188,15 @@
 
         /* ── Alert banner ── */
         .alert { padding:12px 16px;border-radius:var(--radius);border-left:4px solid;margin-bottom:10px; }
-        .alert-info    { background:rgba(201,162,77,0.08);border-color:var(--fbi);color:var(--fbi-light); }
-        .alert-warning { background:rgba(181,132,44,0.08);border-color:var(--warning);color:#dfb567; }
-        .alert-danger  { background:rgba(164,55,47,0.1);border-color:var(--danger);color:#d98f86; }
-        .alert-success { background:rgba(85,121,79,0.1);border-color:var(--success);color:#a3c49c; }
+        .alert-info    { background:#eff6ff;border-color:var(--fbi);color:var(--fbi-dark); }
+        .alert-warning { background:#fffbeb;border-color:var(--warning);color:#92400e; }
+        .alert-danger  { background:#fef2f2;border-color:var(--danger);color:#991b1b; }
+        .alert-success { background:#f0fdf4;border-color:var(--success);color:#14532d; }
 
         /* ── Home hero ── */
         .gov-header {
-            background: radial-gradient(900px 400px at 50% -20%, rgba(201,162,77,0.10), transparent 65%), linear-gradient(180deg, #100e0a 0%, #0b0a08 100%);
-            color: white; padding: 56px 24px 48px; text-align: center; position: relative; overflow: hidden;
-            border-bottom: 1px solid var(--border);
-        }
-        /* Signature: the classified stamp, canted in the corner of the first thing you see */
-        .gov-header::before {
-            content: 'CLASSIFIED — EYES ONLY';
-            position: absolute; top: 22px; right: -46px;
-            transform: rotate(28deg);
-            font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.2em;
-            color: rgba(164,55,47,0.75); border: 1.5px solid rgba(164,55,47,0.65);
-            padding: 3px 52px; white-space: nowrap; pointer-events: none;
+            background: linear-gradient(135deg, #0f1923 0%, #1a2a3e 50%, #0f1923 100%);
+            color: white; padding: 48px 24px; text-align: center;
         }
 
         /* ── Log entry ── */
@@ -220,23 +205,50 @@
         .log-user  { font-weight:600; }
 
         /* ── Wanted card ── */
-        .wanted-photo { width:100%;height:160px;object-fit:cover;border-bottom:3px solid var(--danger);display:block;filter:saturate(0.85) contrast(1.05); }
+        .wanted-photo { width:100%;height:160px;object-fit:cover;border-bottom:3px solid var(--danger);display:block; }
 
         /* ── Unit card ── */
         .unit-item { padding:10px 14px;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center; }
         .unit-item:last-child { border-bottom:none; }
 
-        /* home page sector card — looks like a folder front cover */
+        /* home page sector cards */
         .sector-choice {
-            border: 1px solid var(--border); border-radius: 3px; padding: 32px 24px;
+            border: 2px solid var(--border); border-radius: 10px; padding: 32px 24px;
             cursor: pointer; transition: all .2s ease; text-align: center;
-            background: var(--surface); position: relative;
+            background: var(--surface);
         }
-        .sector-choice::before {
-            content: ''; position: absolute; top: 0; left: 24px; width: 64px; height: 6px;
-            background: var(--surface2); border: 1px solid var(--border); border-top: none; border-radius: 0 0 3px 3px;
+        .sector-choice:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+        .sector-choice.fbi-choice:hover { border-color: var(--fbi); }
+
+        /* ── Login split layout ── */
+        .login-split { display:flex; width:100%; max-width:760px; min-height:460px; }
+        .login-brand {
+            flex:0 0 40%; background:var(--fbi); color:#fff; padding:36px 30px;
+            display:flex; flex-direction:column; justify-content:space-between;
         }
-        .sector-choice:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--fbi); }
+        .login-form-side { flex:1; padding:40px 36px; display:flex; flex-direction:column; justify-content:center; }
+        @media (max-width: 680px) {
+            .login-split { flex-direction:column; max-width:420px; min-height:0; }
+            .login-brand { flex:0 0 auto; padding:22px 24px; flex-direction:row; align-items:center; justify-content:space-between; }
+            .login-form-side { padding:28px 24px; }
+        }
+
+        /* ── Top nav strip (replaces bottom tab bar) ── */
+        .top-nav-strip {
+            display:flex; gap:4px; padding:6px 10px; overflow-x:auto; flex-shrink:0;
+            background:var(--surface); border-bottom:1px solid var(--border);
+        }
+        .top-nav-strip::-webkit-scrollbar { display:none; }
+        .nav-pill {
+            display:flex; align-items:center; gap:6px; padding:8px 14px; border-radius:20px;
+            cursor:pointer; white-space:nowrap; font-family:var(--mono); font-size:0.68rem;
+            letter-spacing:0.06em; text-transform:uppercase; transition:all .15s; flex-shrink:0;
+            border:1px solid transparent;
+        }
+        .nav-pill i { font-size:0.85rem; }
+        .nav-pill.inactive { color:var(--text2); }
+        .nav-pill.inactive:hover { background:var(--surface2); }
+        .nav-pill.active-fbi { background:var(--fbi-glow); color:var(--fbi); border-color:var(--fbi); font-weight:600; }
     </style>
 </head>
 <body>
@@ -411,20 +423,20 @@ const App = () => {
 const HomeScreen = ({ onLogin }) => (
     <div className="fade-in" style={{height:'100vh',display:'flex',flexDirection:'column',overflow:'auto'}}>
         {/* Gov banner */}
-        <div style={{background:'#0e0d0a',color:'var(--text3)',padding:'6px 20px',display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid var(--border2)'}}>
+        <div style={{background:'#1a2a3e',color:'#94a3b8',padding:'6px 20px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
             <span className="mono" style={{fontSize:'0.6rem',letterSpacing:'0.15em'}}>OFFICIAL GOVERNMENT PORTAL — AUTHORIZED PERSONNEL ONLY</span>
-            <span className="mono" style={{fontSize:'0.6rem',color:'var(--text3)'}}>{new Date().toUTCString()}</span>
+            <span className="mono" style={{fontSize:'0.6rem',color:'#64748b'}}>{new Date().toUTCString()}</span>
         </div>
 
         {/* Hero */}
         <div className="gov-header" style={{flexShrink:0}}>
             <div style={{display:'flex',justifyContent:'center',marginBottom:32}}>
-                <img src={FBI_LOGO} style={{width:72,height:72,filter:'brightness(0) invert(1)',opacity:.8}} alt="FBI"/>
+                <img src={FBI_LOGO} style={{width:72,height:72,filter:'brightness(0) invert(1)',opacity:.85}} alt="FBI"/>
             </div>
-            <h1 className="display" style={{fontSize:'clamp(1.5rem,5vw,2.4rem)',letterSpacing:'0.06em',marginBottom:10,color:'var(--text)'}}>
+            <h1 className="display" style={{fontSize:'clamp(1.6rem,5vw,2.8rem)',letterSpacing:'0.08em',marginBottom:8,color:'#f8fafc'}}>
                 LAW ENFORCEMENT PORTAL
             </h1>
-            <p className="mono" style={{color:'var(--text3)',fontSize:'0.7rem',letterSpacing:'0.2em',marginBottom:32}}>
+            <p className="mono" style={{color:'#64748b',fontSize:'0.7rem',letterSpacing:'0.2em',marginBottom:32}}>
                 FEDERAL BUREAU OF INVESTIGATION — v2.0
             </p>
             <button className="btn btn-primary-fbi" style={{padding:'14px 40px',fontSize:'0.9rem',letterSpacing:'0.1em'}} onClick={onLogin}>
@@ -436,13 +448,13 @@ const HomeScreen = ({ onLogin }) => (
         {/* Sector */}
         <div style={{flex:1,padding:'32px 20px',maxWidth:420,margin:'0 auto',width:'100%'}}>
             <div className="sector-choice fbi-choice" onClick={onLogin}>
-                <img src={FBI_LOGO} style={{width:56,height:56,margin:'0 auto 16px',display:'block',filter:'brightness(0) invert(1)',opacity:.85}} alt="FBI"/>
-                <div className="display" style={{fontSize:'1.2rem',letterSpacing:'0.08em',color:'var(--fbi-light)',marginBottom:6}}>FBI</div>
+                <img src={FBI_LOGO} style={{width:56,height:56,margin:'0 auto 16px',display:'block'}} alt="FBI"/>
+                <div className="display" style={{fontSize:'1.3rem',letterSpacing:'0.1em',color:'var(--fbi)',marginBottom:6}}>FBI</div>
                 <p style={{fontSize:'0.75rem',color:'var(--text2)'}}>Federal Bureau of Investigation</p>
                 <div style={{marginTop:12}}><span className="badge badge-fbi">@fbi.gov</span></div>
             </div>
-            <div style={{marginTop:24,padding:'16px',background:'rgba(164,55,47,0.08)',border:'1px solid rgba(164,55,47,0.35)',borderRadius:2}}>
-                <p className="mono" style={{fontSize:'0.65rem',color:'#d98f86',letterSpacing:'0.1em',textAlign:'center'}}>
+            <div style={{marginTop:24,padding:'16px',background:'#fffbeb',border:'1px solid #fed7aa',borderRadius:6}}>
+                <p className="mono" style={{fontSize:'0.65rem',color:'#92400e',letterSpacing:'0.1em',textAlign:'center'}}>
                     <i className="fas fa-triangle-exclamation" style={{marginRight:6}}/>
                     UNAUTHORIZED ACCESS IS A CRIMINAL OFFENSE — 18 U.S.C. § 1030
                 </p>
@@ -463,28 +475,38 @@ const LoginScreen = ({ onBack, onLogin, error, loading, setError, setLoginSector
     const name  = detected === 'fbi' ? 'Federal Bureau of Investigation' : 'Enter your email address';
 
     return (
-        <div className="fade-in" style={{height:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:20,background:'var(--bg)'}}>
-            <div className="card" style={{width:'100%',maxWidth:400,overflow:'hidden'}}>
-                {/* Sector strip */}
-                <div style={{height:4,background: detected === 'fbi' ? 'var(--fbi)' : 'var(--border)',transition:'background .3s'}}/>
-
-                <div style={{padding:'28px 28px 24px'}}>
-                    {/* Header */}
-                    <div style={{textAlign:'center',marginBottom:28}}>
+        <div className="fade-in" style={{height:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:20,background:'var(--bg)'}}>
+            <div className="card login-split" style={{overflow:'hidden'}}>
+                {/* Left brand panel */}
+                <div className="login-brand">
+                    <button className="btn btn-ghost btn-sm" style={{color:'rgba(255,255,255,0.85)',alignSelf:'flex-start',padding:0}} onClick={onBack}>
+                        <i className="fas fa-arrow-left"/> Back
+                    </button>
+                    <div style={{textAlign:'center'}}>
                         {logo ? (
-                            <img src={logo} style={{width:52,height:52,margin:'0 auto 14px',display:'block',objectFit:'contain'}} alt="logo"/>
+                            <img src={logo} style={{width:60,height:60,margin:'0 auto 14px',display:'block',objectFit:'contain',filter:'brightness(0) invert(1)'}} alt="logo"/>
                         ) : (
-                            <div style={{width:52,height:52,margin:'0 auto 14px',display:'flex',alignItems:'center',justifyContent:'center',background:'var(--surface2)',borderRadius:8}}>
-                                <i className="fas fa-shield-halved" style={{fontSize:'1.4rem',color:'var(--text3)'}}/>
+                            <div style={{width:60,height:60,margin:'0 auto 14px',display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(255,255,255,0.1)',borderRadius:8}}>
+                                <i className="fas fa-shield-halved" style={{fontSize:'1.5rem',color:'#fff'}}/>
                             </div>
                         )}
-                        <h2 className="display" style={{fontSize:'1.2rem',letterSpacing:'0.1em',color: detected ? color : 'var(--text)',marginBottom:4}}>
+                        <h2 className="display" style={{fontSize:'1.3rem',letterSpacing:'0.1em',color:'#fff',marginBottom:6}}>
                             {detected ? 'FBI PORTAL' : 'SECURE LOGIN'}
                         </h2>
-                        <p className="mono" style={{fontSize:'0.6rem',color:'var(--text3)',letterSpacing:'0.15em'}}>{name.toUpperCase()}</p>
+                        <p className="mono" style={{fontSize:'0.6rem',color:'rgba(255,255,255,0.75)',letterSpacing:'0.15em'}}>{name.toUpperCase()}</p>
+                    </div>
+                    <p className="mono" style={{fontSize:'0.55rem',color:'rgba(255,255,255,0.55)',letterSpacing:'0.1em'}}>
+                        AUTHORIZED PERSONNEL ONLY
+                    </p>
+                </div>
+
+                {/* Right form panel */}
+                <div className="login-form-side">
+                    <div style={{marginBottom:22}}>
+                        <span className="display" style={{fontSize:'1rem',letterSpacing:'0.08em',color:'var(--text)'}}>SIGN IN</span>
+                        <p className="mono" style={{fontSize:'0.6rem',color:'var(--text3)',letterSpacing:'0.1em',marginTop:4}}>ENTER YOUR CREDENTIALS TO CONTINUE</p>
                     </div>
 
-                    {/* Fields */}
                     <div style={{display:'flex',flexDirection:'column',gap:16}}>
                         <FormField label="Email Address">
                             <input id="auth_email" type="email" className="input" placeholder="username@fbi.gov"
@@ -503,18 +525,13 @@ const LoginScreen = ({ onBack, onLogin, error, loading, setError, setLoginSector
                         )}
 
                         <button className={`btn ${detected==='fbi'?'btn-primary-fbi':'btn-outline'}`}
-                            style={{width:'100%',padding:'12px'}} onClick={onLogin} disabled={loading}>
+                            style={{width:'100%',padding:'12px',marginTop:4}} onClick={onLogin} disabled={loading}>
                             {loading ? <><Spinner/> AUTHENTICATING...</> : <><i className="fas fa-fingerprint"/> AUTHENTICATE</>}
                         </button>
-                        <button className="btn btn-ghost" style={{width:'100%'}} onClick={onBack}>
-                            <i className="fas fa-arrow-left"/> Back to Portal
-                        </button>
+                        <p className="mono" style={{fontSize:'0.58rem',color:'var(--text3)',letterSpacing:'0.1em',textAlign:'center',marginTop:2}}>
+                            USE @fbi.gov TO SIGN IN
+                        </p>
                     </div>
-                </div>
-                <div style={{padding:'12px 28px',background:'var(--surface2)',borderTop:'1px solid var(--border2)',textAlign:'center'}}>
-                    <p className="mono" style={{fontSize:'0.55rem',color:'var(--text3)',letterSpacing:'0.12em'}}>
-                        USE @fbi.gov TO SIGN IN
-                    </p>
                 </div>
             </div>
         </div>
@@ -598,28 +615,39 @@ const SectorApp = ({ sector, currentUser, onLogout, data, activityLog, addLog, r
             {/* Sector strip */}
             <div style={{height:3,background:color,flexShrink:0}}/>
 
-            {/* Top bar */}
+            {/* Top bar — sign out moved to the left, identity to the right */}
             <div className="topbar" style={{flexShrink:0}}>
-                <div style={{display:'flex',alignItems:'center',gap:10}}>
-                    <img src={logo} style={{width:28,height:28,objectFit:'contain'}} alt="logo"/>
-                    <div>
-                        <div className="display" style={{fontSize:'0.9rem',letterSpacing:'0.08em',color:color}}>{label} — {currentUser.name}</div>
-                        <div className="mono" style={{fontSize:'0.55rem',color:'var(--text3)',letterSpacing:'0.1em'}}>{currentUser.rank}</div>
-                    </div>
-                </div>
-                <div style={{display:'flex',alignItems:'center',gap:10}}>
+                <div style={{display:'flex',alignItems:'center',gap:12}}>
+                    <button className="btn btn-outline btn-sm" onClick={onLogout} style={{color:'var(--danger)',borderColor:'rgba(220,38,38,0.35)'}}>
+                        <i className="fas fa-right-from-bracket"/> Sign Out
+                    </button>
                     <div style={{display:'flex',alignItems:'center',gap:5}}>
                         <Dot status="green"/>
                         <span className="mono" style={{fontSize:'0.55rem',color:'var(--text3)'}}>ONLINE</span>
                     </div>
-                    <button className="btn btn-outline btn-sm" onClick={onLogout} style={{color:'var(--danger)',borderColor:'rgba(164,55,47,0.4)'}}>
-                        <i className="fas fa-right-from-bracket"/> Sign Out
-                    </button>
+                </div>
+                <div style={{display:'flex',alignItems:'center',gap:10,textAlign:'right'}}>
+                    <div>
+                        <div className="display" style={{fontSize:'0.9rem',letterSpacing:'0.08em',color:color}}>{label} — {currentUser.name}</div>
+                        <div className="mono" style={{fontSize:'0.55rem',color:'var(--text3)',letterSpacing:'0.1em'}}>{currentUser.rank}</div>
+                    </div>
+                    <img src={logo} style={{width:28,height:28,objectFit:'contain'}} alt="logo"/>
                 </div>
             </div>
 
+            {/* Nav — horizontal pill strip under the top bar */}
+            <div className="top-nav-strip">
+                {NAV.map(n => (
+                    <div key={n.key} className={`nav-pill ${activeTab===n.key ? activeClass : 'inactive'}`}
+                        onClick={() => setActiveTab(n.key)}>
+                        <i className={`fas ${n.icon}`}/>
+                        <span>{n.label}</span>
+                    </div>
+                ))}
+            </div>
+
             {/* Content */}
-            <main style={{flex:1,overflowY:'auto',padding:'16px 14px 90px'}}>
+            <main style={{flex:1,overflowY:'auto',padding:'16px 14px 24px'}}>
                 {activeTab === 'dashboard' && <DashboardTab sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal}/>}
                 {activeTab === 'cases'     && <CasesTab     sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal} deleteRecord={deleteRecord} setEditItem={setEditItem} setModal={setModal}/>}
                 {activeTab === 'wanted'    && <WantedTab    sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal} deleteRecord={deleteRecord}/>}
@@ -629,17 +657,6 @@ const SectorApp = ({ sector, currentUser, onLogout, data, activityLog, addLog, r
                 {activeTab === 'crypto'    && <CryptoTab    color={color}/>}
                 {activeTab === 'logs'      && <LogsTab      activityLog={activityLog} sector={sector}/>}
             </main>
-
-            {/* Bottom nav */}
-            <nav style={{position:'fixed',bottom:0,width:'100%',background:'var(--surface)',borderTop:'1px solid var(--border)',padding:'8px 4px 10px',display:'flex',justifyContent:'space-around',zIndex:200,boxShadow:'0 -2px 8px rgba(0,0,0,0.06)'}}>
-                {NAV.map(n => (
-                    <div key={n.key} className={`nav-tab ${activeTab===n.key ? activeClass : 'inactive'}`}
-                        onClick={() => setActiveTab(n.key)}>
-                        <i className={`fas ${n.icon}`}/>
-                        <span>{n.label}</span>
-                    </div>
-                ))}
-            </nav>
 
             {/* Modals */}
             {modal && (
@@ -882,7 +899,7 @@ const OpsTab = ({ sector, data, color, currentUser, addLog }) => {
                         <p className="mono" style={{fontSize:'0.65rem',fontWeight:600}}><i className="fas fa-crosshairs" style={{marginRight:6}}/>DEPLOY MODE — TAP ON MAP</p>
                         <p style={{fontSize:'0.7rem',color:'var(--text2)',marginTop:2}}>Unit: {selectedUnit?.name}</p>
                     </div>
-                    <button className="btn btn-outline btn-sm" style={{color:'var(--danger)',borderColor:'rgba(164,55,47,0.4)'}}
+                    <button className="btn btn-outline btn-sm" style={{color:'var(--danger)',borderColor:'#fecaca'}}
                         onClick={() => {setIsDeploying(false);setSelectedUnit(null);}}>Cancel</button>
                 </div>
             )}
