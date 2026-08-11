@@ -10,50 +10,64 @@
     <script src="https://unpkg.com/@babel/standalone@7.23.5/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@500;700;800;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            /* Government palette */
-            --bg:       #0a0d13;
-            --surface:  #10141c;
-            --surface2: #0c0f15;
-            --border:   #232a38;
-            --border2:  #1a2029;
-            --text:     #f2f4f7;
-            --text2:    #9aa3b5;
-            --text3:    #6b7284;
+            /* Cyber palette */
+            --bg:       #060608;
+            --surface:  #101014;
+            --surface2: #0b0b0f;
+            --border:   #24242e;
+            --border2:  #1a1a22;
+            --text:     #eef0ff;
+            --text2:    #9ea0c0;
+            --text3:    #64647e;
 
-            /* FBI accent */
-            --fbi:      #e8c14a;
-            --fbi-dark: #b8912e;
-            --fbi-light:#f5d878;
-            --fbi-glow: rgba(232,193,74,0.15);
+            /* Neon accents */
+            --fbi:      #00e5ff;
+            --fbi-dark: #0aa8c4;
+            --fbi-light:#7cf5ff;
+            --fbi-glow: rgba(0,229,255,0.16);
 
-            --danger:   #dc2626;
-            --warning:  #d97706;
-            --success:  #16a34a;
+            --accent2:      #a855f7;
+            --accent2-glow: rgba(168,85,247,0.18);
+            --accent3:      #ff2bd6;
+
+            --danger:   #ff342b;
+            --warning:  #ffb020;
+            --success:  #00ff9d;
             --mono:     'IBM Plex Mono', monospace;
-            --sans:     'IBM Plex Sans', sans-serif;
-            --display:  'Oswald', sans-serif;
+            --sans:     'Rajdhani', sans-serif;
+            --display:  'Orbitron', sans-serif;
 
-            --radius: 6px;
-            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
-            --shadow-lg: 0 10px 30px rgba(0,0,0,0.12);
+            --radius: 10px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.45), 0 0 20px rgba(0,229,255,0.06);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.55), 0 0 30px rgba(0,229,255,0.08);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); color: var(--text); font-family: var(--sans); height: 100vh; width: 100vw; overflow: hidden; font-size: 14px; }
+        html, body { height: 100%; }
+        body {
+            background:
+                linear-gradient(to right, rgba(0,229,255,0.035) 1px, transparent 1px) 0 0 / 34px 34px,
+                linear-gradient(to bottom, rgba(0,229,255,0.035) 1px, transparent 1px) 0 0 / 34px 34px,
+                radial-gradient(ellipse 900px 500px at 15% -10%, rgba(168,85,247,0.10), transparent 60%),
+                radial-gradient(ellipse 900px 500px at 100% 10%, rgba(0,229,255,0.08), transparent 60%),
+                var(--bg);
+            color: var(--text); font-family: var(--sans); font-weight:500;
+            height: 100vh; width: 100vw; overflow: hidden; font-size: 15px;
+        }
 
         /* ── Scrollbar ── */
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb { background: var(--fbi-dark); border-radius: 3px; }
 
         /* ── Typography ── */
         .mono   { font-family: var(--mono); }
-        .display{ font-family: var(--display); }
+        .display{ font-family: var(--display); font-weight:700; }
 
         /* ── Animations ── */
         @keyframes fadeIn  { from { opacity:0 } to { opacity:1 } }
@@ -62,6 +76,7 @@
         @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:.4} }
         @keyframes spin    { to{transform:rotate(360deg)} }
         @keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+        @keyframes neonPulse { 0%,100%{ box-shadow:0 0 8px rgba(0,229,255,.35), 0 0 2px rgba(0,229,255,.6) inset; } 50%{ box-shadow:0 0 18px rgba(0,229,255,.6), 0 0 4px rgba(0,229,255,.8) inset; } }
 
         .fade-in  { animation: fadeIn  .35s ease both }
         .fade-up  { animation: fadeUp  .4s ease both }
@@ -71,11 +86,22 @@
 
         /* ── Cards & Surfaces ── */
         .card {
-            background: var(--surface);
+            background: linear-gradient(180deg, var(--surface), var(--surface2));
             border: 1px solid var(--border);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
         }
+        .card::before {
+            content:''; position:absolute; inset:0; padding:1px; border-radius:var(--radius);
+            background: linear-gradient(160deg, rgba(0,229,255,0.35), rgba(168,85,247,0.12) 40%, transparent 70%);
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude;
+            pointer-events:none; opacity:.5; transition:opacity .25s;
+        }
+        .card:hover::before { opacity: 1; }
         .card-inset {
             background: var(--surface2);
             border: 1px solid var(--border2);
@@ -85,42 +111,50 @@
         /* ── Buttons ── */
         .btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            padding: 10px 18px; border-radius: var(--radius); border: none; cursor: pointer;
-            font-family: var(--sans); font-weight: 600; font-size: 0.82rem;
-            letter-spacing: 0.04em; transition: all .18s ease; white-space: nowrap;
+            padding: 10px 18px; border-radius: 12px; border: none; cursor: pointer;
+            font-family: var(--sans); font-weight: 700; font-size: 0.85rem;
+            letter-spacing: 0.05em; transition: all .18s ease; white-space: nowrap;
         }
-        .btn-primary-fbi { background: linear-gradient(135deg, #f0cf6a 0%, #d4a62e 100%); color: #14110a; font-weight:700; }
-        .btn-primary-fbi:hover { background: var(--fbi-light); box-shadow: 0 4px 12px rgba(232,193,74,.4); }
-        .btn-outline { background: transparent; color: var(--text2); border: 1px solid var(--border); }
-        .btn-outline:hover { background: var(--surface2); border-color: var(--text3); }
+        .btn-primary-fbi {
+            background: radial-gradient(120px 60px at 15% 0%, rgba(255,255,255,0.18), transparent 60%), linear-gradient(135deg, #00c2e0 0%, #7c3aed 100%);
+            color: #04070a; box-shadow: 0 0 0 1px rgba(0,229,255,0.25), 0 4px 18px rgba(0,229,255,0.25);
+        }
+        .btn-primary-fbi:hover { filter:brightness(1.12); box-shadow: 0 0 0 1px rgba(0,229,255,0.5), 0 6px 26px rgba(168,85,247,.45); transform:translateY(-1px); }
+        .btn-outline { background: rgba(255,255,255,0.02); color: var(--text2); border: 1px solid var(--border); }
+        .btn-outline:hover { background: rgba(0,229,255,0.06); border-color: var(--fbi); color: var(--fbi-light); }
         .btn-ghost  { background: transparent; color: var(--text2); border: none; padding: 8px 12px; }
-        .btn-ghost:hover  { background: var(--surface2); }
-        .btn-danger { background: var(--danger); color: #fff; }
-        .btn-danger:hover { background: #b91c1c; }
+        .btn-ghost:hover  { background: var(--surface2); color: var(--fbi-light); }
+        .btn-danger { background: rgba(255,52,43,0.14); color:#ff6a62; border:1px solid rgba(255,52,43,0.35); }
+        .btn-danger:hover { background: rgba(255,52,43,0.28); box-shadow:0 0 14px rgba(255,52,43,.3); }
         .btn:disabled { opacity: .5; cursor: not-allowed; }
         .btn-sm { padding: 6px 12px; font-size: 0.75rem; }
         .btn-xs { padding: 4px 8px; font-size: 0.7rem; }
 
         /* ── Form inputs ── */
         .input {
-            width: 100%; padding: 10px 14px;
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: var(--radius); font-family: var(--sans); font-size: 0.85rem;
+            width: 100%; padding: 11px 14px;
+            background: #08080b; border: 1px solid var(--border);
+            border-radius: 10px; font-family: var(--sans); font-size: 0.92rem; font-weight:500;
             color: var(--text); outline: none; transition: border-color .15s, box-shadow .15s;
         }
-        .input:focus { border-color: var(--fbi); box-shadow: 0 0 0 3px rgba(232,193,74,.15); }
+        .input:focus { border-color: var(--fbi); box-shadow: 0 0 0 3px rgba(0,229,255,.14), 0 0 16px rgba(168,85,247,.12); }
         .input::placeholder { color: var(--text3); }
         select.input option { background: var(--surface); }
         textarea.input { resize: none; }
-        .label { display: block; font-size: 0.72rem; font-weight: 600; color: var(--text2); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+        .label { display: block; font-size: 0.72rem; font-weight: 700; color: var(--text2); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; font-family: var(--mono); }
+
+        /* ── Neon input wrap (login screen) ── */
+        .neon-input-wrap { position:relative; border-radius:12px; padding:1px; background: linear-gradient(120deg, var(--fbi), var(--accent2), var(--accent3), var(--fbi)); background-size:300% 300%; animation: neonShift 6s ease infinite; }
+        .neon-input-wrap .input { border:none; border-radius:11px; }
+        @keyframes neonShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
 
         /* ── Badges ── */
-        .badge { display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-family:var(--mono);font-size:0.62rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase; }
-        .badge-open    { background:#fef2f2;color:#dc2626;border:1px solid #fecaca; }
-        .badge-closed  { background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0; }
-        .badge-pending { background:#fffbeb;color:#d97706;border:1px solid #fed7aa; }
-        .badge-fbi     { background:rgba(232,193,74,0.12);color:var(--fbi);border:1px solid rgba(232,193,74,0.4); }
-        .badge-blue    { background:rgba(232,193,74,0.08);color:#d4ac3e;border:1px solid rgba(232,193,74,0.3); }
+        .badge { display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-family:var(--mono);font-size:0.62rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase; }
+        .badge-open    { background:rgba(255,52,43,0.12);color:#ff6a62;border:1px solid rgba(255,52,43,0.4); }
+        .badge-closed  { background:rgba(0,255,157,0.12);color:var(--success);border:1px solid rgba(0,255,157,0.35); }
+        .badge-pending { background:rgba(255,176,32,0.12);color:var(--warning);border:1px solid rgba(255,176,32,0.35); }
+        .badge-fbi     { background:rgba(0,229,255,0.12);color:var(--fbi);border:1px solid rgba(0,229,255,0.4); }
+        .badge-blue    { background:rgba(168,85,247,0.1);color:var(--accent2);border:1px solid rgba(168,85,247,0.35); }
 
         /* ── Table rows ── */
         .data-row {
@@ -129,7 +163,7 @@
             transition: background .15s;
         }
         .data-row:last-child { border-bottom: none; }
-        .data-row:hover { background: var(--surface2); }
+        .data-row:hover { background: rgba(0,229,255,0.03); }
 
         /* ── Nav ── */
         .nav-tab {
@@ -139,30 +173,31 @@
         }
         .nav-tab span { font-size: 0.5rem; font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
         .nav-tab i { font-size: 1rem; }
-        .nav-tab.active-fbi   { color: var(--fbi); }
+        .nav-tab.active-fbi   { color: var(--fbi); text-shadow: 0 0 10px rgba(0,229,255,.6); }
         .nav-tab.inactive { color: var(--text3); }
         .nav-tab.active-fbi::after {
             content: ''; position: absolute; bottom: -10px; left: 20%; width: 60%; height: 2px; border-radius: 2px 2px 0 0;
+            box-shadow: 0 0 8px var(--fbi);
         }
         .nav-tab.active-fbi::after   { background: var(--fbi); }
 
         /* ── Status dot ── */
         .dot { width:7px;height:7px;border-radius:50%;display:inline-block; }
-        .dot-green  { background:#16a34a;box-shadow:0 0 0 0 rgba(22,163,74,.5);animation:dotPulse 2s ease-in-out infinite; }
-        .dot-red    { background:#dc2626; }
-        .dot-orange { background:#d97706; }
-        @keyframes dotPulse { 0%{box-shadow:0 0 0 0 rgba(22,163,74,.5)}70%{box-shadow:0 0 0 5px rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)} }
+        .dot-green  { background:var(--success);box-shadow:0 0 0 0 rgba(0,255,157,.5);animation:dotPulse 2s ease-in-out infinite; }
+        .dot-red    { background:var(--danger); }
+        .dot-orange { background:var(--warning); }
+        @keyframes dotPulse { 0%{box-shadow:0 0 0 0 rgba(0,255,157,.5)}70%{box-shadow:0 0 0 6px rgba(0,255,157,0)}100%{box-shadow:0 0 0 0 rgba(0,255,157,0)} }
 
         /* ── Modal ── */
         .modal-backdrop {
-            position:fixed;inset:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);
+            position:fixed;inset:0;background:rgba(2,2,6,0.72);backdrop-filter:blur(6px);
             z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;
             animation:fadeIn .2s ease;
         }
         .modal-box {
-            background:var(--surface);border:1px solid var(--border);border-radius:8px;
+            background:var(--surface);border:1px solid var(--border);border-radius:14px;
             width:100%;max-width:480px;max-height:90vh;overflow-y:auto;
-            box-shadow:var(--shadow-lg);animation:fadeUp .25s ease;
+            box-shadow:var(--shadow-lg), 0 0 0 1px rgba(0,229,255,0.08);animation:fadeUp .25s ease;
         }
         .modal-header { padding:20px 24px 16px;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center; }
         .modal-body   { padding:20px 24px; }
@@ -172,40 +207,43 @@
         .topbar { background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;box-shadow:var(--shadow); }
 
         /* ── Sector strip ── */
-        .sector-strip-fbi   { background:var(--fbi);height:3px;width:100%; }
+        .sector-strip-fbi   { background:linear-gradient(90deg, var(--fbi), var(--accent2), var(--accent3));height:3px;width:100%; }
 
         /* ── Stat card ── */
         .stat-card { padding:16px;display:flex;flex-direction:column;gap:4px; }
-        .stat-val   { font-family:var(--display);font-size:2rem;line-height:1; }
+        .stat-val   { font-family:var(--display);font-size:1.9rem;line-height:1; text-shadow:0 0 14px rgba(0,229,255,.3); }
         .stat-label { font-size:0.65rem;font-family:var(--mono);letter-spacing:0.12em;text-transform:uppercase;color:var(--text3); }
 
         /* ── Progress ── */
         .progress-track { height:4px;background:var(--border2);border-radius:2px;overflow:hidden; }
-        .progress-fill  { height:100%;border-radius:2px;transition:width 1s ease; }
+        .progress-fill  { height:100%;border-radius:2px;transition:width 1s ease; box-shadow:0 0 8px currentColor; }
 
         /* ── Divider ── */
         .divider { border:none;border-top:1px solid var(--border2);margin:14px 0; }
 
         /* ── Alert banner ── */
-        .alert { padding:12px 16px;border-radius:var(--radius);border-left:4px solid;margin-bottom:10px; }
-        .alert-info    { background:rgba(232,193,74,0.1);border-color:var(--fbi);color:var(--fbi-light); }
-        .alert-warning { background:#fffbeb;border-color:var(--warning);color:#92400e; }
-        .alert-danger  { background:#fef2f2;border-color:var(--danger);color:#991b1b; }
-        .alert-success { background:#f0fdf4;border-color:var(--success);color:#14532d; }
+        .alert { padding:12px 16px;border-radius:var(--radius);border-left:3px solid;margin-bottom:10px; }
+        .alert-info    { background:rgba(0,229,255,0.08);border-color:var(--fbi);color:var(--fbi-light); }
+        .alert-warning { background:rgba(255,176,32,0.08);border-color:var(--warning);color:var(--warning); }
+        .alert-danger  { background:rgba(255,52,43,0.08);border-color:var(--danger);color:#ff6a62; }
+        .alert-success { background:rgba(0,255,157,0.08);border-color:var(--success);color:var(--success); }
 
         /* ── Home hero ── */
         .gov-header {
-            background: linear-gradient(135deg, #05070a 0%, #10141c 50%, #05070a 100%);
+            background:
+                radial-gradient(ellipse 700px 400px at 50% 0%, rgba(0,229,255,0.1), transparent 60%),
+                radial-gradient(ellipse 700px 400px at 50% 100%, rgba(168,85,247,0.1), transparent 60%),
+                linear-gradient(135deg, #030304 0%, #101014 50%, #030304 100%);
             color: white; padding: 48px 24px; text-align: center;
         }
 
         /* ── Log entry ── */
         .log-entry { padding:8px 16px;border-bottom:1px solid var(--border2);font-family:var(--mono);font-size:0.68rem;color:var(--text2); }
         .log-time  { color:var(--text3); }
-        .log-user  { font-weight:600; }
+        .log-user  { font-weight:700; }
 
         /* ── Wanted card ── */
-        .wanted-photo { width:100%;height:160px;object-fit:cover;border-bottom:3px solid var(--danger);display:block; }
+        .wanted-photo { width:100%;height:160px;object-fit:cover;border-bottom:3px solid var(--danger);display:block;filter:saturate(1.1) contrast(1.05); }
 
         /* ── Unit card ── */
         .unit-item { padding:10px 14px;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center; }
@@ -213,20 +251,20 @@
 
         /* home page sector cards */
         .sector-choice {
-            border: 2px solid var(--border); border-radius: 10px; padding: 32px 24px;
+            border: 1px solid var(--border); border-radius: 14px; padding: 32px 24px;
             cursor: pointer; transition: all .2s ease; text-align: center;
             background: var(--surface);
         }
-        .sector-choice:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+        .sector-choice:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--fbi); }
         .sector-choice.fbi-choice:hover { border-color: var(--fbi); }
 
         /* ── Login split layout ── */
-        .login-split { display:flex; width:100%; max-width:760px; min-height:460px; }
+        .login-split { display:flex; width:100%; max-width:760px; min-height:460px; border-radius:16px; overflow:hidden; box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0,229,255,0.1); }
         .login-brand {
-            flex:0 0 40%; background:linear-gradient(135deg, #f0cf6a 0%, #d4a62e 100%); color:#14110a; padding:36px 30px;
+            flex:0 0 40%; background:radial-gradient(120px 80px at 20% 0%, rgba(255,255,255,0.16), transparent 60%), linear-gradient(150deg, #00c2e0 0%, #7c3aed 100%); color:#04070a; padding:36px 30px;
             display:flex; flex-direction:column; justify-content:space-between;
         }
-        .login-form-side { flex:1; padding:40px 36px; display:flex; flex-direction:column; justify-content:center; }
+        .login-form-side { flex:1; padding:40px 36px; display:flex; flex-direction:column; justify-content:center; background: var(--surface); }
         @media (max-width: 680px) {
             .login-split { flex-direction:column; max-width:420px; min-height:0; }
             .login-brand { flex:0 0 auto; padding:22px 24px; flex-direction:row; align-items:center; justify-content:space-between; }
@@ -247,8 +285,146 @@
         }
         .nav-pill i { font-size:0.85rem; }
         .nav-pill.inactive { color:var(--text2); }
-        .nav-pill.inactive:hover { background:var(--surface2); }
-        .nav-pill.active-fbi { background:var(--fbi-glow); color:var(--fbi); border-color:rgba(232,193,74,0.5); font-weight:600; }
+        .nav-pill.inactive:hover { background:rgba(0,229,255,0.05); color:var(--fbi-light); }
+        .nav-pill.active-fbi { background:var(--fbi-glow); color:var(--fbi); border-color:rgba(0,229,255,0.5); font-weight:700; box-shadow:0 0 12px rgba(0,229,255,.2); }
+
+        /* ── Threat ribbon (wanted cards) ── */
+        .ribbon-wrap { position:absolute; overflow:hidden; width:110px; height:110px; top:-6px; left:-6px; pointer-events:none; }
+        .ribbon-wrap span {
+            position:absolute; width:150%; height:26px; top:20px; left:-32px;
+            transform:rotate(-45deg); display:flex; align-items:center; justify-content:center;
+            color:#04070a; font-weight:800; font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase;
+            box-shadow:0 3px 10px rgba(0,0,0,0.4);
+        }
+        .ribbon-high span   { background:linear-gradient(90deg,#ff2bd6,#ff342b); }
+        .ribbon-mid span    { background:linear-gradient(90deg,#ffb020,#ff6a20); }
+        .ribbon-low span    { background:linear-gradient(90deg,#00e5ff,#00ff9d); }
+
+        /* ── Dot spinner ── */
+        .dot-spinner { --uib-size:1.6rem; --uib-speed:.9s; --uib-color: var(--fbi); position:relative; display:inline-flex; align-items:center; justify-content:flex-start; height:var(--uib-size); width:var(--uib-size); }
+        .dot-spinner__dot { position:absolute; top:0; left:0; display:flex; align-items:center; justify-content:flex-start; height:100%; width:100%; }
+        .dot-spinner__dot::before { content:''; height:20%; width:20%; border-radius:50%; background-color:var(--uib-color); transform:scale(0); opacity:.5; animation:pulse0112 calc(var(--uib-speed)*1.111) ease-in-out infinite; box-shadow:0 0 8px var(--fbi); }
+        .dot-spinner__dot:nth-child(2){transform:rotate(45deg)} .dot-spinner__dot:nth-child(2)::before{animation-delay:calc(var(--uib-speed)*-0.875)}
+        .dot-spinner__dot:nth-child(3){transform:rotate(90deg)} .dot-spinner__dot:nth-child(3)::before{animation-delay:calc(var(--uib-speed)*-0.75)}
+        .dot-spinner__dot:nth-child(4){transform:rotate(135deg)} .dot-spinner__dot:nth-child(4)::before{animation-delay:calc(var(--uib-speed)*-0.625)}
+        .dot-spinner__dot:nth-child(5){transform:rotate(180deg)} .dot-spinner__dot:nth-child(5)::before{animation-delay:calc(var(--uib-speed)*-0.5)}
+        .dot-spinner__dot:nth-child(6){transform:rotate(225deg)} .dot-spinner__dot:nth-child(6)::before{animation-delay:calc(var(--uib-speed)*-0.375)}
+        .dot-spinner__dot:nth-child(7){transform:rotate(270deg)} .dot-spinner__dot:nth-child(7)::before{animation-delay:calc(var(--uib-speed)*-0.25)}
+        .dot-spinner__dot:nth-child(8){transform:rotate(315deg)} .dot-spinner__dot:nth-child(8)::before{animation-delay:calc(var(--uib-speed)*-0.125)}
+        @keyframes pulse0112 { 0%,100%{transform:scale(0);opacity:.5} 50%{transform:scale(1);opacity:1} }
+
+        /* ═══════════════════════════════════════════════════════
+           NEW LAYOUT — App shell with rail sidebar
+        ═══════════════════════════════════════════════════════ */
+        .app-shell { height:100vh; display:flex; overflow:hidden; }
+
+        .rail {
+            width:74px; flex-shrink:0; height:100vh; display:flex; flex-direction:column; align-items:center;
+            background: linear-gradient(180deg, var(--surface), #08080b);
+            border-right:1px solid var(--border); padding:18px 0 14px; gap:4px;
+            position:relative; z-index:20;
+            transition: width .22s cubic-bezier(.4,0,.2,1);
+        }
+        .rail:hover { width:220px; }
+        .rail::after {
+            content:''; position:absolute; top:0; right:-1px; width:1px; height:100%;
+            background:linear-gradient(180deg, transparent, rgba(0,229,255,0.4), transparent);
+        }
+        .rail-logo { width:38px; height:38px; object-fit:contain; flex-shrink:0; filter:grayscale(1) brightness(1.6) drop-shadow(0 0 6px rgba(0,229,255,.5)); margin-bottom:6px; }
+        .rail-brand { display:flex; align-items:center; gap:10px; width:100%; padding:0 18px 16px; margin-bottom:8px; border-bottom:1px solid var(--border2); }
+        .rail-brand-text { font-family:var(--display); font-size:0.72rem; letter-spacing:0.12em; color:var(--fbi); white-space:nowrap; opacity:0; transition:opacity .18s; }
+        .rail:hover .rail-brand-text { opacity:1; transition-delay:.05s; }
+
+        .rail-nav { display:flex; flex-direction:column; gap:2px; width:100%; padding:0 10px; overflow-y:auto; flex:1; }
+        .rail-item {
+            display:flex; align-items:center; gap:14px; width:100%; padding:11px 12px; border-radius:10px;
+            cursor:pointer; color:var(--text3); position:relative; transition:all .15s; white-space:nowrap; overflow:hidden;
+        }
+        .rail-item i { font-size:1.02rem; width:20px; text-align:center; flex-shrink:0; }
+        .rail-item span { font-family:var(--mono); font-size:0.68rem; letter-spacing:0.09em; opacity:0; transition:opacity .15s; text-transform:uppercase; }
+        .rail:hover .rail-item span { opacity:1; }
+        .rail-item:hover { background:var(--surface2); color:var(--text2); }
+        .rail-item.rail-active { background:var(--fbi-glow); color:var(--fbi); }
+        .rail-item.rail-active::before {
+            content:''; position:absolute; left:0; top:50%; transform:translateY(-50%); width:3px; height:60%;
+            background:var(--fbi); border-radius:0 3px 3px 0; box-shadow:0 0 10px var(--fbi);
+        }
+        .rail-footer { width:100%; padding:12px 10px 0; border-top:1px solid var(--border2); display:flex; flex-direction:column; gap:8px; }
+        .rail-user { display:flex; align-items:center; gap:10px; padding:8px; border-radius:10px; overflow:hidden; }
+        .rail-user-avatar { width:30px; height:30px; border-radius:8px; background:var(--surface2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .rail-user-text { opacity:0; transition:opacity .15s; overflow:hidden; white-space:nowrap; }
+        .rail:hover .rail-user-text { opacity:1; }
+        .rail-signout { display:flex; align-items:center; gap:14px; padding:10px 12px; border-radius:10px; cursor:pointer; color:var(--danger); transition:background .15s; }
+        .rail-signout:hover { background:rgba(255,52,43,0.1); }
+        .rail-signout i { width:20px; text-align:center; flex-shrink:0; }
+        .rail-signout span { font-family:var(--mono); font-size:0.68rem; letter-spacing:0.08em; opacity:0; transition:opacity .15s; text-transform:uppercase; }
+        .rail:hover .rail-signout span { opacity:1; }
+
+        .content-col { flex:1; height:100vh; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+        .content-header {
+            flex-shrink:0; display:flex; justify-content:space-between; align-items:center;
+            padding:14px 22px; border-bottom:1px solid var(--border); background:rgba(16,16,20,0.6); backdrop-filter:blur(8px);
+        }
+        .content-scroll { flex:1; overflow-y:auto; padding:20px 22px 32px; }
+        .content-scroll > * { max-width:960px; margin:0 auto; }
+
+        @media (max-width: 720px) {
+            .rail { width:58px; padding-top:14px; }
+            .rail:hover { width:58px; }
+            .rail-brand { padding:0 0 12px; justify-content:center; }
+            .rail-item span, .rail-user-text, .rail-signout span, .rail-brand-text { display:none; }
+            .rail-item { justify-content:center; padding:12px 0; }
+            .rail-signout { justify-content:center; }
+            .content-scroll { padding:14px 12px 24px; }
+            .content-header { padding:12px 14px; }
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           NEW LOGIN — interactive stage + floating card
+        ═══════════════════════════════════════════════════════ */
+        .login-stage {
+            height:100vh; width:100vw; position:relative; overflow:hidden;
+            display:flex; align-items:center; justify-content:center;
+            background:
+                radial-gradient(ellipse 1000px 600px at var(--mx,50%) var(--my,40%), rgba(0,229,255,0.10), transparent 55%),
+                radial-gradient(ellipse 800px 500px at calc(100% - var(--mx,50%)) calc(100% - var(--my,40%)), rgba(168,85,247,0.10), transparent 55%),
+                var(--bg);
+        }
+        .login-grid {
+            position:absolute; inset:-2px;
+            background:
+                linear-gradient(to right, rgba(0,229,255,0.05) 1px, transparent 1px) 0 0 / 42px 42px,
+                linear-gradient(to bottom, rgba(0,229,255,0.05) 1px, transparent 1px) 0 0 / 42px 42px;
+            transform: translate(calc(var(--mx,50%) * -0.02px), calc(var(--my,40%) * -0.02px));
+            transition: transform .3s ease-out; pointer-events:none;
+        }
+        .login-scanline {
+            position:absolute; left:0; right:0; height:120px; pointer-events:none;
+            background:linear-gradient(180deg, transparent, rgba(0,229,255,0.06), transparent);
+            animation: scanMove 7s linear infinite;
+        }
+        @keyframes scanMove { 0%{top:-120px} 100%{top:100%} }
+        .login-orb { position:absolute; border-radius:50%; filter:blur(2px); pointer-events:none; opacity:.55; animation: orbFloat linear infinite; }
+        @keyframes orbFloat { 0%{transform:translate(0,0)} 33%{transform:translate(18px,-24px)} 66%{transform:translate(-14px,16px)} 100%{transform:translate(0,0)} }
+
+        .login-card-float {
+            position:relative; z-index:10; width:100%; max-width:378px; margin:0 20px;
+            padding:2px; border-radius:20px;
+            background: linear-gradient(135deg, rgba(0,229,255,0.5), rgba(168,85,247,0.25) 45%, rgba(0,229,255,0.08) 70%);
+            box-shadow: var(--shadow-lg);
+        }
+        .login-card-inner {
+            background: rgba(13,13,17,0.86); backdrop-filter: blur(18px) saturate(140%);
+            border-radius:18px; padding:34px 30px 28px;
+        }
+        .login-badge-ring {
+            width:76px; height:76px; border-radius:50%; margin:0 auto 16px;
+            background:radial-gradient(circle, rgba(0,229,255,0.18) 0%, rgba(168,85,247,0.08) 55%, transparent 75%);
+            display:flex; align-items:center; justify-content:center;
+            filter:drop-shadow(0 0 16px rgba(0,229,255,0.35));
+            animation: ringPulse 3s ease-in-out infinite;
+        }
+        @keyframes ringPulse { 0%,100%{filter:drop-shadow(0 0 12px rgba(0,229,255,0.28))} 50%{filter:drop-shadow(0 0 22px rgba(0,229,255,0.5))} }
     </style>
 </head>
 <body>
@@ -418,86 +594,99 @@ const App = () => {
    HOME SCREEN
 ═══════════════════════════════════════════════════════ */
 const HomeScreen = ({ onLogin, error, loading, setError }) => {
-    const [showLogin, setShowLogin] = useState(false);
     const [email, setEmail] = useState('');
+    const stageRef = useRef(null);
+    const [clock, setClock] = useState(new Date());
+
+    // Interactive parallax — background reacts to pointer position
+    useEffect(() => {
+        const el = stageRef.current;
+        if (!el) return;
+        const onMove = (e) => {
+            const r = el.getBoundingClientRect();
+            const mx = ((e.clientX - r.left) / r.width) * 100;
+            const my = ((e.clientY - r.top) / r.height) * 100;
+            el.style.setProperty('--mx', mx + '%');
+            el.style.setProperty('--my', my + '%');
+        };
+        el.addEventListener('mousemove', onMove);
+        return () => el.removeEventListener('mousemove', onMove);
+    }, []);
+
+    useEffect(() => { const t = setInterval(() => setClock(new Date()), 1000); return () => clearInterval(t); }, []);
+
+    const orbs = [
+        { top:'12%', left:'8%',  size:220, color:'rgba(0,229,255,0.14)',  dur:'16s' },
+        { top:'62%', left:'4%',  size:160, color:'rgba(168,85,247,0.14)', dur:'20s' },
+        { top:'18%', left:'86%', size:180, color:'rgba(255,43,214,0.10)', dur:'18s' },
+        { top:'70%', left:'88%', size:240, color:'rgba(0,229,255,0.10)',  dur:'22s' },
+    ];
 
     return (
-        <div className="fade-in" style={{height:'100vh',display:'flex',flexDirection:'column',overflow:'auto'}}>
-            {/* Gov banner */}
-            <div style={{background:'#000000',color:'#b8a878',padding:'6px 20px',display:'flex',justifyContent:'space-between',alignItems:'center',flexShrink:0}}>
-                <span className="mono" style={{fontSize:'0.6rem',letterSpacing:'0.15em'}}>OFFICIAL GOVERNMENT PORTAL — AUTHORIZED PERSONNEL ONLY</span>
-                <span className="mono" style={{fontSize:'0.6rem',color:'#7a6f4f'}}>{new Date().toUTCString()}</span>
+        <div ref={stageRef} className="login-stage fade-in">
+            <div className="login-grid"/>
+            <div className="login-scanline"/>
+            {orbs.map((o,i) => (
+                <div key={i} className="login-orb" style={{top:o.top,left:o.left,width:o.size,height:o.size,background:o.color,animationDuration:o.dur}}/>
+            ))}
+
+            {/* Corner status readout */}
+            <div style={{position:'absolute',top:18,left:20,zIndex:10}} className="mono">
+                <span style={{fontSize:'0.6rem',letterSpacing:'0.15em',color:'#6a6a8c'}}>CLASSIFIED NETWORK — AUTHORIZED PERSONNEL ONLY</span>
+            </div>
+            <div style={{position:'absolute',top:18,right:20,zIndex:10,textAlign:'right'}} className="mono">
+                <span style={{fontSize:'0.6rem',color:'var(--text3)'}}>{clock.toLocaleTimeString('en-US')}</span>
             </div>
 
-            {/* Hero */}
-            <div className="gov-header" style={{flex:1,display:'flex',flexDirection:'column',justifyContent:'center'}}>
-                <div style={{display:'flex',justifyContent:'center',marginBottom:32}}>
-                    <div style={{width:150,height:150,borderRadius:'50%',background:'radial-gradient(circle, rgba(232,193,74,0.12) 0%, rgba(232,193,74,0) 70%)',display:'flex',alignItems:'center',justifyContent:'center',padding:8}}>
-                        <img src={FBI_LOGO} style={{width:130,height:130,objectFit:'contain'}} alt="FBI"/>
+            {/* Floating login card */}
+            <div className="login-card-float fade-up">
+                <div className="login-card-inner">
+                    <div className="login-badge-ring">
+                        <img src={FBI_LOGO} style={{width:52,height:52,objectFit:'contain',filter:'grayscale(1) brightness(1.6) drop-shadow(0 0 6px rgba(0,229,255,0.6))'}} alt="FBI"/>
                     </div>
-                </div>
-                <h1 className="display" style={{fontSize:'clamp(2rem,7vw,3.4rem)',letterSpacing:'0.1em',marginBottom:8,color:'#f0d67a'}}>
-                    FBI
-                </h1>
-                <p className="mono" style={{color:'#8a7f5f',fontSize:'0.7rem',letterSpacing:'0.2em',marginBottom:36}}>
-                    FEDERAL BUREAU OF INVESTIGATION — v2.0
-                </p>
+                    <h1 className="display" style={{fontSize:'1.5rem',letterSpacing:'0.16em',textAlign:'center',marginBottom:2,background:'linear-gradient(90deg,#7cf5ff,#00e5ff 40%,#a855f7)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
+                        FBI
+                    </h1>
+                    <p className="mono" style={{color:'#6a6a8c',fontSize:'0.6rem',letterSpacing:'0.18em',textAlign:'center',marginBottom:24}}>
+                        SECURE TERMINAL ACCESS
+                    </p>
 
-                {!showLogin && (
-                    <button className="btn btn-primary-fbi fade-up" style={{padding:'14px 40px',fontSize:'0.9rem',letterSpacing:'0.1em',margin:'0 auto'}} onClick={() => setShowLogin(true)}>
-                        <i className="fas fa-shield-halved"/>
-                        SECURE LOGIN
-                    </button>
-                )}
-
-                {/* Animated login panel */}
-                <div style={{
-                    maxWidth:380, margin:'0 auto', width:'100%', padding:'0 20px',
-                    maxHeight: showLogin ? 480 : 0,
-                    opacity: showLogin ? 1 : 0,
-                    overflow:'hidden',
-                    transition:'max-height .45s cubic-bezier(.4,0,.2,1), opacity .35s ease .05s',
-                }}>
-                    <div className="card" style={{padding:'24px 22px',textAlign:'left',marginTop:8}}>
-                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:18}}>
-                            <span className="display" style={{fontSize:'0.95rem',letterSpacing:'0.08em',color:'var(--text)'}}>SIGN IN</span>
-                            <button className="btn btn-ghost btn-xs" onClick={() => setShowLogin(false)}><i className="fas fa-times"/></button>
-                        </div>
-                        <div style={{display:'flex',flexDirection:'column',gap:14}}>
-                            <FormField label="Email Address">
+                    <div style={{display:'flex',flexDirection:'column',gap:14}}>
+                        <FormField label="Email Address">
+                            <div className="neon-input-wrap">
                                 <input id="auth_email" type="email" className="input" placeholder="username@fbi.gov"
                                     value={email} onChange={e=>{setEmail(e.target.value); setError('');}}
                                     onKeyDown={e=>e.key==='Enter'&&onLogin()} autoComplete="off"/>
-                            </FormField>
-                            <FormField label="Password">
+                            </div>
+                        </FormField>
+                        <FormField label="Password">
+                            <div className="neon-input-wrap">
                                 <input id="auth_pass" type="password" className="input" placeholder="••••••••"
                                     onKeyDown={e=>e.key==='Enter'&&onLogin()} autoComplete="off"/>
-                            </FormField>
+                            </div>
+                        </FormField>
 
-                            {error && (
-                                <div className="alert alert-danger mono" style={{fontSize:'0.65rem',letterSpacing:'0.08em',padding:'10px 14px'}}>
-                                    <i className="fas fa-exclamation-circle" style={{marginRight:8}}/>{error}
-                                </div>
-                            )}
+                        {error && (
+                            <div className="alert alert-danger mono" style={{fontSize:'0.65rem',letterSpacing:'0.08em',padding:'10px 14px'}}>
+                                <i className="fas fa-exclamation-circle" style={{marginRight:8}}/>{error}
+                            </div>
+                        )}
 
-                            <button className="btn btn-primary-fbi" style={{width:'100%',padding:'12px'}} onClick={onLogin} disabled={loading}>
-                                {loading ? <><Spinner/> AUTHENTICATING...</> : <><i className="fas fa-fingerprint"/> AUTHENTICATE</>}
-                            </button>
-                            <p className="mono" style={{fontSize:'0.58rem',color:'var(--text3)',letterSpacing:'0.1em',textAlign:'center'}}>
-                                USE @fbi.gov TO SIGN IN
-                            </p>
-                        </div>
+                        <button className="btn btn-primary-fbi" style={{width:'100%',padding:'12px'}} onClick={onLogin} disabled={loading}>
+                            {loading ? <><Spinner/> AUTHENTICATING...</> : <><i className="fas fa-fingerprint"/> AUTHENTICATE</>}
+                        </button>
+                        <p className="mono" style={{fontSize:'0.58rem',color:'var(--text3)',letterSpacing:'0.1em',textAlign:'center'}}>
+                            USE @fbi.gov TO SIGN IN
+                        </p>
                     </div>
                 </div>
             </div>
 
             {/* Warning strip */}
-            <div style={{padding:'0 20px 28px',maxWidth:420,margin:'0 auto',width:'100%',flexShrink:0}}>
-                <div style={{padding:'16px',background:'#fffbeb',border:'1px solid #fed7aa',borderRadius:6}}>
-                    <p className="mono" style={{fontSize:'0.65rem',color:'#92400e',letterSpacing:'0.1em',textAlign:'center'}}>
-                        <i className="fas fa-triangle-exclamation" style={{marginRight:6}}/>
-                        UNAUTHORIZED ACCESS IS A CRIMINAL OFFENSE — 18 U.S.C. § 1030
-                    </p>
+            <div style={{position:'absolute',bottom:16,left:0,right:0,display:'flex',justifyContent:'center',zIndex:10,padding:'0 20px'}}>
+                <div className="mono" style={{padding:'8px 16px',background:'rgba(255,176,32,0.08)',border:'1px solid rgba(255,176,32,0.3)',borderRadius:8,fontSize:'0.6rem',color:'var(--warning)',letterSpacing:'0.08em',textAlign:'center'}}>
+                    <i className="fas fa-triangle-exclamation" style={{marginRight:6}}/>
+                    UNAUTHORIZED ACCESS IS A CRIMINAL OFFENSE — 18 U.S.C. § 1030
                 </div>
             </div>
         </div>
@@ -574,55 +763,71 @@ const SectorApp = ({ sector, currentUser, onLogout, data, activityLog, addLog, r
         { key:'logs',      icon:'fa-terminal',         label:'LOGS' },
     ];
 
-    const activeClass = 'active-fbi';
+    const activeTabMeta = NAV.find(n => n.key === activeTab);
+    const [clock, setClock] = useState(new Date());
+    useEffect(() => { const t = setInterval(() => setClock(new Date()), 1000); return () => clearInterval(t); }, []);
 
     return (
-        <div style={{height:'100vh',display:'flex',flexDirection:'column',overflow:'hidden'}}>
-            {/* Sector strip */}
-            <div style={{height:3,background:color,flexShrink:0}}/>
+        <div className="app-shell fade-in">
+            {/* Rail sidebar — hover to expand */}
+            <nav className="rail">
+                <div className="rail-brand">
+                    <img src={logo} className="rail-logo" alt="logo"/>
+                    <span className="rail-brand-text">{label} TERMINAL</span>
+                </div>
 
-            {/* Top bar — sign out moved to the left, identity to the right */}
-            <div className="topbar" style={{flexShrink:0}}>
-                <div style={{display:'flex',alignItems:'center',gap:12}}>
-                    <button className="btn btn-outline btn-sm" onClick={onLogout} style={{color:'var(--danger)',borderColor:'rgba(220,38,38,0.35)'}}>
-                        <i className="fas fa-right-from-bracket"/> Sign Out
-                    </button>
-                    <div style={{display:'flex',alignItems:'center',gap:5}}>
-                        <Dot status="green"/>
-                        <span className="mono" style={{fontSize:'0.55rem',color:'var(--text3)'}}>ONLINE</span>
+                <div className="rail-nav">
+                    {NAV.map(n => (
+                        <div key={n.key} className={`rail-item ${activeTab===n.key ? 'rail-active' : ''}`}
+                            onClick={() => setActiveTab(n.key)} title={n.label}>
+                            <i className={`fas ${n.icon}`}/>
+                            <span>{n.label}</span>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="rail-footer">
+                    <div className="rail-user">
+                        <div className="rail-user-avatar"><i className="fas fa-user-shield" style={{color,fontSize:'0.75rem'}}/></div>
+                        <div className="rail-user-text">
+                            <div style={{fontSize:'0.72rem',fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',maxWidth:130}}>{currentUser.name}</div>
+                            <div className="mono" style={{fontSize:'0.55rem',color:'var(--text3)',whiteSpace:'nowrap'}}>{currentUser.rank}</div>
+                        </div>
+                    </div>
+                    <div className="rail-signout" onClick={onLogout} title="Sign Out">
+                        <i className="fas fa-right-from-bracket"/>
+                        <span>Sign Out</span>
                     </div>
                 </div>
-                <div style={{display:'flex',alignItems:'center',gap:10,textAlign:'right'}}>
-                    <div>
-                        <div className="display" style={{fontSize:'0.9rem',letterSpacing:'0.08em',color:color}}>{label} — {currentUser.name}</div>
-                        <div className="mono" style={{fontSize:'0.55rem',color:'var(--text3)',letterSpacing:'0.1em'}}>{currentUser.rank}</div>
+            </nav>
+
+            {/* Content column */}
+            <div className="content-col">
+                <div className="content-header">
+                    <div style={{display:'flex',alignItems:'center',gap:10}}>
+                        <i className={`fas ${activeTabMeta?.icon}`} style={{color,fontSize:'0.95rem'}}/>
+                        <span className="display" style={{fontSize:'1rem',letterSpacing:'0.1em',color:'var(--text)'}}>{activeTabMeta?.label}</span>
                     </div>
-                    <img src={logo} style={{width:28,height:28,objectFit:'contain'}} alt="logo"/>
+                    <div style={{display:'flex',alignItems:'center',gap:16}}>
+                        <div style={{display:'flex',alignItems:'center',gap:5}}>
+                            <Dot status="green"/>
+                            <span className="mono" style={{fontSize:'0.55rem',color:'var(--text3)'}}>ONLINE</span>
+                        </div>
+                        <span className="mono" style={{fontSize:'0.6rem',color:'var(--text3)'}}>{clock.toLocaleTimeString('en-US')}</span>
+                    </div>
                 </div>
-            </div>
 
-            {/* Nav — horizontal pill strip under the top bar */}
-            <div className="top-nav-strip">
-                {NAV.map(n => (
-                    <div key={n.key} className={`nav-pill ${activeTab===n.key ? activeClass : 'inactive'}`}
-                        onClick={() => setActiveTab(n.key)}>
-                        <i className={`fas ${n.icon}`}/>
-                        <span>{n.label}</span>
-                    </div>
-                ))}
+                <main className="content-scroll">
+                    {activeTab === 'dashboard' && <DashboardTab sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal}/>}
+                    {activeTab === 'cases'     && <CasesTab     sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal} deleteRecord={deleteRecord} setEditItem={setEditItem} setModal={setModal}/>}
+                    {activeTab === 'wanted'    && <WantedTab    sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal} deleteRecord={deleteRecord}/>}
+                    {activeTab === 'civilians' && <CiviliansTab sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal} deleteRecord={deleteRecord} search={search} setSearch={setSearch} setModal={setModal} setEditItem={setEditItem}/>}
+                    {activeTab === 'ops'       && <OpsTab       sector={sector} data={data} color={color} currentUser={currentUser} addLog={addLog}/>}
+                    {activeTab === 'staff'     && <StaffTab     sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal} deleteRecord={deleteRecord} ranks={ranks}/>}
+                    {activeTab === 'crypto'    && <CryptoTab    color={color}/>}
+                    {activeTab === 'logs'      && <LogsTab      activityLog={activityLog} sector={sector}/>}
+                </main>
             </div>
-
-            {/* Content */}
-            <main style={{flex:1,overflowY:'auto',padding:'16px 14px 24px'}}>
-                {activeTab === 'dashboard' && <DashboardTab sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal}/>}
-                {activeTab === 'cases'     && <CasesTab     sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal} deleteRecord={deleteRecord} setEditItem={setEditItem} setModal={setModal}/>}
-                {activeTab === 'wanted'    && <WantedTab    sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal} deleteRecord={deleteRecord}/>}
-                {activeTab === 'civilians' && <CiviliansTab sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal} deleteRecord={deleteRecord} search={search} setSearch={setSearch} setModal={setModal} setEditItem={setEditItem}/>}
-                {activeTab === 'ops'       && <OpsTab       sector={sector} data={data} color={color} currentUser={currentUser} addLog={addLog}/>}
-                {activeTab === 'staff'     && <StaffTab     sector={sector} data={data} color={color} isPrivileged={isPrivileged} openModal={openModal} deleteRecord={deleteRecord} ranks={ranks}/>}
-                {activeTab === 'crypto'    && <CryptoTab    color={color}/>}
-                {activeTab === 'logs'      && <LogsTab      activityLog={activityLog} sector={sector}/>}
-            </main>
 
             {/* Modals */}
             {modal && (
@@ -647,7 +852,7 @@ const DashboardTab = ({ sector, data, color, isPrivileged, openModal }) => {
             <div className="display" style={{fontSize:'1.1rem',letterSpacing:'0.08em',color}}>DASHBOARD</div>
 
             {/* Stats grid */}
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))',gap:10}}>
                 {[
                     {label:'OPEN CASES',  val:openCases,       icon:'fa-folder-open', border:'var(--danger)'},
                     {label:'WANTED',      val:data.wanted.length, icon:'fa-crosshairs', border:color},
@@ -751,7 +956,10 @@ const WantedTab = ({ sector, data, color, isPrivileged, openModal, deleteRecord 
             <div className="card"><Empty icon="fa-crosshairs" text="NO TARGETS ON FILE"/></div>
         ) : (
             data.wanted.map(w => (
-                <div key={w.id} className="card" style={{overflow:'hidden',borderLeft:'3px solid var(--danger)'}}>
+                <div key={w.id} className="card" style={{overflow:'hidden',borderLeft:'3px solid var(--danger)',position:'relative'}}>
+                    <div className={`ribbon-wrap ${w.dangerLevel==='Extremely Dangerous'?'ribbon-high':w.dangerLevel==='Moderate'?'ribbon-mid':'ribbon-low'}`}>
+                        <span>{w.dangerLevel==='Extremely Dangerous'?'EXTREME':w.dangerLevel==='Moderate'?'MODERATE':'LOW'}</span>
+                    </div>
                     <img src={w.image} className="wanted-photo" alt="wanted"
                         onError={e => e.target.src='https://placehold.co/400x160/1a1a1a/555?text=NO+PHOTO'}/>
                     <div style={{padding:14}}>
